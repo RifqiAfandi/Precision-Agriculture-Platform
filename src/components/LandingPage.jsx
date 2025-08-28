@@ -8,7 +8,22 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Cloud, Home, ArrowRight, Leaf } from "lucide-react";
-import { Logo } from "./Logo";
+
+const Logo = ({ size = "md", variant = "default", className = "" }) => {
+  const sizeClasses = {
+    sm: "h-8",
+    md: "h-10",
+    lg: "h-12",
+  };
+
+  return (
+    <img
+      src="/Agriweb.png"
+      alt="Agriweb Logo"
+      className={`${sizeClasses[size]} ${className}`}
+    />
+  );
+};
 
 export function LandingPage({ onNavigate }) {
   const products = [

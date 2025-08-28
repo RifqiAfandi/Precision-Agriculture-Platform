@@ -1,20 +1,10 @@
 import React from "react";
-import { LandingPage } from "./components/LandingPage";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./styles/index.css";
 
-export default function App() {
-  const renderPage = () => {
-    switch (currentPage) {
-      case "landing":
-        return <LandingPage onNavigate={setCurrentPage} />;
-      default:
-        return <LandingPage onNavigate={setCurrentPage} />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      {renderPage()}
-      <Toaster />
-    </div>
-  );
-}
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
