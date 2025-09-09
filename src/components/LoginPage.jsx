@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "./ui/Card";
 import { Alert, AlertDescription } from "./ui/alert";
 import { ArrowLeft, Mail, Lock, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
@@ -24,21 +24,17 @@ export function LoginPage({ onNavigate, onLogin }) {
     setError("");
     setIsLoading(true);
 
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Simple validation
     if (!email || !password) {
       setError("Email dan password harus diisi");
       setIsLoading(false);
       return;
     }
 
-    // Demo login - accept any credentials
     if (email === "demo@agriiweb.com" && password === "demo123") {
       onLogin({ name: "Demo User", email: email });
     } else if (email && password) {
-      // Accept any email/password for demo
       const name =
         email.split("@")[0].charAt(0).toUpperCase() +
         email.split("@")[0].slice(1);
