@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/Card";
-import { Alert, AlertDescription } from "./ui/alert";
+import { Alert, AlertDescription } from "./ui/Alert";
 import {
   ArrowLeft,
   Mail,
