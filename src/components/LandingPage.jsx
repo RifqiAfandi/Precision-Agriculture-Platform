@@ -6,7 +6,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "./ui/Card";
 import { Cloud, Home, ArrowRight, Leaf } from "lucide-react";
 import { Logo } from "./Logo";
 
