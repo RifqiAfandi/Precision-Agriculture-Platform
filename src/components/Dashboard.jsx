@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/Card";
+
 import { Badge } from "./ui/badge";
 import {
   User,
@@ -14,13 +8,10 @@ import {
   Leaf,
   Cloud,
   Home,
-  Settings,
   Bell,
   Moon,
   Sun,
   Activity,
-  MapPin,
-  BarChart3,
   Calendar,
   Plus,
   Gauge,
