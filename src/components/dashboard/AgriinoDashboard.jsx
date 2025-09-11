@@ -127,14 +127,13 @@ export function AgriinoDashboard() {
   const handleAddPlant = () => {
     if (!newPlant.name || !newPlant.location) return;
 
-    // Simulate adding plant
     console.log("Adding plant:", newPlant);
     setNewPlant({ name: "", description: "", location: "" });
   };
 
   return (
     <div className="space-y-6">
-      {/* Header dengan statistik */}
+      {/* Header */}
       <div className="grid md:grid-cols-4 gap-4">
         <Card className="glass-card">
           <CardContent className="p-4">
@@ -203,7 +202,7 @@ export function AgriinoDashboard() {
           <TabsTrigger value="history">Riwayat Data</TabsTrigger>
         </TabsList>
 
-        {/* Tab: Tambah Tanaman */}
+        {/* Tab: Add Plant */}
         <TabsContent value="add" className="space-y-4">
           <Card className="glass-card">
             <CardHeader>
@@ -280,10 +279,10 @@ export function AgriinoDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Tab: Peta Monitoring */}
+        {/* Tab: Monitoring Map */}
         <TabsContent value="monitoring" className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Daftar Tanaman */}
+            {/* Add Plant */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -337,7 +336,7 @@ export function AgriinoDashboard() {
               </CardContent>
             </Card>
 
-            {/* Detail Monitoring */}
+            {/* Monitoring Detail */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle>Detail Monitoring</CardTitle>
@@ -359,7 +358,7 @@ export function AgriinoDashboard() {
 
                       return (
                         <>
-                          {/* Grafik Tren */}
+                          {/* Trend Chart */}
                           <div>
                             <h4 className="font-medium mb-3 flex items-center space-x-2">
                               <BarChart3 className="w-4 h-4" />
@@ -391,7 +390,7 @@ export function AgriinoDashboard() {
                             </div>
                           </div>
 
-                          {/* Nilai Saat Ini */}
+                          {/* Score */}
                           <div className="grid grid-cols-2 gap-4">
                             <div className="bg-green-50 p-4 rounded-lg">
                               <p className="text-sm text-green-600 mb-1">
@@ -411,7 +410,7 @@ export function AgriinoDashboard() {
                             </div>
                           </div>
 
-                          {/* Rekomendasi AI */}
+                          {/* AI Recommendation */}
                           <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
                             <h4 className="font-medium text-purple-900 mb-2 flex items-center space-x-2">
                               <AlertCircle className="w-4 h-4" />
@@ -438,7 +437,7 @@ export function AgriinoDashboard() {
           </div>
         </TabsContent>
 
-        {/* Tab: Riwayat Data */}
+        {/* Tab: Data History */}
         <TabsContent value="history" className="space-y-4">
           <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -455,7 +454,7 @@ export function AgriinoDashboard() {
               </Button>
             </CardHeader>
             <CardContent>
-              {/* Grafik Tren Keseluruhan */}
+              {/* Trend Chart */}
               <div className="mb-6">
                 <h4 className="font-medium mb-3">
                   Tren Rata-rata (9 Hari Terakhir)
@@ -478,7 +477,7 @@ export function AgriinoDashboard() {
                 </div>
               </div>
 
-              {/* Tabel Data */}
+              {/* Data Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>

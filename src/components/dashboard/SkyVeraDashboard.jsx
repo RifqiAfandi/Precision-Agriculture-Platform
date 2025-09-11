@@ -169,7 +169,7 @@ export function SkyVeraDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header dengan refresh */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
@@ -303,7 +303,7 @@ export function SkyVeraDashboard() {
             </Card>
           </div>
 
-          {/* Quick Trend Chart */}
+          {/* Trend Chart */}
           <Card className="glass-card">
             <CardHeader>
               <CardTitle>Tren 12 Jam Terakhir</CardTitle>

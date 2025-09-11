@@ -198,7 +198,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
+      {/* Header */}
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
@@ -425,7 +425,6 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
           )}
         </div>
       ) : (
-        // Empty state when no devices installed
         <Card className="glass-card text-center py-12">
           <CardContent>
             <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
