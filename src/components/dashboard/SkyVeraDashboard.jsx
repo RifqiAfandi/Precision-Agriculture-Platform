@@ -53,7 +53,7 @@ import {
   weatherInsights,
   getParameterStatus,
   getStatusLabel,
-} from "./skyvera/SkyVeraData";
+} from "./skyvera/skyveraData";
 
 export function SkyVeraDashboard() {
   const [activeTab, setActiveTab] = useState("monitoring");
