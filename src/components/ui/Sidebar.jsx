@@ -7,15 +7,15 @@ import { useIsMobile } from "./use-mobile";
 import { cn } from "./utils";
 import { Button } from "./Button";
 import { Input } from "./Input";
-import { Separator } from "./separator";
+import { Separator } from "./Separator";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "./sheet";
-import { Skeleton } from "./Skeleteon";
+} from "./Sheet";
+import { Skeleton } from "./Skeleton";
 import {
   Tooltip,
   TooltipContent,
