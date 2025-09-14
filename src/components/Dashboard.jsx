@@ -136,12 +136,12 @@ export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50/30 via-white to-blue-50/30 flex">
+    <div className="h-screen bg-gradient-to-br from-green-50/30 via-white to-blue-50/30 flex overflow-hidden">
       {/* Sidebar */}
       <div
         className={`${
           sidebarCollapsed ? "w-20" : "w-72"
-        } transition-all duration-300 bg-white/80 backdrop-blur-lg border-r border-green-100 flex flex-col`}
+        } transition-all duration-300 bg-white/80 backdrop-blur-lg border-r border-green-100 flex flex-col fixed inset-y-0 left-0 z-40`}
       >
         {/* Sidebar Header */}
         <div className="p-6 border-b border-green-100">
@@ -244,10 +244,14 @@ export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Main Content Wrapper (offset by sidebar width) */}
+      <div
+        className={`flex-1 flex flex-col transition-[margin] duration-300 ${
+          sidebarCollapsed ? "ml-20" : "ml-72"
+        }`}
+      >
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-lg border-b border-green-100 px-6 py-4">
+        <header className="bg-white/80 backdrop-blur-lg border-b border-green-100 px-6 py-4 sticky top-0 z-30">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
@@ -325,8 +329,8 @@ export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
           </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-auto p-6">{renderContent()}</main>
+        {/* Content Area (scroll container) */}
+        <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
 
       {/* Add Device Dialog */}
