@@ -24,7 +24,7 @@ export * from "./HoverCard";
 export * from "./Input";
 export * from "./InputOtp";
 export * from "./Label";
-export * from "./MenuBar";
+export * from "./MenuBar"; // now exports MenuBar* symbols
 export * from "./NavigationMenu";
 export * from "./Pagination";
 export * from "./Popover";
@@ -45,5 +45,5 @@ export * from "./TextArea";
 export * from "./Toggle";
 export * from "./ToggleGroup";
 export * from "./Tooltip";
-export * from "./use-mobile";
+export * from "./useMobile";
 export * from "./utils";
