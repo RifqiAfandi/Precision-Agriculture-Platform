@@ -51,9 +51,9 @@ export function LandingPage({ onNavigate }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6 flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 relative">
+      {/* Navbar */}
+      <header className="container mx-auto px-4 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-md border-b border-green-100">
         <Logo size="lg" variant="default" textClassName="black" />
 
         <div className="space-x-4">
@@ -65,7 +65,7 @@ export function LandingPage({ onNavigate }) {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="container mx-auto px-4 pt-32 pb-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Precision Agriculture Platform
