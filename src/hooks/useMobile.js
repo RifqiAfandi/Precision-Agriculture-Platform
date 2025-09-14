@@ -1,6 +1,8 @@
 import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768;
+// Shared responsive hook (public) -- returns boolean if viewport < MOBILE_BREAKPOINT.
+// Keep internal helpers (breakpoint constant) private to discourage magic numbers elsewhere.
+const MOBILE_BREAKPOINT = 768; // px
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState(undefined);
