@@ -135,7 +135,8 @@ export function AddDeviceDialog({ open, onOpenChange, onDeviceAdded }) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const devicesPerSlide = 3;
+  // Perlu lebih lebar & tampilkan lebih banyak kartu per slide → ubah jadi 4
+  const devicesPerSlide = 4;
   const totalSlides = Math.ceil(allDevices.length / devicesPerSlide);
 
   const getCurrentDevices = () => {
@@ -209,7 +210,8 @@ export function AddDeviceDialog({ open, onOpenChange, onDeviceAdded }) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-none w-[800px] max-h-[90vh] overflow-hidden">
+      {/* Lebarkan dialog (sebelumnya 800px) agar informasi tidak terasa sempit */}
+      <DialogContent className="max-w-none w-[1100px] max-h-[92vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {step === "select"
@@ -264,7 +266,8 @@ export function AddDeviceDialog({ open, onOpenChange, onDeviceAdded }) {
               </div>
 
               {/* Device Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[400px]">
+              {/* Lebarkan grid: pada layar sangat lebar tampilkan 4 kartu agar tidak 'gepeng' */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 min-h-[430px]">
                 {getCurrentDevices().map((device) => (
                   <Card
                     key={device.id}
