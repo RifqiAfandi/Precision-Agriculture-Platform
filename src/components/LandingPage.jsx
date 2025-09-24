@@ -53,14 +53,15 @@ export function LandingPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 relative">
       {/* Navbar */}
-      <header className="container mx-auto px-4 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-md border-b border-green-100">
-        <Logo size="lg" variant="default" textClassName="black" />
-
-        <div className="space-x-4">
-          <Button variant="ghost" onClick={() => onNavigate("login")}>
-            Masuk
-          </Button>
-          <Button onClick={() => onNavigate("register")}>Daftar</Button>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-md border-b border-green-100">
+        <div className="container mx-auto flex justify-between items-center px-6 py-4">
+          <Logo size="lg" variant="default" textClassName="black" />
+          <div className="space-x-4">
+            <Button variant="ghost" onClick={() => onNavigate("login")}>
+              Masuk
+            </Button>
+            <Button onClick={() => onNavigate("register")}>Daftar</Button>
+          </div>
         </div>
       </header>
 
