@@ -5,9 +5,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
+} from "../../ui/Card";
+import { Button } from "../../ui/Button";
+import { Badge } from "../../ui/Badge";
 import {
   Leaf,
   Home,

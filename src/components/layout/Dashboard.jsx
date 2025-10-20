@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "./ui/Button";
+import { Button } from "../ui/Button";
 
-import { Badge } from "./ui/Badge";
+import { Badge } from "../ui/Badge";
 import {
   User,
   LogOut,
@@ -16,14 +16,14 @@ import {
   Plus,
   Gauge,
 } from "lucide-react";
-import { Logo } from "./Logo";
-import { WelcomePage } from "./dashboard/WelcomePage";
-import { AgriinoDashboard } from "../features/agriino/AgriinoDashboard";
-import { AgriimeterDashboard } from "../features/agriimeter/AgriimeterDashboard";
-import { GreenhouseDashboard } from "../features/greenhouse/GreenhouseDashboard";
-import SkyVeraDashboard from "../features/skyvera/SkyVeraDashboard";
-import { ProfilePage } from "./dashboard/ProfilePage";
-import { AddDeviceDialog } from "./dashboard/AddDeviceDialog";
+import { Logo } from "../common/Logo";
+import { WelcomePage } from "./dashboardPages/WelcomePage";
+import { AgriinoDashboard } from "../../features/agriino/AgriinoDashboard";
+import { AgriimeterDashboard } from "../../features/agriimeter/AgriimeterDashboard";
+import { GreenhouseDashboard } from "../../features/greenhouse/GreenhouseDashboard";
+import SkyVeraDashboard from "../../features/skyvera/SkyVeraDashboard";
+import { ProfilePage } from "./dashboardPages/ProfilePage";
+import { AddDeviceDialog } from "./dashboardPages/AddDeviceDialog";
 
 export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");

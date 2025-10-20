@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { LandingPage } from "./components/LandingPage";
-import { LoginPage } from "./components/LoginPage";
-import { RegisterPage } from "./components/RegisterPage";
-import { Dashboard } from "./components/Dashboard";
+import { LandingPage } from "./components/layout/pages/LandingPage";
+import { LoginPage } from "./components/layout/pages/LoginPage";
+import { RegisterPage } from "./components/layout/pages/RegisterPage";
+import { Dashboard } from "./components/layout/Dashboard";
 import { Toaster } from "./components/ui/Sonner";
 
 export default function App() {

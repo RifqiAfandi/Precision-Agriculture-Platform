@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { Button } from "./ui/Button";
-import { Input } from "./ui/Input";
-import { Label } from "./ui/Label";
+import { Button } from "../../ui/Button";
+import { Input } from "../../ui/Input";
+import { Label } from "../../ui/Label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/Card";
-import { Alert, AlertDescription } from "./ui/alert";
+} from "../../ui/Card";
+import { Alert, AlertDescription } from "../../ui/Alert";
 import { ArrowLeft, Mail, Lock, AlertCircle } from "lucide-react";
-import { Logo } from "./Logo";
+import { Logo } from "../../common/Logo";
 
 export function LoginPage({ onNavigate, onLogin }) {
   const [email, setEmail] = useState("");

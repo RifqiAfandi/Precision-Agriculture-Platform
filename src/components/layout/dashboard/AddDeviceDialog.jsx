@@ -5,19 +5,19 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/Dialog";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
+} from "../../ui/Dialog";
+import { Button } from "../../ui/Button";
+import { Input } from "../../ui/Input";
+import { Label } from "../../ui/Label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/Card";
-import { Badge } from "../ui/Badge";
-import { Alert, AlertDescription } from "../ui/Alert";
+} from "../../ui/Card";
+import { Badge } from "../../ui/Badge";
+import { Alert, AlertDescription } from "../../ui/Alert";
 import {
   Home,
   Leaf,

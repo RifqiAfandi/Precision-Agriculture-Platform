@@ -5,11 +5,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
-import { Badge } from "../ui/Badge";
+} from "../../ui/Card";
+import { Button } from "../../ui/Button";
+import { Input } from "../../ui/Input";
+import { Label } from "../../ui/Label";
+import { Badge } from "../../ui/Badge";
 import {
   User,
   Mail,

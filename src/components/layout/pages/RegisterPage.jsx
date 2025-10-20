@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Button } from "./ui/Button";
-import { Input } from "./ui/Input";
-import { Label } from "./ui/Label";
+import { Button } from "../../ui/Button";
+import { Input } from "../../ui/Input";
+import { Label } from "../../ui/Label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/Card";
-import { Alert, AlertDescription } from "./ui/Alert";
+} from "../../ui/Card";
+import { Alert, AlertDescription } from "../../ui/Alert";
 import {
   ArrowLeft,
   Mail,
@@ -18,7 +18,7 @@ import {
   AlertCircle,
   Building,
 } from "lucide-react";
-import { Logo } from "./Logo";
+import { Logo } from "../../common/Logo";
 
 export function RegisterPage({ onNavigate }) {
   const [formData, setFormData] = useState({
