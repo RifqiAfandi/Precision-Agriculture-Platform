@@ -21,7 +21,7 @@ import { WelcomePage } from "./dashboard/WelcomePage";
 import { AgriinoDashboard } from "../features/agriino/AgriinoDashboard";
 import { AgriimeterDashboard } from "../features/agriimeter/AgriimeterDashboard";
 import { GreenhouseDashboard } from "../features/greenhouse/GreenhouseDashboard";
-import { SkyVeraDashboard } from "./dashboard/SkyVeraDashboard";
+import SkyVeraDashboard from "../features/skyvera/SkyVeraDashboard";
 import { ProfilePage } from "./dashboard/ProfilePage";
 import { AddDeviceDialog } from "./dashboard/AddDeviceDialog";
 
