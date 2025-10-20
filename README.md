@@ -58,29 +58,40 @@ src/
 │   │   └── utils/                # Utility functions
 │   │       └── agriimeterHelpers.js
 │   │
-│   └── greenhouse/               # ✅ Refactored (see REFACTORING_GREENHOUSE.md)
-│       ├── GreenhouseDashboard.jsx
+│   ├── greenhouse/               # ✅ Refactored (see REFACTORING_GREENHOUSE.md)
+│   │   ├── GreenhouseDashboard.jsx
+│   │   ├── components/           # Sub-components
+│   │   │   ├── MonitoringCard.jsx
+│   │   │   ├── ParameterCard.jsx
+│   │   │   ├── ControlPanel.jsx
+│   │   │   ├── TrendChart.jsx
+│   │   │   └── ActionHistoryPanel.jsx
+│   │   ├── data/                 # Data layer
+│   │   │   └── greenhouseData.js
+│   │   └── utils/                # Utility functions
+│   │       └── greenhouseHelpers.js
+│   │
+│   └── agriino/                  # ✅ Refactored (see REFACTORING_AGRIINO.md)
+│       ├── AgriinoDashboard.jsx
 │       ├── components/           # Sub-components
-│       │   ├── MonitoringCard.jsx
-│       │   ├── ParameterCard.jsx
-│       │   ├── ControlPanel.jsx
-│       │   ├── TrendChart.jsx
-│       │   └── ActionHistoryPanel.jsx
+│       │   ├── PlantCard.jsx
+│       │   ├── PlantDetailPanel.jsx
+│       │   ├── AddPlantForm.jsx
+│       │   └── HistoryTable.jsx
 │       ├── data/                 # Data layer
-│       │   └── greenhouseData.js
+│       │   └── agriinoData.js
 │       └── utils/                # Utility functions
-│           └── greenhouseHelpers.js
+│           └── agriinoHelpers.js
 │
 ├── components/
 │   ├── common/                   # Shared components
 │   │   └── StatCard.jsx          # Reusable stat card
 │   │
-│   ├── dashboard/                # Dashboard pages (to be refactored)
+│   ├── dashboard/                # Dashboard pages
 │   │   ├── WelcomePage.jsx
 │   │   ├── ProfilePage.jsx
 │   │   ├── AddDeviceDialog.jsx
-│   │   ├── AgriinoDashboard.jsx          # ⏳ Next refactor target
-│   │   └── SkyVeraDashboard.jsx          # ⏳ Next refactor target
+│   │   └── SkyVeraDashboard.jsx  # ⏳ Next refactor target
 │   │
 │   └── ui/                       # Shadcn UI components
 │       ├── Button.jsx
@@ -122,13 +133,16 @@ src/
 |-----------|--------|--------------|-------------|-----------|
 | Agriimeter | ✅ Complete | 750 | 150 | 80% |
 | Greenhouse | ✅ Complete | 280 | 140 | 50% |
-| Agriino | ⏳ Planned | 620 | ~150 | 76% |
+| Agriino | ✅ Complete | 620 | 130 | 79% |
 | SkyVera | ⏳ Planned | 600 | ~150 | 75% |
+
+**Progress: 3/4 dashboards (75%) completed! 🎉**
 
 **See detailed refactoring docs:**
 - [REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md) - Executive summary
 - [REFACTORING_AGRIIMETER.md](REFACTORING_AGRIIMETER.md) - Agriimeter full report
 - [REFACTORING_GREENHOUSE.md](REFACTORING_GREENHOUSE.md) - Greenhouse full report
+- [REFACTORING_AGRIINO.md](REFACTORING_AGRIINO.md) - Agriino full report (Best Practice)
 - [REFACTORING_VISUAL_COMPARISON.md](REFACTORING_VISUAL_COMPARISON.md) - Before/after comparison
 - [REFACTORING_GUIDE.md](REFACTORING_GUIDE.md) - Replication guide
 

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { WelcomePage } from "./dashboard/WelcomePage";
-import { AgriinoDashboard } from "./dashboard/AgriinoDashboard";
+import { AgriinoDashboard } from "../features/agriino/AgriinoDashboard";
 import { AgriimeterDashboard } from "../features/agriimeter/AgriimeterDashboard";
 import { GreenhouseDashboard } from "../features/greenhouse/GreenhouseDashboard";
 import { SkyVeraDashboard } from "./dashboard/SkyVeraDashboard";
