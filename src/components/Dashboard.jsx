@@ -20,7 +20,7 @@ import { Logo } from "./Logo";
 import { WelcomePage } from "./dashboard/WelcomePage";
 import { AgriinoDashboard } from "./dashboard/AgriinoDashboard";
 import { AgriimeterDashboard } from "../features/agriimeter/AgriimeterDashboard";
-import { GreenhouseDashboard } from "./dashboard/GreenhouseDashboard";
+import { GreenhouseDashboard } from "../features/greenhouse/GreenhouseDashboard";
 import { SkyVeraDashboard } from "./dashboard/SkyVeraDashboard";
 import { ProfilePage } from "./dashboard/ProfilePage";
 import { AddDeviceDialog } from "./dashboard/AddDeviceDialog";

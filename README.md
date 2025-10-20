@@ -46,17 +46,30 @@ src/
 │   └── main.jsx                  # Entry point
 │
 ├── features/                     # Feature-based modules
-│   └── agriimeter/               # ✅ Refactored (see REFACTORING_SUMMARY.md)
-│       ├── AgriimeterDashboard.jsx
+│   ├── agriimeter/               # ✅ Refactored (see REFACTORING_AGRIIMETER.md)
+│   │   ├── AgriimeterDashboard.jsx
+│   │   ├── components/           # Sub-components
+│   │   │   ├── TreeCard.jsx
+│   │   │   ├── TreeDetailPanel.jsx
+│   │   │   ├── AddTreeForm.jsx
+│   │   │   └── DBHHistoryTable.jsx
+│   │   ├── data/                 # Data layer
+│   │   │   └── agriimeterData.js
+│   │   └── utils/                # Utility functions
+│   │       └── agriimeterHelpers.js
+│   │
+│   └── greenhouse/               # ✅ Refactored (see REFACTORING_GREENHOUSE.md)
+│       ├── GreenhouseDashboard.jsx
 │       ├── components/           # Sub-components
-│       │   ├── TreeCard.jsx
-│       │   ├── TreeDetailPanel.jsx
-│       │   ├── AddTreeForm.jsx
-│       │   └── DBHHistoryTable.jsx
+│       │   ├── MonitoringCard.jsx
+│       │   ├── ParameterCard.jsx
+│       │   ├── ControlPanel.jsx
+│       │   ├── TrendChart.jsx
+│       │   └── ActionHistoryPanel.jsx
 │       ├── data/                 # Data layer
-│       │   └── agriimeterData.js
+│       │   └── greenhouseData.js
 │       └── utils/                # Utility functions
-│           └── agriimeterHelpers.js
+│           └── greenhouseHelpers.js
 │
 ├── components/
 │   ├── common/                   # Shared components
@@ -67,15 +80,7 @@ src/
 │   │   ├── ProfilePage.jsx
 │   │   ├── AddDeviceDialog.jsx
 │   │   ├── AgriinoDashboard.jsx          # ⏳ Next refactor target
-│   │   ├── SkyVeraDashboard.jsx          # ⏳ Next refactor target
-│   │   ├── GreenhouseDashboard.jsx       # ⏳ Next refactor target
-│   │   ├── greenhouse/
-│   │   │   ├── MonitoringCard.jsx
-│   │   │   ├── ControlPanel.jsx
-│   │   │   └── greenhouseData.js
-│   │   └── skyvera/
-│   │       ├── WeatherParameterCard.jsx
-│   │       └── skyveraData.js
+│   │   └── SkyVeraDashboard.jsx          # ⏳ Next refactor target
 │   │
 │   └── ui/                       # Shadcn UI components
 │       ├── Button.jsx
@@ -116,13 +121,14 @@ src/
 | Dashboard | Status | Lines Before | Lines After | Reduction |
 |-----------|--------|--------------|-------------|-----------|
 | Agriimeter | ✅ Complete | 750 | 150 | 80% |
-| Greenhouse | ⏳ Planned | 450 | ~120 | 73% |
+| Greenhouse | ✅ Complete | 280 | 140 | 50% |
 | Agriino | ⏳ Planned | 620 | ~150 | 76% |
 | SkyVera | ⏳ Planned | 600 | ~150 | 75% |
 
 **See detailed refactoring docs:**
 - [REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md) - Executive summary
-- [REFACTORING_AGRIIMETER.md](REFACTORING_AGRIIMETER.md) - Full report
+- [REFACTORING_AGRIIMETER.md](REFACTORING_AGRIIMETER.md) - Agriimeter full report
+- [REFACTORING_GREENHOUSE.md](REFACTORING_GREENHOUSE.md) - Greenhouse full report
 - [REFACTORING_VISUAL_COMPARISON.md](REFACTORING_VISUAL_COMPARISON.md) - Before/after comparison
 - [REFACTORING_GUIDE.md](REFACTORING_GUIDE.md) - Replication guide
 
