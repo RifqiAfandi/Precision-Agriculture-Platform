@@ -1,0 +1,122 @@
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Download, Clock } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
+import { getParameterStatus } from "../data/skyveraData";
+
+export function WeatherHistoryTable({ stations, onExport }) {
+  // Collect recent data from all stations
+  const allRecords = stations.flatMap((station) =>
+    station.history.slice(-5).map((record) => ({
+      ...record,
+      stationName: station.name,
+      stationId: station.id,
+    }))
+  );
+
+  // Sort by time (most recent first)
+  const sortedRecords = allRecords.sort((a, b) => {
+    return b.time.localeCompare(a.time);
+  });
+
+  const getAQIBadge = (aqi) => {
+    const status = getParameterStatus(aqi, "aqi");
+    const colors = {
+      good: "bg-green-100 text-green-800",
+      moderate: "bg-yellow-100 text-yellow-800",
+      unhealthy_sensitive: "bg-orange-100 text-orange-800",
+      unhealthy: "bg-red-100 text-red-800",
+    };
+    return colors[status.status] || "bg-gray-100 text-gray-800";
+  };
+
+  const getWindBadge = (wind) => {
+    if (wind <= 20) return "bg-green-100 text-green-800";
+    if (wind <= 40) return "bg-blue-100 text-blue-800";
+    if (wind <= 60) return "bg-orange-100 text-orange-800";
+    return "bg-red-100 text-red-800";
+  };
+
+  return (
+    <Card className="glass-card">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center space-x-2">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <span>Riwayat Data Cuaca</span>
+            </CardTitle>
+            <CardDescription>
+              Histori data monitoring dari semua weather station
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            onClick={onExport}
+            className="border-blue-200 hover:bg-blue-50"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Ekspor
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Waktu</TableHead>
+                <TableHead>Station</TableHead>
+                <TableHead>Suhu</TableHead>
+                <TableHead>Kelembaban</TableHead>
+                <TableHead>Angin</TableHead>
+                <TableHead>Hujan</TableHead>
+                <TableHead>AQI</TableHead>
+                <TableHead>CO₂</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedRecords.length > 0 ? (
+                sortedRecords.map((record, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell className="font-medium">{record.time}</TableCell>
+                    <TableCell>{record.stationName}</TableCell>
+                    <TableCell>{record.temp}°C</TableCell>
+                    <TableCell>{record.humidity}%</TableCell>
+                    <TableCell>
+                      <Badge className={getWindBadge(record.wind)} variant="outline">
+                        {record.wind} km/h
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{record.rainfall} mm</TableCell>
+                    <TableCell>
+                      <Badge className={getAQIBadge(record.aqi)}>
+                        {record.aqi}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{record.co2} ppm</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                    Belum ada data riwayat
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
