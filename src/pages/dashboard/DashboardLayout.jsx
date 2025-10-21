@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "../../components/ui/Button";
+import PropTypes from "prop-types";
+import { Button } from "@/components/ui/Button";
 
-import { Badge } from "../../components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import {
   User,
   LogOut,
@@ -16,16 +17,24 @@ import {
   Plus,
   Gauge,
 } from "lucide-react";
-import { Logo } from "../../components/common/Logo";
+import { Logo } from "@/components/common/Logo";
 import { WelcomePage } from "./WelcomePage";
-import { AgriinoDashboard } from "../../features/agriino/AgriinoDashboard";
-import { AgriimeterDashboard } from "../../features/agriimeter/AgriimeterDashboard";
-import { GreenhouseDashboard } from "../../features/greenhouse/GreenhouseDashboard";
-import SkyVeraDashboard from "../../features/skyvera/SkyVeraDashboard";
+import { AgriinoDashboard } from "@/features/agriino/AgriinoDashboard";
+import { AgriimeterDashboard } from "@/features/agriimeter/AgriimeterDashboard";
+import { GreenhouseDashboard } from "@/features/greenhouse/GreenhouseDashboard";
+import SkyVeraDashboard from "@/features/skyvera/SkyVeraDashboard";
 import { ProfilePage } from "./ProfilePage";
-import AddDeviceDialog from "../../features/devices/components/AddDeviceDialog";
-import { loadInstalledDevices, addDevice } from "../../features/devices/utils/devicesHelpers";
+import AddDeviceDialog from "@/features/devices/components/AddDeviceDialog";
+import { loadInstalledDevices, addDevice } from "@/features/devices/utils/devicesHelpers";
 
+/**
+ * DashboardLayout Component - Main dashboard layout with sidebar and navigation
+ * @param {Object} props - Component props
+ * @param {Object} props.user - Current user object
+ * @param {Function} props.onLogout - Logout handler
+ * @param {boolean} props.darkMode - Dark mode state
+ * @param {Function} props.toggleDarkMode - Dark mode toggle handler
+ */
 export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -128,13 +137,11 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
 
   return (
     <div className="h-screen bg-gradient-to-br from-green-50/30 via-white to-blue-50/30 flex overflow-hidden">
-      {}
       <div
         className={`${
           sidebarCollapsed ? "w-20" : "w-72"
         } transition-all duration-300 bg-white/80 backdrop-blur-lg border-r border-green-100 flex flex-col fixed inset-y-0 left-0 z-40`}
       >
-        {}
         <div className="p-6 border-b border-green-100">
           <div className="flex items-center space-x-3">
             {sidebarCollapsed ? (
@@ -145,7 +152,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
           </div>
         </div>
 
-        {}
         <nav className="flex-1 p-4">
           <div className="space-y-2">
             {menuItems.map((item) => (
@@ -196,7 +202,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
               </button>
             ))}
 
-            {}
             {!sidebarCollapsed && (
               <button
                 onClick={() => setShowAddDevice(true)}
@@ -212,7 +217,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
           </div>
         </nav>
 
-        {}
         <div className="p-4 border-t border-green-100">
           <button
             onClick={() => setCurrentPage("profile")}
@@ -235,13 +239,11 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
         </div>
       </div>
 
-      {}
       <div
         className={`flex-1 flex flex-col transition-[margin] duration-300 ${
           sidebarCollapsed ? "ml-20" : "ml-72"
         }`}
       >
-        {}
         <header className="bg-white/80 backdrop-blur-lg border-b border-green-100 px-6 py-4 sticky top-0 z-30">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -266,7 +268,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
             </div>
 
             <div className="flex items-center space-x-3">
-              {}
               <Button
                 onClick={() => setShowAddDevice(true)}
                 variant="outline"
@@ -277,7 +278,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 <span>Tambah Alat</span>
               </Button>
 
-              {}
               <Button variant="ghost" size="sm" className="relative p-2">
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
@@ -285,7 +285,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 </span>
               </Button>
 
-              {}
               <Button
                 variant="ghost"
                 size="sm"
@@ -299,7 +298,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 )}
               </Button>
 
-              {}
               <div className="flex items-center space-x-2 px-3 py-2 bg-green-50 rounded-lg">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
                 <span className="text-sm font-medium text-green-700">
@@ -307,7 +305,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 </span>
               </div>
 
-              {}
               <Button
                 variant="ghost"
                 size="sm"
@@ -320,11 +317,9 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
           </div>
         </header>
 
-        {}
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
 
-      {}
       <AddDeviceDialog
         open={showAddDevice}
         onOpenChange={setShowAddDevice}
@@ -333,3 +328,14 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
     </div>
   );
 }
+
+DashboardLayout.propTypes = {
+  user: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }).isRequired,
+  onLogout: PropTypes.func.isRequired,
+  darkMode: PropTypes.bool.isRequired,
+  toggleDarkMode: PropTypes.func.isRequired,
+};

@@ -1,18 +1,25 @@
 import React, { useState } from "react";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
+import PropTypes from "prop-types";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Alert, AlertDescription } from "../../components/ui/Alert";
+} from "@/components/ui/Card";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { ArrowLeft, Mail, Lock, AlertCircle } from "lucide-react";
-import { Logo } from "../../components/common/Logo";
+import { Logo } from "@/components/common/Logo";
 
+/**
+ * LoginPage Component - User login page
+ * @param {Object} props - Component props
+ * @param {Function} props.onNavigate - Navigation handler
+ * @param {Function} props.onLogin - Login success handler
+ */
 export function LoginPage({ onNavigate, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +56,6 @@ export function LoginPage({ onNavigate, onLogin }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
@@ -62,7 +68,6 @@ export function LoginPage({ onNavigate, onLogin }) {
           </p>
         </div>
 
-        {}
         <Card className="glass-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Masuk</CardTitle>
@@ -120,7 +125,6 @@ export function LoginPage({ onNavigate, onLogin }) {
               </Button>
             </form>
 
-            {}
             <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
               <p className="font-medium mb-1">Demo Login:</p>
               <p>Email: demo@agriiweb.com</p>
@@ -144,7 +148,6 @@ export function LoginPage({ onNavigate, onLogin }) {
           </CardContent>
         </Card>
 
-        {}
         <div className="text-center mt-6">
           <Button
             variant="ghost"
@@ -159,3 +162,8 @@ export function LoginPage({ onNavigate, onLogin }) {
     </div>
   );
 }
+
+LoginPage.propTypes = {
+  onNavigate: PropTypes.func.isRequired,
+  onLogin: PropTypes.func.isRequired,
+};

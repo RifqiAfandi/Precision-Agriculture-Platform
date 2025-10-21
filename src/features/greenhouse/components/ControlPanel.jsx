@@ -13,7 +13,6 @@ export function ControlPanel({
 }) {
   return (
     <div className="space-y-6">
-      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -35,8 +34,6 @@ export function ControlPanel({
           </div>
         </CardContent>
       </Card>
-
-      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle>Kontrol Perangkat</CardTitle>

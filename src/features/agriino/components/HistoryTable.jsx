@@ -56,7 +56,6 @@ export function HistoryTable({ plants }) {
         </Button>
       </CardHeader>
       <CardContent>
-        {}
         <div className="mb-6">
           <h4 className="font-medium mb-3">
             Tren Rata-rata ({historicalData.length} Hari Terakhir)
@@ -74,8 +73,6 @@ export function HistoryTable({ plants }) {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

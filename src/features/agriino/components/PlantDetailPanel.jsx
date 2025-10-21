@@ -24,7 +24,6 @@ export function PlantDetailPanel({ plant }) {
 
   return (
     <div className="space-y-6">
-      {}
       <div>
         <h4 className="font-medium mb-3 flex items-center space-x-2">
           <BarChart3 className="w-4 h-4" />
@@ -55,8 +54,6 @@ export function PlantDetailPanel({ plant }) {
           </ResponsiveContainer>
         </div>
       </div>
-
-      {}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-green-50 p-4 rounded-lg">
           <p className="text-sm text-green-600 mb-1">Indeks Klorofil</p>
@@ -69,8 +66,6 @@ export function PlantDetailPanel({ plant }) {
           <p className="text-2xl font-bold text-blue-800">{plant.nitrogen}</p>
         </div>
       </div>
-
-      {}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
         <h4 className="font-medium text-purple-900 mb-2 flex items-center space-x-2">
           <AlertCircle className="w-4 h-4" />

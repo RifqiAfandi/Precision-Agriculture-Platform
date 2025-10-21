@@ -5,11 +5,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs";
+} from "@/components/ui/Card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { MapPin } from "lucide-react";
 import { plants, getAgriinoStats, getPlantById } from "./data/agriinoData";
-import { StatCard } from "../../components/common/StatCard";
+import { StatCard } from "@/components/common/StatCard";
 import { PlantCard } from "./components/PlantCard";
 import { PlantDetailPanel } from "./components/PlantDetailPanel";
 import { AddPlantForm } from "./components/AddPlantForm";
@@ -26,14 +26,13 @@ export function AgriinoDashboard() {
 
   const stats = getAgriinoStats();
   const selectedPlant = getPlantById(selectedPlantId);
-  const handleAddPlant = (plantData) => {
-    console.log("Adding plant:", plantData);
+  
+  const handleAddPlant = () => {
     setActiveTab("monitoring");
   };
 
   return (
     <div className="space-y-6">
-      {}
       <div className="grid md:grid-cols-4 gap-4">
         <StatCard
           icon={Leaf}
@@ -63,24 +62,17 @@ export function AgriinoDashboard() {
           value={stats.needsAttention}
         />
       </div>
-
-      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="add">Tambah Tanaman</TabsTrigger>
           <TabsTrigger value="monitoring">Peta Monitoring</TabsTrigger>
           <TabsTrigger value="history">Riwayat Data</TabsTrigger>
         </TabsList>
-
-        {}
         <TabsContent value="add">
           <AddPlantForm onSubmit={handleAddPlant} />
         </TabsContent>
-
-        {}
         <TabsContent value="monitoring" className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
-            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -102,8 +94,6 @@ export function AgriinoDashboard() {
                 ))}
               </CardContent>
             </Card>
-
-            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle>Detail Monitoring</CardTitle>
@@ -119,8 +109,6 @@ export function AgriinoDashboard() {
             </Card>
           </div>
         </TabsContent>
-
-        {}
         <TabsContent value="history">
           <HistoryTable plants={plants} />
         </TabsContent>

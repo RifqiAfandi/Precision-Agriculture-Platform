@@ -119,8 +119,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
               Complete
             </TabsTrigger>
           </TabsList>
-
-          {}
           <TabsContent value="select" className="space-y-4 mt-6">
             {availableDevices.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -181,12 +179,9 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
               </Alert>
             )}
           </TabsContent>
-
-          {}
           <TabsContent value="configure" className="space-y-6 mt-6">
             {selectedDevice && (
               <>
-                {}
                 <div className={`p-4 ${selectedDevice.color.light} rounded-lg border ${selectedDevice.color.border}`}>
                   <div className="flex items-center space-x-3">
                     {(() => {
@@ -203,8 +198,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
                     </div>
                   </div>
                 </div>
-
-                {}
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="serialNumber">Serial Number *</Label>
@@ -244,8 +237,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
                     />
                   </div>
                 </div>
-
-                {}
                 <div className="flex justify-between pt-4">
                   <Button variant="outline" onClick={() => setActiveTab("select")}>
                     Back
@@ -268,8 +259,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
               </>
             )}
           </TabsContent>
-
-          {}
           <TabsContent value="success" className="space-y-6 mt-6">
             <div className="text-center py-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">

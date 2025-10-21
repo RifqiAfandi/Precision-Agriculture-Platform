@@ -33,7 +33,6 @@ const DeviceList = ({
 
   return (
     <div className="space-y-4">
-      {}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
         <div className="flex items-center gap-2">
@@ -50,8 +49,6 @@ const DeviceList = ({
           </Button>
         </div>
       </div>
-
-      {}
       {(showSearch || showFilters) && (
         <div className="flex flex-col md:flex-row gap-3">
           {showSearch && (
@@ -91,8 +88,6 @@ const DeviceList = ({
           )}
         </div>
       )}
-
-      {}
       {sortedDevices.length > 0 ? (
         <div
           className={
@@ -120,8 +115,6 @@ const DeviceList = ({
           </p>
         </div>
       )}
-
-      {}
       <div className="text-sm text-gray-500 text-center">
         Showing {sortedDevices.length} of {devices.length} devices
         {installedDevices.length > 0 && ` (${installedDevices.length} installed)`}

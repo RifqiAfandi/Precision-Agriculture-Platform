@@ -31,7 +31,6 @@ export function TreeDetailPanel({ tree, onMeasure }) {
 
   return (
     <div className="space-y-6">
-      {}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-green-50 p-4 rounded-lg">
           <p className="text-sm text-green-600 mb-1">DBH Saat Ini</p>
@@ -51,8 +50,6 @@ export function TreeDetailPanel({ tree, onMeasure }) {
           <p className="text-xs text-blue-600 mt-1">Biomassa kayu</p>
         </div>
       </div>
-
-      {}
       <div>
         <h4 className="font-medium mb-3 flex items-center space-x-2">
           <BarChart3 className="w-4 h-4" />
@@ -76,8 +73,6 @@ export function TreeDetailPanel({ tree, onMeasure }) {
           </ResponsiveContainer>
         </div>
       </div>
-
-      {}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
         <h4 className="font-medium text-purple-900 mb-2 flex items-center space-x-2">
           <Target className="w-4 h-4" />
@@ -97,8 +92,6 @@ export function TreeDetailPanel({ tree, onMeasure }) {
           </p>
         </div>
       </div>
-
-      {}
       <Button
         onClick={() => onMeasure(tree.id)}
         className="w-full bg-blue-600 hover:bg-blue-700"

@@ -5,11 +5,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
-import { Badge } from "../../components/ui/Badge";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Badge } from "@/components/ui/Badge";
 import {
   User,
   Mail,
@@ -88,7 +88,6 @@ export function ProfilePage({ user }) {
 
   return (
     <div className="max-w-4xl space-y-6">
-      {}
       <Card className="glass-card">
         <CardContent className="p-6">
           <div className="flex items-center space-x-6">
@@ -114,7 +113,6 @@ export function ProfilePage({ user }) {
       </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {}
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -159,8 +157,6 @@ export function ProfilePage({ user }) {
             </div>
           </CardContent>
         </Card>
-
-        {}
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -261,8 +257,6 @@ export function ProfilePage({ user }) {
           </CardContent>
         </Card>
       </div>
-
-      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">

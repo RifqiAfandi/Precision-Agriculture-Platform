@@ -1,5 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
 
+/**
+ * Logo Component - Displays the AgriiWeb logo with optional text
+ * @param {Object} props - Component props
+ * @param {string} props.size - Size of the logo (sm, md, lg, xl)
+ * @param {string} props.className - Additional CSS classes
+ * @param {boolean} props.showText - Whether to show the text next to logo
+ * @param {string} props.textClassName - CSS classes for the text
+ * @param {string} props.variant - Color variant (default, white, dark)
+ */
 export function Logo({
   size = "md",
   className = "",
@@ -55,10 +65,29 @@ export function Logo({
   );
 }
 
+Logo.propTypes = {
+  size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
+  className: PropTypes.string,
+  showText: PropTypes.bool,
+  textClassName: PropTypes.string,
+  variant: PropTypes.oneOf(["default", "white", "dark"]),
+};
+
+/**
+ * LogoIcon - Logo without text
+ */
 export function LogoIcon({ size = "md", className = "" }) {
   return <Logo size={size} className={className} showText={false} />;
 }
 
+LogoIcon.propTypes = {
+  size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
+  className: PropTypes.string,
+};
+
+/**
+ * LogoWithText - Logo with text (explicit)
+ */
 export function LogoWithText({
   size = "md",
   className = "",
@@ -75,3 +104,10 @@ export function LogoWithText({
     />
   );
 }
+
+LogoWithText.propTypes = {
+  size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
+  className: PropTypes.string,
+  textClassName: PropTypes.string,
+  variant: PropTypes.oneOf(["default", "white", "dark"]),
+};

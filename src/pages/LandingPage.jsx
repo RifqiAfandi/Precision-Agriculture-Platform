@@ -1,15 +1,21 @@
 import React from "react";
-import { Button } from "../components/ui/Button";
+import PropTypes from "prop-types";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../components/ui/Card";
+} from "@/components/ui/Card";
 import { Cloud, Home, ArrowRight, Leaf } from "lucide-react";
-import { Logo } from "../components/common/Logo";
+import { Logo } from "@/components/common/Logo";
 
+/**
+ * LandingPage Component - Main landing page for the application
+ * @param {Object} props - Component props
+ * @param {Function} props.onNavigate - Navigation handler function
+ */
 export function LandingPage({ onNavigate }) {
   const products = [
     {
@@ -52,7 +58,6 @@ export function LandingPage({ onNavigate }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 relative">
-      {}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-md border-b border-green-100">
         <div className="container mx-auto flex justify-between items-center px-6 py-4">
           <Logo size="lg" variant="default" textClassName="black" />
@@ -74,7 +79,6 @@ export function LandingPage({ onNavigate }) {
         </div>
       </header>
 
-      {}
       <section className="container mx-auto px-4 pt-32 pb-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -108,7 +112,6 @@ export function LandingPage({ onNavigate }) {
           </div>
         </div>
 
-        {}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-20 h-20 bg-green-100 rounded-full animate-float opacity-60"></div>
           <div
@@ -122,7 +125,6 @@ export function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      {}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -136,7 +138,7 @@ export function LandingPage({ onNavigate }) {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {products.map((product, index) => (
+          {products.map((product) => (
             <Card
               key={product.name}
               className="glass-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0"
@@ -174,7 +176,6 @@ export function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      {}
       <section className="bg-gradient-to-r from-green-500 to-green-600 py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 text-center text-white">
@@ -194,7 +195,6 @@ export function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      {}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -214,7 +214,6 @@ export function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      {}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
@@ -265,3 +264,7 @@ export function LandingPage({ onNavigate }) {
     </div>
   );
 }
+
+LandingPage.propTypes = {
+  onNavigate: PropTypes.func.isRequired,
+};

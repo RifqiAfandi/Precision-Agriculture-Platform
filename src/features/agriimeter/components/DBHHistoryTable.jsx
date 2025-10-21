@@ -45,7 +45,6 @@ export function DBHHistoryTable({ trees, onExport }) {
         </Button>
       </CardHeader>
       <CardContent>
-        {}
         <div className="mb-6">
           <h4 className="font-medium mb-3">Rata-rata Pertumbuhan DBH</h4>
           <div className="h-64">
@@ -60,8 +59,6 @@ export function DBHHistoryTable({ trees, onExport }) {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

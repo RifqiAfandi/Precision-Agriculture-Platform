@@ -62,7 +62,6 @@ const DeviceStatus = ({
   return (
     <Card>
       <CardContent className="p-6 space-y-4">
-        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <connectionStatus.icon className={`w-6 h-6 ${connectionStatus.color}`} />
@@ -82,10 +81,7 @@ const DeviceStatus = ({
             </div>
           )}
         </div>
-
-        {}
         <div className="grid grid-cols-2 gap-4">
-          {}
           {metrics.uptime !== undefined && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gray-400" />
@@ -95,8 +91,6 @@ const DeviceStatus = ({
               </div>
             </div>
           )}
-
-          {}
           {metrics.signalStrength !== undefined && (
             <div className="flex items-center gap-2">
               <Signal className="w-4 h-4 text-gray-400" />
@@ -106,8 +100,6 @@ const DeviceStatus = ({
               </div>
             </div>
           )}
-
-          {}
           {metrics.batteryLevel !== undefined && (
             <div className="flex items-center gap-2">
               {metrics.isCharging ? (
@@ -129,8 +121,6 @@ const DeviceStatus = ({
               </div>
             </div>
           )}
-
-          {}
           {metrics.errorRate !== undefined && (
             <div className="flex items-center gap-2">
               <AlertTriangle
@@ -149,8 +139,6 @@ const DeviceStatus = ({
             </div>
           )}
         </div>
-
-        {}
         {metrics.lastSeen && (
           <div className="pt-3 border-t">
             <p className="text-xs text-gray-500">
@@ -158,8 +146,6 @@ const DeviceStatus = ({
             </p>
           </div>
         )}
-
-        {}
         {(metrics.dataReceived || metrics.dataSent) && (
           <div className="pt-3 border-t">
             <div className="flex justify-between text-xs text-gray-500">

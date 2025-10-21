@@ -1,7 +1,19 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Card, CardContent } from "../ui/Card";
+
+/**
+ * StatCard Component - Displays a statistic with an icon
+ * @param {Object} props - Component props
+ * @param {React.ComponentType} props.icon - Lucide icon component
+ * @param {string} props.iconColor - Tailwind classes for icon background and text color
+ * @param {string} props.label - Label text for the statistic
+ * @param {string|number} props.value - The value to display
+ * @param {string} props.unit - Optional unit to display after value
+ * @param {string} props.className - Additional CSS classes
+ */
 export function StatCard({
-  icon: Icon,
+  icon: IconComponent,
   iconColor = "bg-gray-100 text-gray-600",
   label,
   value,
@@ -18,7 +30,7 @@ export function StatCard({
           <div
             className={`w-10 h-10 ${bgColorClass} rounded-lg flex items-center justify-center flex-shrink-0`}
           >
-            <Icon className={`w-5 h-5 ${textColorClass}`} />
+            <IconComponent className={`w-5 h-5 ${textColorClass}`} />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-gray-500 truncate">{label}</p>
@@ -36,3 +48,12 @@ export function StatCard({
     </Card>
   );
 }
+
+StatCard.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  iconColor: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  unit: PropTypes.string,
+  className: PropTypes.string,
+};

@@ -78,7 +78,6 @@ onClick={() => onNavigate && onNavigate(device.id)}>
       </CardHeader>
 
       <CardContent>
-        {}
         <div className="space-y-2 mb-4">
           {device.features.slice(0, 3).map((feature, index) => (
             <div key={index} className="flex items-start space-x-2 text-sm">
@@ -87,8 +86,6 @@ onClick={() => onNavigate && onNavigate(device.id)}>
             </div>
           ))}
         </div>
-
-        {}
         {variant === "detailed" && device.specifications && (
           <div className={`mb-4 p-3 ${device.color.light} rounded-lg`}>
             <h4 className="text-xs font-semibold text-gray-700 mb-2">Specifications</h4>
@@ -102,8 +99,6 @@ onClick={() => onNavigate && onNavigate(device.id)}>
             </div>
           </div>
         )}
-
-        {}
         {showActions && (
           <div className="flex gap-2 mt-4">
             {isInstalled ? (
@@ -141,8 +136,6 @@ onClick={() => onNavigate && onNavigate(device.id)}>
             )}
           </div>
         )}
-
-        {}
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
           <span className="capitalize">{device.category}</span>
           {device.specifications?.connectivity && (

@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Alert, AlertDescription } from "../../components/ui/Alert";
+} from "@/components/ui/Card";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import {
   ArrowLeft,
   Mail,
@@ -18,7 +18,7 @@ import {
   AlertCircle,
   Building,
 } from "lucide-react";
-import { Logo } from "../../components/common/Logo";
+import { Logo } from "@/components/common/Logo";
 
 export function RegisterPage({ onNavigate }) {
   const [formData, setFormData] = useState({
@@ -68,7 +68,6 @@ export function RegisterPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
@@ -80,8 +79,6 @@ export function RegisterPage({ onNavigate }) {
             Bergabung dengan platform IoT pertanian terdepan
           </p>
         </div>
-
-        {}
         <Card className="glass-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Buat Akun</CardTitle>
@@ -216,8 +213,6 @@ export function RegisterPage({ onNavigate }) {
             </div>
           </CardContent>
         </Card>
-
-        {}
         <div className="text-center mt-6">
           <Button
             variant="ghost"

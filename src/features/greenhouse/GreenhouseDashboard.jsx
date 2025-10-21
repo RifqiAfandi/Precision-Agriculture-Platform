@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Badge } from "../../components/ui/Badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs";
+import { Badge } from "@/components/ui/Badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Home, Thermometer, Droplets, Activity, TrendingUp, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -72,7 +72,6 @@ export function GreenhouseDashboard() {
 
   return (
     <div className="space-y-6">
-      {}
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
@@ -98,19 +97,14 @@ export function GreenhouseDashboard() {
           </div>
         </div>
       </div>
-
-      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="monitoring">Dashboard Monitoring</TabsTrigger>
           <TabsTrigger value="control">Halaman Kendali</TabsTrigger>
           <TabsTrigger value="history">Riwayat</TabsTrigger>
         </TabsList>
-
-        {}
         <TabsContent value="monitoring" className="space-y-6">
           <div className="grid md:grid-cols-3 gap-6">
-            {}
             <MonitoringCard
               title="Suhu Greenhouse"
               icon={Thermometer}
@@ -140,8 +134,6 @@ export function GreenhouseDashboard() {
                 </div>
               }
             />
-
-            {}
             <MonitoringCard
               title="Kelembaban"
               icon={Droplets}
@@ -165,8 +157,6 @@ export function GreenhouseDashboard() {
                 </div>
               }
             />
-
-            {}
             <ParameterCard
               title="CO₂ Level"
               icon={Activity}
@@ -177,8 +167,6 @@ export function GreenhouseDashboard() {
               description={getRecommendation("co2", currentData.co2Level)}
             />
           </div>
-
-          {}
           <TrendChart
             title="Tren 24 Jam Terakhir"
             description="Suhu, kelembaban, dan CO₂ level"
@@ -186,8 +174,6 @@ export function GreenhouseDashboard() {
             lines={trendLines}
           />
         </TabsContent>
-
-        {}
         <TabsContent value="control">
           <ControlPanel
             autoMode={autoMode}
@@ -196,8 +182,6 @@ export function GreenhouseDashboard() {
             onAutoModeToggle={toggleAutoMode}
           />
         </TabsContent>
-
-        {}
         <TabsContent value="history">
           <ActionHistoryPanel history={actionHistory} />
         </TabsContent>

@@ -16,11 +16,11 @@ export function AgriimeterDashboard() {
 
   const stats = getTreeStatistics(trees);
 
-  const handleAddTree = (treeData) => {
-    console.log("Adding tree:", treeData);
+  const handleAddTree = () => {
+    toast.success("Pohon berhasil ditambahkan!");
   };
 
-  const handleMeasureDBH = (treeId) => {
+  const handleMeasureDBH = () => {
     toast.success("Pengukuran DBH berhasil disimpan!");
   };
 
@@ -32,7 +32,6 @@ export function AgriimeterDashboard() {
 
   return (
     <div className="space-y-6">
-      {}
       <div className="grid md:grid-cols-4 gap-4">
         <StatCard
           icon={TreePine}
@@ -61,24 +60,17 @@ export function AgriimeterDashboard() {
           unit="m³"
         />
       </div>
-
-      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="add">Tambah Pohon</TabsTrigger>
           <TabsTrigger value="monitoring">Peta Monitoring</TabsTrigger>
           <TabsTrigger value="history">Riwayat DBH</TabsTrigger>
         </TabsList>
-
-        {}
         <TabsContent value="add" className="space-y-4">
           <AddTreeForm onSubmit={handleAddTree} />
         </TabsContent>
-
-        {}
         <TabsContent value="monitoring" className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
-            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -100,8 +92,6 @@ export function AgriimeterDashboard() {
                 ))}
               </CardContent>
             </Card>
-
-            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle>Detail Pertumbuhan DBH</CardTitle>
@@ -120,8 +110,6 @@ export function AgriimeterDashboard() {
             </Card>
           </div>
         </TabsContent>
-
-        {}
         <TabsContent value="history" className="space-y-4">
           <DBHHistoryTable trees={trees} onExport={handleExportData} />
         </TabsContent>
