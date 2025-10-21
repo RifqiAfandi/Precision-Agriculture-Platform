@@ -7,13 +7,10 @@ import {
 } from "../utils/agriimeterHelpers";
 
 /**
- * TreeCard component untuk menampilkan informasi pohon individual
- * Digunakan di monitoring tab untuk list pohon
- * 
  * @param {Object} props
- * @param {Object} props.tree - Tree data object
- * @param {boolean} props.isSelected - Whether this tree is selected
- * @param {Function} props.onClick - Click handler
+ * @param {Object} props.tree
+ * @param {boolean} props.isSelected
+ * @param {Function} props.onClick
  */
 export function TreeCard({ tree, isSelected = false, onClick }) {
   const getGrowthIcon = () => {

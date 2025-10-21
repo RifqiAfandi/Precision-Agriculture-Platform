@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "./pages";
-import { Toaster } from "./components/ui/Sonner";
+import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "../pages";
+import { Toaster } from "../components/ui/Sonner";
 
 export default function App() {
-  // currentPage: "landing" | "login" | "register" | "dashboard"
   const [currentPage, setCurrentPage] = useState("landing");
-  // user = { id, name, email } | null
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check for saved user session
     const savedUser = localStorage.getItem("agri-user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setCurrentPage("dashboard");
     }
 
-    // Check for dark mode preference
     const savedDarkMode = localStorage.getItem("agri-dark-mode");
     if (savedDarkMode === "true") {
       setDarkMode(true);

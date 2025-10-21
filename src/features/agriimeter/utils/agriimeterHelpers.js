@@ -1,9 +1,6 @@
-// Helper functions untuk Agriimeter Dashboard
-
 /**
- * Get status badge color based on tree status
- * @param {string} status - Tree status (optimal, growing, slow, stagnant)
- * @returns {string} Tailwind classes for badge styling
+ * @param {string} status
+ * @returns {string}
  */
 export const getStatusColor = (status) => {
   switch (status) {
@@ -21,9 +18,8 @@ export const getStatusColor = (status) => {
 };
 
 /**
- * Get human-readable status label
- * @param {string} status - Tree status
- * @returns {string} Label in Indonesian
+ * @param {string} status
+ * @returns {string}
  */
 export const getStatusLabel = (status) => {
   switch (status) {
@@ -41,11 +37,10 @@ export const getStatusLabel = (status) => {
 };
 
 /**
- * Calculate estimated time to reach target DBH
- * @param {number} currentDBH - Current diameter
- * @param {number} targetDBH - Target diameter
- * @param {number} growthRate - Growth rate per month
- * @returns {number} Months to reach target
+ * @param {number} currentDBH
+ * @param {number} targetDBH
+ * @param {number} growthRate
+ * @returns {number} 
  */
 export const calculateTimeToTarget = (currentDBH, targetDBH, growthRate) => {
   if (growthRate <= 0) return Infinity;

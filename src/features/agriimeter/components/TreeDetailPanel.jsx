@@ -18,12 +18,9 @@ import {
 import { growthData } from "../data/agriimeterData";
 
 /**
- * TreeDetailPanel component untuk menampilkan detail pertumbuhan pohon
- * Includes chart, metrics, AI analysis, dan action buttons
- * 
  * @param {Object} props
- * @param {Object} props.tree - Selected tree data
- * @param {Function} props.onMeasure - Handler untuk simulasi pengukuran DBH
+ * @param {Object} props.tree
+ * @param {Function} props.onMeasure
  */
 export function TreeDetailPanel({ tree, onMeasure }) {
   if (!tree) {

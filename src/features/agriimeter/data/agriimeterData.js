@@ -1,6 +1,3 @@
-// Mock data untuk Agriimeter Dashboard
-// Data ini nantinya akan diganti dengan API calls
-
 export const trees = [
   {
     id: "1",
@@ -71,7 +68,6 @@ export const speciesOptions = [
   "Pinus",
 ];
 
-// Summary statistics (bisa dihitung dinamis dari trees array)
 export const getTreeStatistics = (treesData = trees) => {
   const totalTrees = treesData.length;
   const avgDBH = (

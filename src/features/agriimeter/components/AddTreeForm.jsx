@@ -22,11 +22,8 @@ import { speciesOptions } from "../data/agriimeterData";
 import { validateTreeForm } from "../utils/agriimeterHelpers";
 
 /**
- * AddTreeForm component untuk form pendaftaran pohon baru
- * Includes validation dan GPS auto-detection info
- * 
  * @param {Object} props
- * @param {Function} props.onSubmit - Handler ketika form disubmit
+ * @param {Function} props.onSubmit
  */
 export function AddTreeForm({ onSubmit }) {
   const [formData, setFormData] = useState({

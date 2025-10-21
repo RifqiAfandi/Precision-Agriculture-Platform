@@ -26,12 +26,9 @@ import {
 import { growthData } from "../data/agriimeterData";
 
 /**
- * DBHHistoryTable component untuk menampilkan riwayat pengukuran DBH
- * Includes overview chart dan data table
- * 
  * @param {Object} props
- * @param {Array} props.trees - Array of tree objects
- * @param {Function} props.onExport - Handler untuk export data
+ * @param {Array} props.trees
+ * @param {Function} props.onExport
  */
 export function DBHHistoryTable({ trees, onExport }) {
   return (

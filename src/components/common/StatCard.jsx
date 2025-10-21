@@ -1,16 +1,13 @@
 import React from "react";
 import { Card, CardContent } from "../ui/Card";
 
-/**
- * Reusable StatCard component untuk menampilkan metric/statistik
- * Digunakan di header semua dashboard
- * 
+/** 
  * @param {Object} props
  * @param {React.Component} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind color classes (e.g., "bg-green-100 text-green-600")
+ * @param {string} props.iconColor - Tailwind color classes
  * @param {string} props.label - Label statistik
  * @param {string|number} props.value - Nilai statistik
- * @param {string} props.unit - Unit (opsional, e.g., "cm", "%", "m³")
+ * @param {string} props.unit - Unit 
  * @param {string} props.className - Additional classes
  */
 export function StatCard({
@@ -21,7 +18,6 @@ export function StatCard({
   unit,
   className = "",
 }) {
-  // Extract bg and text colors from iconColor string
   const bgColorClass = iconColor.split(" ").find((c) => c.startsWith("bg-")) || "bg-gray-100";
   const textColorClass = iconColor.split(" ").find((c) => c.startsWith("text-")) || "text-gray-600";
 
