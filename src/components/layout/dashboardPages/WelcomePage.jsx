@@ -24,6 +24,8 @@ import {
   Wind,
   Thermometer,
 } from "lucide-react";
+import { DeviceCard } from "../../../features/devices";
+import { getInstalledDevices, getAvailableDevices, getDeviceById, deviceCatalog } from "../../../features/devices/data/devicesData";
 
 export function WelcomePage({ user, onNavigate, installedDevices }) {
   const dashboardStats = [
@@ -71,81 +73,24 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
   ];
 
   const getProductStatus = () => {
-    const products = [];
-
-    if (installedDevices.includes("agriino")) {
-      products.push({
-        id: "agriino",
-        name: "Agriino",
-        description: "Monitoring Klorofil & Nitrogen",
-        icon: Leaf,
-        status: "active",
-        devices: 5,
-        lastUpdate: "2 menit lalu",
-        alerts: 1,
-        data: {
-          avgChlorophyll: 45.2,
-          avgNitrogen: 2.8,
-          recommendations: 3,
-        },
-      });
-    }
-
-    if (installedDevices.includes("agriimeter")) {
-      products.push({
-        id: "agriimeter",
-        name: "Agriimeter",
-        description: "Pengukur DBH Pohon",
-        icon: TreePine,
-        status: "active",
-        devices: 3,
-        lastUpdate: "5 menit lalu",
-        alerts: 0,
-        data: {
-          avgDBH: 18.8,
-          totalTrees: 3,
-          growthRate: 0.4,
-        },
-      });
-    }
-
-    if (installedDevices.includes("greenhouse")) {
-      products.push({
-        id: "greenhouse",
-        name: "Greenhouse Compax",
-        description: "Monitoring Rumah Kaca",
-        icon: Home,
-        status: "active",
-        devices: 1,
-        lastUpdate: "1 menit lalu",
-        alerts: 0,
-        data: {
-          insideTemp: 26.8,
-          co2Level: 420,
-          ventilation: "Auto",
-        },
-      });
-    }
-
-    if (installedDevices.includes("skyvera")) {
-      products.push({
-        id: "skyvera",
-        name: "SkyVera",
-        description: "Weather Station Professional",
-        icon: Gauge,
-        status: "active",
-        devices: 1,
-        lastUpdate: "30 detik lalu",
-        alerts: 1,
-        data: {
-          temperature: 29.1,
-          aqi: 57,
-          windSpeed: 12.3,
-        },
-      });
-    }
-
-    return products;
+    return installedDevices
+      .map(deviceId => {
+        const device = getDeviceById(deviceId);
+        if (!device) return null;
+        
+        return {
+          id: device.id,
+          name: device.name,
+          description: device.description,
+          icon: device.icon,
+          status: 'active',
+          devices: device.id === 'agriino' ? 5 : device.id === 'agriimeter' ? 3 : 1,
+          lastUpdate: device.id === 'skyvera' ? '30 detik lalu' : device.id === 'greenhouse' ? '1 menit lalu' : device.id === 'agriino' ? '2 menit lalu' : '5 menit lalu',
+          alerts: device.id === 'agriino' || device.id === 'skyvera' ? 1 : 0,
+          data: device.specifications,
+        };
+      })
+      .filter(Boolean);
   };
 
   const productStatus = getProductStatus();
@@ -187,14 +132,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
     });
   }
 
-  const availableDevices = [
-    {
-      id: "greenhouse",
-      name: "Greenhouse Compax",
-      desc: "Monitoring rumah kaca",
-    },
-    { id: "skyvera", name: "SkyVera", desc: "Weather station professional" },
-  ].filter((device) => !installedDevices.includes(device.id));
+  const availableDevicesData = getAvailableDevices(installedDevices);
 
   return (
     <div className="space-y-8">
@@ -397,7 +335,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
           ))}
 
           {/* Add Device Card */}
-          {availableDevices.length > 0 && (
+          {availableDevicesData.length > 0 && (
             <Card className="glass-card hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 border-dashed border-gray-300 hover:border-green-400">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-green-50 transition-colors">
@@ -410,7 +348,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   Pasang perangkat IoT baru untuk monitoring yang lebih lengkap
                 </p>
                 <div className="space-y-1">
-                  {availableDevices.map((device, index) => (
+                  {availableDevicesData.map((device, index) => (
                     <Badge
                       key={index}
                       variant="outline"

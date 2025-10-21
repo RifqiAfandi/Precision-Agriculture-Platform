@@ -23,32 +23,23 @@ import { AgriimeterDashboard } from "../../features/agriimeter/AgriimeterDashboa
 import { GreenhouseDashboard } from "../../features/greenhouse/GreenhouseDashboard";
 import SkyVeraDashboard from "../../features/skyvera/SkyVeraDashboard";
 import { ProfilePage } from "./dashboardPages/ProfilePage";
-import { AddDeviceDialog } from "./dashboardPages/AddDeviceDialog";
+import { AddDeviceDialog } from "../../features/devices/components/AddDeviceDialog";
+import { loadInstalledDevices, addDevice } from "../../features/devices/utils/devicesHelpers";
 
 export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showAddDevice, setShowAddDevice] = useState(false);
-  const [installedDevices, setInstalledDevices] = useState([
-    "agriino",
-    "agriimeter",
-  ]);
+  const [installedDevices, setInstalledDevices] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("agri-installed-devices");
-    if (saved) {
-      setInstalledDevices(JSON.parse(saved));
-    }
+    const devices = loadInstalledDevices();
+    setInstalledDevices(devices);
   }, []);
 
-  const saveInstalledDevices = (devices) => {
-    setInstalledDevices(devices);
-    localStorage.setItem("agri-installed-devices", JSON.stringify(devices));
-  };
-
   const handleDeviceAdded = (deviceId) => {
-    const newDevices = [...installedDevices, deviceId];
-    saveInstalledDevices(newDevices);
+    const updatedDevices = addDevice(deviceId, installedDevices);
+    setInstalledDevices(updatedDevices);
 
     if (deviceId === "greenhouse") {
       setCurrentPage("greenhouse");
@@ -56,6 +47,7 @@ export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
       setCurrentPage("skyvera");
     }
   };
+
 
   const menuItems = [
     {
