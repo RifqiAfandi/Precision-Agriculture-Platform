@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "../ui/Button";
+import { Button } from "../../components/ui/Button";
 
-import { Badge } from "../ui/Badge";
+import { Badge } from "../../components/ui/Badge";
 import {
   User,
   LogOut,
@@ -16,17 +16,17 @@ import {
   Plus,
   Gauge,
 } from "lucide-react";
-import { Logo } from "../common/Logo";
-import { WelcomePage } from "./dashboardPages/WelcomePage";
+import { Logo } from "../../components/common/Logo";
+import { WelcomePage } from "./WelcomePage";
 import { AgriinoDashboard } from "../../features/agriino/AgriinoDashboard";
 import { AgriimeterDashboard } from "../../features/agriimeter/AgriimeterDashboard";
 import { GreenhouseDashboard } from "../../features/greenhouse/GreenhouseDashboard";
 import SkyVeraDashboard from "../../features/skyvera/SkyVeraDashboard";
-import { ProfilePage } from "./dashboardPages/ProfilePage";
+import { ProfilePage } from "./ProfilePage";
 import { AddDeviceDialog } from "../../features/devices/components/AddDeviceDialog";
 import { loadInstalledDevices, addDevice } from "../../features/devices/utils/devicesHelpers";
 
-export function Dashboard({ user, onLogout, darkMode, toggleDarkMode }) {
+export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showAddDevice, setShowAddDevice] = useState(false);

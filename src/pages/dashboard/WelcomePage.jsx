@@ -5,9 +5,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import { Badge } from "../../ui/Badge";
+} from "../../components/ui/Card";
+import { Button } from "../../components/ui/Button";
+import { Badge } from "../../components/ui/Badge";
 import {
   Leaf,
   Home,
@@ -24,8 +24,8 @@ import {
   Wind,
   Thermometer,
 } from "lucide-react";
-import { DeviceCard } from "../../../features/devices";
-import { getInstalledDevices, getAvailableDevices, getDeviceById, deviceCatalog } from "../../../features/devices/data/devicesData";
+import { DeviceCard } from "../../features/devices";
+import { getInstalledDevices, getAvailableDevices, getDeviceById, deviceCatalog } from "../../features/devices/data/devicesData";
 
 export function WelcomePage({ user, onNavigate, installedDevices }) {
   const dashboardStats = [

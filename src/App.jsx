@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LandingPage } from "./components/layout/pages/LandingPage";
-import { LoginPage } from "./components/layout/pages/LoginPage";
-import { RegisterPage } from "./components/layout/pages/RegisterPage";
-import { Dashboard } from "./components/layout/Dashboard";
+import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "./pages";
 import { Toaster } from "./components/ui/Sonner";
 
 export default function App() {
@@ -63,7 +60,7 @@ export default function App() {
         return <RegisterPage onNavigate={setCurrentPage} />;
       case "dashboard":
         return (
-          <Dashboard
+          <DashboardLayout
             user={user}
             onLogout={handleLogout}
             darkMode={darkMode}

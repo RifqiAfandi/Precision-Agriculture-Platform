@@ -1,14 +1,14 @@
 import React from "react";
-import { Button } from "../../ui/Button";
+import { Button } from "../components/ui/Button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../ui/Card";
+} from "../components/ui/Card";
 import { Cloud, Home, ArrowRight, Leaf } from "lucide-react";
-import { Logo } from "../../common/Logo";
+import { Logo } from "../components/common/Logo";
 
 export function LandingPage({ onNavigate }) {
   const products = [
