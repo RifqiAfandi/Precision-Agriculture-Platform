@@ -23,7 +23,7 @@ import { AgriimeterDashboard } from "../../features/agriimeter/AgriimeterDashboa
 import { GreenhouseDashboard } from "../../features/greenhouse/GreenhouseDashboard";
 import SkyVeraDashboard from "../../features/skyvera/SkyVeraDashboard";
 import { ProfilePage } from "./ProfilePage";
-import { AddDeviceDialog } from "../../features/devices/components/AddDeviceDialog";
+import AddDeviceDialog from "../../features/devices/components/AddDeviceDialog";
 import { loadInstalledDevices, addDevice } from "../../features/devices/utils/devicesHelpers";
 
 export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
