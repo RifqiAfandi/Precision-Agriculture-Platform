@@ -36,12 +36,10 @@ export const validateDeviceInstallation = (deviceId, config) => {
     errors.deviceId = "Device ID is required";
   }
 
-  if (config?.serialNumber && config.serialNumber.length < 8) {
+  if (!config?.serialNumber || config.serialNumber.trim() === "") {
+    errors.serialNumber = "Serial number is required";
+  } else if (config.serialNumber.length < 8) {
     errors.serialNumber = "Serial number must be at least 8 characters";
-  }
-
-  if (config?.location && config.location.trim() === "") {
-    errors.location = "Location is required";
   }
 
   return {

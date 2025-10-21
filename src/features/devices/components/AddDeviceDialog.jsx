@@ -42,8 +42,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
   const [installSuccess, setInstallSuccess] = useState(false);
   const [config, setConfig] = useState({
     serialNumber: "",
-    location: "",
-    notes: "",
   });
   const [errors, setErrors] = useState({});
 
@@ -94,7 +92,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
     setActiveTab("select");
     setInstalling(false);
     setInstallSuccess(false);
-    setConfig({ serialNumber: "", location: "", notes: "" });
+    setConfig({ serialNumber: "" });
     setErrors({});
     onOpenChange(false);
   };
@@ -211,30 +209,9 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
                     {errors.serialNumber && (
                       <p className="text-xs text-red-600 mt-1">{errors.serialNumber}</p>
                     )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="location">Installation Location *</Label>
-                    <Input
-                      id="location"
-                      value={config.location}
-                      onChange={(e) => handleConfigChange("location", e.target.value)}
-                      placeholder="e.g., Greenhouse A, Field 1, etc."
-                      className={errors.location ? "border-red-500" : ""}
-                    />
-                    {errors.location && (
-                      <p className="text-xs text-red-600 mt-1">{errors.location}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="notes">Notes (Optional)</Label>
-                    <Input
-                      id="notes"
-                      value={config.notes}
-                      onChange={(e) => handleConfigChange("notes", e.target.value)}
-                      placeholder="Additional notes about this device"
-                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Device will be automatically configured with this serial number
+                    </p>
                   </div>
                 </div>
                 <div className="flex justify-between pt-4">
@@ -268,12 +245,10 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
               <p className="text-gray-600 mb-6">
                 {selectedDevice?.name} has been added to your system
               </p>
-              {config.location && (
-                <div className="inline-flex items-center gap-2 text-sm text-gray-500">
-                  <span>📍 Location:</span>
-                  <Badge variant="outline">{config.location}</Badge>
-                </div>
-              )}
+              <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+                <span>� Serial Number:</span>
+                <Badge variant="outline" className="font-mono">{config.serialNumber}</Badge>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
