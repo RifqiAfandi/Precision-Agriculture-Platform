@@ -5,42 +5,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
-import { Badge } from "../../../components/ui/Badge";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { Calendar, Download } from "lucide-react";
 import {
   getActionTypeBadgeVariant,
   getActionStatusBadgeVariant,
   formatTimestamp,
 } from "../utils/greenhouseHelpers";
-
-/**
- * ActionHistoryPanel component displays system action logs
- * Shows automatic and manual control actions with timestamps
- * 
- * @component
- * @param {Object} props - Component props
- * @param {Array<Object>} props.history - Array of action log entries
- * @param {string} props.history[].time - Action timestamp
- * @param {string} props.history[].action - Device/system name
- * @param {string} props.history[].status - Action status (Dinyalakan/Dimatikan)
- * @param {string} props.history[].reason - Reason for action
- * @param {'auto'|'manual'} props.history[].type - Action trigger type
- * @param {Function} [props.onExport] - Optional export callback
- * 
- * @example
- * <ActionHistoryPanel
- *   history={actionHistory}
- *   onExport={() => exportToCSV()}
- * />
- */
 export function ActionHistoryPanel({ history, onExport }) {
   const handleExport = () => {
     if (onExport) {
       onExport();
     } else {
-      // Default export logic
       const csv = [
         ["Waktu", "Aksi", "Status", "Tipe", "Alasan"].join(","),
         ...history.map((action) =>

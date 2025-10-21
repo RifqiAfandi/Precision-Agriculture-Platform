@@ -1,11 +1,3 @@
-/**
- * SkyVera weather station data and configuration
- * Contains real-time weather data, forecasts, and air quality monitoring
- */
-
-/**
- * Current weather data from all sensors
- */
 export const currentWeatherData = {
   windSpeed: 12.3,
   rainfall: 4.8,
@@ -19,10 +11,6 @@ export const currentWeatherData = {
   visibility: 8.5,
   lastUpdate: "2024-08-02 14:35:00",
 };
-
-/**
- * Hourly weather data for trend analysis
- */
 export const hourlyWeatherData = [
   { time: "00:00", temp: 26.5, humidity: 85, co2: 390, aqi: 45, wind: 8.2, rainfall: 0 },
   { time: "02:00", temp: 26.1, humidity: 87, co2: 388, aqi: 43, wind: 7.8, rainfall: 0 },
@@ -37,10 +25,6 @@ export const hourlyWeatherData = [
   { time: "20:00", temp: 27.2, humidity: 85, co2: 394, aqi: 47, wind: 8.9, rainfall: 1.1 },
   { time: "22:00", temp: 26.8, humidity: 87, co2: 391, aqi: 45, wind: 8.1, rainfall: 0.3 },
 ];
-
-/**
- * Daily weather data for 7-day trends
- */
 export const dailyWeatherData = [
   { day: "Sen", avgTemp: 27.2, totalRain: 12.5, maxWind: 18.2, avgAQI: 48, humidity: 82, co2: 405 },
   { day: "Sel", avgTemp: 28.1, totalRain: 8.3, maxWind: 15.7, avgAQI: 52, humidity: 78, co2: 412 },
@@ -50,10 +34,6 @@ export const dailyWeatherData = [
   { day: "Sab", avgTemp: 29.8, totalRain: 7.4, maxWind: 13.9, avgAQI: 58, humidity: 76, co2: 415 },
   { day: "Min", avgTemp: 28.9, totalRain: 15.6, maxWind: 17.5, avgAQI: 51, humidity: 81, co2: 408 },
 ];
-
-/**
- * AI weather insights and recommendations
- */
 export const weatherInsights = [
   {
     priority: "high",
@@ -80,10 +60,6 @@ export const weatherInsights = [
     category: "forecast",
   },
 ];
-
-/**
- * 24-hour weather forecast
- */
 export const weatherForecast = [
   {
     period: "Sore Ini",
@@ -107,10 +83,6 @@ export const weatherForecast = [
     color: "yellow",
   },
 ];
-
-/**
- * Get parameter status based on value and type
- */
 export const getParameterStatus = (value, parameter) => {
   switch (parameter) {
     case "temperature":
@@ -167,10 +139,6 @@ export const getParameterStatus = (value, parameter) => {
       return { status: "normal", color: "text-gray-600", bg: "bg-gray-100" };
   }
 };
-
-/**
- * Get status label in Indonesian
- */
 export const getStatusLabel = (status) => {
   const labels = {
     excellent: "Sangat Baik",
@@ -188,10 +156,6 @@ export const getStatusLabel = (status) => {
   };
   return labels[status] || "Normal";
 };
-
-/**
- * Calculate dashboard statistics
- */
 export const getWeatherStats = () => {
   const avgTemp = hourlyData.reduce((sum, d) => sum + d.temp, 0) / hourlyData.length;
   const avgHumidity = hourlyData.reduce((sum, d) => sum + d.humidity, 0) / hourlyData.length;

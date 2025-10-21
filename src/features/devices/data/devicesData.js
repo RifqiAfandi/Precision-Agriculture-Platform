@@ -1,11 +1,3 @@
-/**
- * Device Registry Data Module
- * Central registry for all IoT devices and their configurations
- */
-
-/**
- * Device catalog with metadata and specifications
- */
 export const deviceCatalog = {
   agriino: {
     id: "agriino",
@@ -141,10 +133,6 @@ export const deviceCatalog = {
     },
   },
 };
-
-/**
- * Device status definitions
- */
 export const deviceStatus = {
   active: {
     label: "Aktif",
@@ -177,10 +165,6 @@ export const deviceStatus = {
     description: "Device menunggu setup atau konfigurasi",
   },
 };
-
-/**
- * Device categories
- */
 export const deviceCategories = {
   monitoring: {
     label: "Monitoring",
@@ -203,66 +187,24 @@ export const deviceCategories = {
     icon: "BarChart",
   },
 };
-
-/**
- * Get device by ID
- * @param {string} deviceId - Device identifier
- * @returns {Object|null} Device object or null if not found
- */
 export const getDeviceById = (deviceId) => {
   return deviceCatalog[deviceId] || null;
 };
-
-/**
- * Get all devices as array
- * @returns {Array} Array of all devices
- */
 export const getAllDevices = () => {
   return Object.values(deviceCatalog);
 };
-
-/**
- * Get devices by category
- * @param {string} category - Category name
- * @returns {Array} Array of devices in category
- */
 export const getDevicesByCategory = (category) => {
   return getAllDevices().filter((device) => device.category === category);
 };
-
-/**
- * Get devices by status
- * @param {string} status - Status name
- * @returns {Array} Array of devices with status
- */
 export const getDevicesByStatus = (status) => {
   return getAllDevices().filter((device) => device.status === status);
 };
-
-/**
- * Check if device is installed
- * @param {string} deviceId - Device identifier
- * @param {Array} installedDevices - Array of installed device IDs
- * @returns {boolean} True if device is installed
- */
 export const isDeviceInstalled = (deviceId, installedDevices) => {
   return installedDevices.includes(deviceId);
 };
-
-/**
- * Get available devices for installation
- * @param {Array} installedDevices - Array of installed device IDs
- * @returns {Array} Array of available devices
- */
 export const getAvailableDevices = (installedDevices) => {
   return getAllDevices().filter((device) => !installedDevices.includes(device.id));
 };
-
-/**
- * Get installed devices
- * @param {Array} installedDevices - Array of installed device IDs
- * @returns {Array} Array of installed device objects
- */
 export const getInstalledDevices = (installedDevices) => {
   return installedDevices
     .map((id) => getDeviceById(id))

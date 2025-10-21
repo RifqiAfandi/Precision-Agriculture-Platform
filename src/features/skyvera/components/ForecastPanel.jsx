@@ -7,14 +7,6 @@ const colorConfig = {
   yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
   orange: "bg-orange-100 text-orange-700 border-orange-200",
 };
-
-/**
- * Forecast Panel Component
- * Displays weather forecast for multiple time periods
- * 
- * @param {Object} props
- * @param {Array} props.forecasts - Array of forecast objects
- */
 const ForecastPanel = ({ forecasts }) => {
   return (
     <Card>

@@ -1,20 +1,3 @@
-/**
- * Greenhouse monitoring data and configuration
- * Contains current sensor readings, historical data, and action logs
- */
-
-/**
- * Current real-time sensor readings
- * @typedef {Object} CurrentData
- * @property {number} insideTemp - Inside temperature in Celsius
- * @property {number} outsideTemp - Outside temperature in Celsius
- * @property {number} insideHumidity - Inside humidity percentage
- * @property {number} outsideHumidity - Outside humidity percentage
- * @property {number} co2Level - CO2 concentration in ppm
- * @property {number} soilMoisture - Soil moisture percentage
- * @property {number} lightIntensity - Light intensity in lux
- * @property {string} lastUpdate - Last sensor update timestamp
- */
 export const currentData = {
   insideTemp: 26.8,
   outsideTemp: 28.5,
@@ -25,15 +8,6 @@ export const currentData = {
   lightIntensity: 42000,
   lastUpdate: "2024-08-02 14:35:00",
 };
-
-/**
- * Hourly data for 24-hour trend visualization
- * @typedef {Object} HourlyDataPoint
- * @property {string} time - Time in HH:MM format
- * @property {number} insideTemp - Temperature reading
- * @property {number} humidity - Humidity percentage
- * @property {number} co2 - CO2 level in ppm
- */
 export const hourlyData = [
   { time: "00:00", insideTemp: 24.5, humidity: 70, co2: 410 },
   { time: "02:00", insideTemp: 24.2, humidity: 72, co2: 415 },
@@ -48,16 +22,6 @@ export const hourlyData = [
   { time: "20:00", insideTemp: 25.5, humidity: 71, co2: 408 },
   { time: "22:00", insideTemp: 25.0, humidity: 72, co2: 405 },
 ];
-
-/**
- * System action history log
- * @typedef {Object} ActionLog
- * @property {string} time - Action timestamp
- * @property {string} action - Device/system affected
- * @property {string} status - Action status (Dinyalakan/Dimatikan)
- * @property {string} reason - Reason for action
- * @property {'auto'|'manual'} type - Action trigger type
- */
 export const actionHistory = [
   {
     time: "14:30",
@@ -102,14 +66,6 @@ export const actionHistory = [
     type: "manual",
   },
 ];
-
-/**
- * Control device configuration
- * @typedef {Object} ControlDevice
- * @property {string} key - Unique device identifier
- * @property {string} label - Display name
- * @property {string} description - Device description
- */
 export const controlDevices = [
   {
     key: "exhaustFan",
@@ -132,22 +88,12 @@ export const controlDevices = [
     description: "Kontrol suhu minimum",
   },
 ];
-
-/**
- * Optimal range configuration for environmental parameters
- * @typedef {Object} OptimalRanges
- */
 export const optimalRanges = {
   temperature: { min: 24, max: 28, unit: "°C" },
   humidity: { min: 60, max: 75, unit: "%" },
   co2: { min: 380, max: 450, unit: "ppm" },
   soilMoisture: { min: 50, max: 70, unit: "%" },
 };
-
-/**
- * Calculate greenhouse statistics from current data
- * @returns {Object} Statistics object with calculated metrics
- */
 export const getGreenhouseStats = () => {
   return {
     tempDifference: (currentData.outsideTemp - currentData.insideTemp).toFixed(1),

@@ -35,24 +35,11 @@ const iconComponents = {
   Cloud,
   Gauge,
 };
-
-/**
- * Add Device Dialog Component
- * Dialog for installing and configuring new devices
- * 
- * @param {Object} props
- * @param {boolean} props.open - Dialog open state
- * @param {Function} props.onOpenChange - Open state change handler
- * @param {Function} props.onDeviceAdded - Device added callback
- * @param {Array} props.installedDevices - Currently installed devices
- */
 const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices = [] }) => {
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [activeTab, setActiveTab] = useState("select");
   const [installing, setInstalling] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);
-
-  // Device configuration form
   const [config, setConfig] = useState({
     serialNumber: "",
     location: "",
@@ -74,7 +61,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
 
   const handleConfigChange = (field, value) => {
     setConfig({ ...config, [field]: value });
-    // Clear error for this field
     if (errors[field]) {
       setErrors({ ...errors, [field]: null });
     }
@@ -82,8 +68,6 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
 
   const handleInstall = async () => {
     if (!selectedDevice) return;
-
-    // Validate configuration
     const validation = validateDeviceInstallation(selectedDevice.id, config);
     if (!validation.isValid) {
       setErrors(validation.errors);
@@ -92,20 +76,14 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
 
     setInstalling(true);
     setErrors({});
-
-    // Simulate installation process
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     setInstalling(false);
     setInstallSuccess(true);
     setActiveTab("success");
-
-    // Call parent callback
     if (onDeviceAdded) {
       onDeviceAdded(selectedDevice.id, config);
     }
-
-    // Close dialog after a delay
     setTimeout(() => {
       handleClose();
     }, 1500);
@@ -142,7 +120,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
             </TabsTrigger>
           </TabsList>
 
-          {/* Step 1: Select Device */}
+          {}
           <TabsContent value="select" className="space-y-4 mt-6">
             {availableDevices.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -204,11 +182,11 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
             )}
           </TabsContent>
 
-          {/* Step 2: Configure Device */}
+          {}
           <TabsContent value="configure" className="space-y-6 mt-6">
             {selectedDevice && (
               <>
-                {/* Selected Device Info */}
+                {}
                 <div className={`p-4 ${selectedDevice.color.light} rounded-lg border ${selectedDevice.color.border}`}>
                   <div className="flex items-center space-x-3">
                     {(() => {
@@ -226,7 +204,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
                   </div>
                 </div>
 
-                {/* Configuration Form */}
+                {}
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="serialNumber">Serial Number *</Label>
@@ -267,7 +245,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+                {}
                 <div className="flex justify-between pt-4">
                   <Button variant="outline" onClick={() => setActiveTab("select")}>
                     Back
@@ -291,7 +269,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded, installedDevices =
             )}
           </TabsContent>
 
-          {/* Step 3: Success */}
+          {}
           <TabsContent value="success" className="space-y-6 mt-6">
             <div className="text-center py-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">

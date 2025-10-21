@@ -25,15 +25,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-// Import components
 import { WeatherParameterCard } from "./components/WeatherParameterCard";
 import WeatherOverviewCard from "./components/WeatherOverviewCard";
 import AIInsightsPanel from "./components/AIInsightsPanel";
 import ForecastPanel from "./components/ForecastPanel";
 import ExportPanel from "./components/ExportPanel";
-
-// Import data and utilities
 import {
   currentWeatherData,
   hourlyWeatherData,
@@ -50,15 +46,8 @@ import {
   getAQILevel,
   formatTimestamp,
 } from "./utils/skyveraHelpers";
-
-/**
- * SkyVera Weather Station Dashboard Component
- * Main dashboard for weather monitoring and analysis
- */
 const SkyVeraDashboard = () => {
   const [activeTab, setActiveTab] = useState("monitoring");
-
-  // Weather parameters configuration
   const weatherParameters = [
     {
       title: "Kecepatan Angin",
@@ -121,8 +110,6 @@ const SkyVeraDashboard = () => {
       description: "Kualitas baik",
     },
   ];
-
-  // Weather overview data
   const aqiLevel = getAQILevel(currentWeatherData.aqi);
   const weatherOverview = [
     {
@@ -138,8 +125,6 @@ const SkyVeraDashboard = () => {
       status: { label: aqiLevel.level, bg: `bg-${aqiLevel.color}-100`, color: `text-${aqiLevel.color}-700` },
     },
   ];
-
-  // Export handlers
   const handleExportCSV = () => {
     exportToCSV(hourlyWeatherData, "skyvera_hourly_weather.csv");
   };
@@ -162,7 +147,7 @@ const SkyVeraDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">SkyVera Weather Station</h1>
@@ -175,14 +160,14 @@ const SkyVeraDashboard = () => {
         </div>
       </div>
 
-      {/* Weather Overview Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {weatherOverview.map((item, index) => (
           <WeatherOverviewCard key={index} {...item} />
         ))}
       </div>
 
-      {/* Main Tabs */}
+      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
@@ -190,7 +175,7 @@ const SkyVeraDashboard = () => {
           <TabsTrigger value="insights">AI Insights</TabsTrigger>
         </TabsList>
 
-        {/* Monitoring Tab */}
+        {}
         <TabsContent value="monitoring" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {weatherParameters.map((param, index) => (
@@ -206,9 +191,9 @@ const SkyVeraDashboard = () => {
           />
         </TabsContent>
 
-        {/* Trends Tab */}
+        {}
         <TabsContent value="trends" className="space-y-6">
-          {/* 24h Temperature & Humidity */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Suhu & Kelembaban (24 Jam)</CardTitle>
@@ -229,7 +214,7 @@ const SkyVeraDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Weekly Rainfall */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Curah Hujan Mingguan</CardTitle>
@@ -248,7 +233,7 @@ const SkyVeraDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Air Quality Trend */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Trend Kualitas Udara (AQI & CO₂)</CardTitle>
@@ -270,7 +255,7 @@ const SkyVeraDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* AI Insights Tab */}
+        {}
         <TabsContent value="insights" className="space-y-6">
           <AIInsightsPanel insights={weatherInsights} />
         </TabsContent>

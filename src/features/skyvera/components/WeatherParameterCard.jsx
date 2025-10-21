@@ -1,21 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-
-/**
- * Weather Parameter Card Component
- * Displays individual weather parameter with status, trend, and unit
- * 
- * @param {Object} props
- * @param {string} props.title - Parameter name
- * @param {number|string} props.value - Current value
- * @param {string} props.unit - Unit of measurement
- * @param {Object} props.icon - Lucide icon component
- * @param {string} props.iconColor - Icon color class
- * @param {Object} props.status - Status object with status, color, bg
- * @param {string} props.trend - Trend direction (up/down/stable)
- * @param {string} props.description - Additional description
- */
 export function WeatherParameterCard({
   title,
   value,

@@ -1,7 +1,3 @@
-/**
- * @param {string} status
- * @returns {string}
- */
 export const getStatusColor = (status) => {
   switch (status) {
     case "optimal":
@@ -16,11 +12,6 @@ export const getStatusColor = (status) => {
       return "bg-gray-100 text-gray-700";
   }
 };
-
-/**
- * @param {string} status
- * @returns {string}
- */
 export const getStatusLabel = (status) => {
   switch (status) {
     case "optimal":
@@ -35,23 +26,10 @@ export const getStatusLabel = (status) => {
       return "Normal";
   }
 };
-
-/**
- * @param {number} currentDBH
- * @param {number} targetDBH
- * @param {number} growthRate
- * @returns {number} 
- */
 export const calculateTimeToTarget = (currentDBH, targetDBH, growthRate) => {
   if (growthRate <= 0) return Infinity;
   return Math.ceil((targetDBH - currentDBH) / growthRate);
 };
-
-/**
- * Get AI recommendation based on growth rate
- * @param {number} growthRate - Monthly growth rate in cm
- * @returns {string} Recommendation text
- */
 export const getGrowthRecommendation = (growthRate) => {
   if (growthRate > 0.5) {
     return "Pertumbuhan optimal, lanjutkan perawatan rutin";
@@ -61,12 +39,6 @@ export const getGrowthRecommendation = (growthRate) => {
     return "Periksa kondisi tanah dan sistem irigasi";
   }
 };
-
-/**
- * Get growth rate badge color based on value
- * @param {number} growthRate - Monthly growth rate
- * @returns {string} Tailwind classes
- */
 export const getGrowthRateColor = (growthRate) => {
   if (growthRate > 0.5) {
     return "bg-green-100 text-green-700";
@@ -76,12 +48,6 @@ export const getGrowthRateColor = (growthRate) => {
     return "bg-orange-100 text-orange-700";
   }
 };
-
-/**
- * Validate tree form data
- * @param {Object} treeData - Form data object
- * @returns {Object} { isValid: boolean, errors: string[] }
- */
 export const validateTreeForm = (treeData) => {
   const errors = [];
 

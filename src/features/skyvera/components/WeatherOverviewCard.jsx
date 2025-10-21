@@ -1,19 +1,6 @@
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-
-/**
- * Weather Parameter Card Component
- * Displays individual weather parameter with status, trend, and unit
- * 
- * @param {Object} props
- * @param {string} props.title - Parameter name
- * @param {number|string} props.value - Current value
- * @param {string} props.unit - Unit of measurement
- * @param {Object} props.icon - Lucide icon component
- * @param {Object} props.status - Status object with status, color, bg
- * @param {Object} props.trend - Trend object with direction and percentage
- */
 const WeatherOverviewCard = ({ title, value, status, icon: Icon }) => {
   return (
     <Card className="hover:shadow-md transition-shadow">

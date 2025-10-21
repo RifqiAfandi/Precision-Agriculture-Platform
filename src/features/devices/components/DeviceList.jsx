@@ -11,22 +11,6 @@ import {
 import { Search, SlidersHorizontal, Grid, List } from "lucide-react";
 import DeviceCard from "./DeviceCard";
 import { searchDevices, sortDevices } from "../utils/devicesHelpers";
-
-/**
- * Device List Component
- * Displays a list of devices with search, filter, and sort capabilities
- * 
- * @param {Object} props
- * @param {Array} props.devices - Array of device objects
- * @param {Array} props.installedDevices - Array of installed device IDs
- * @param {Function} props.onNavigate - Navigation handler
- * @param {Function} props.onInstall - Install handler
- * @param {Function} props.onConfigure - Configure handler
- * @param {string} props.title - List title
- * @param {boolean} props.showSearch - Show search bar
- * @param {boolean} props.showFilters - Show filter controls
- * @param {string} props.variant - Card variant to use
- */
 const DeviceList = ({
   devices = [],
   installedDevices = [],
@@ -41,9 +25,7 @@ const DeviceList = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [viewMode, setViewMode] = useState("grid"); // grid or list
-
-  // Apply search and sort
+  const [viewMode, setViewMode] = useState("grid"); 
   const filteredDevices = searchDevices(devices, searchQuery);
   const sortedDevices = sortDevices(filteredDevices, sortBy, sortOrder);
 
@@ -51,7 +33,7 @@ const DeviceList = ({
 
   return (
     <div className="space-y-4">
-      {/* Header with title and controls */}
+      {}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
         <div className="flex items-center gap-2">
@@ -69,7 +51,7 @@ const DeviceList = ({
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {}
       {(showSearch || showFilters) && (
         <div className="flex flex-col md:flex-row gap-3">
           {showSearch && (
@@ -110,7 +92,7 @@ const DeviceList = ({
         </div>
       )}
 
-      {/* Device Grid/List */}
+      {}
       {sortedDevices.length > 0 ? (
         <div
           className={
@@ -139,7 +121,7 @@ const DeviceList = ({
         </div>
       )}
 
-      {/* Results count */}
+      {}
       <div className="text-sm text-gray-500 text-center">
         Showing {sortedDevices.length} of {devices.length} devices
         {installedDevices.length > 0 && ` (${installedDevices.length} installed)`}

@@ -3,15 +3,11 @@ import { Badge } from "../../components/ui/Badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs";
 import { Home, Thermometer, Droplets, Activity, TrendingUp, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-
-// Data imports
 import {
   currentData,
   hourlyData,
   actionHistory,
 } from "./data/greenhouseData";
-
-// Helper imports
 import {
   getTemperatureStatus,
   getHumidityStatus,
@@ -21,25 +17,11 @@ import {
   formatControlAction,
   getRecommendation,
 } from "./utils/greenhouseHelpers";
-
-// Component imports
 import { MonitoringCard } from "./components/MonitoringCard";
 import { ParameterCard } from "./components/ParameterCard";
 import { ControlPanel } from "./components/ControlPanel";
 import { TrendChart } from "./components/TrendChart";
 import { ActionHistoryPanel } from "./components/ActionHistoryPanel";
-
-/**
- * GreenhouseDashboard - Main dashboard for greenhouse monitoring and control
- * 
- * Features:
- * - Real-time environmental monitoring (temp, humidity, CO2)
- * - Manual and automatic device control
- * - 24-hour trend visualization
- * - Action history log
- * 
- * @component
- */
 export function GreenhouseDashboard() {
   const [activeTab, setActiveTab] = useState("monitoring");
   const [autoMode, setAutoMode] = useState(true);
@@ -49,11 +31,6 @@ export function GreenhouseDashboard() {
     irrigationSystem: false,
     heatingSystem: false,
   });
-
-  /**
-   * Handle control device toggle
-   * @param {string} controlKey - Device key to toggle
-   */
   const handleControlChange = (controlKey) => {
     const validation = validateControlChange(autoMode, controlKey);
 
@@ -67,8 +44,6 @@ export function GreenhouseDashboard() {
       ...prev,
       [controlKey]: newState,
     }));
-
-    // Get device label for toast message
     const deviceLabels = {
       exhaustFan: "Exhaust Fan",
       roofVent: "Atap Ventilasi",
@@ -79,10 +54,6 @@ export function GreenhouseDashboard() {
     const message = formatControlAction(deviceLabels[controlKey], newState);
     toast.success(message);
   };
-
-  /**
-   * Toggle automatic/manual mode
-   */
   const toggleAutoMode = () => {
     const newMode = !autoMode;
     setAutoMode(newMode);
@@ -93,8 +64,6 @@ export function GreenhouseDashboard() {
       toast.info("Mode manual diaktifkan");
     }
   };
-
-  // Chart configuration
   const trendLines = [
     { dataKey: "insideTemp", stroke: "#ef4444", name: "Suhu (°C)" },
     { dataKey: "humidity", stroke: "#3b82f6", name: "Kelembaban (%)" },
@@ -103,7 +72,7 @@ export function GreenhouseDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
@@ -130,7 +99,7 @@ export function GreenhouseDashboard() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="monitoring">Dashboard Monitoring</TabsTrigger>
@@ -138,10 +107,10 @@ export function GreenhouseDashboard() {
           <TabsTrigger value="history">Riwayat</TabsTrigger>
         </TabsList>
 
-        {/* Tab: Dashboard Monitoring */}
+        {}
         <TabsContent value="monitoring" className="space-y-6">
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Temperature Card */}
+            {}
             <MonitoringCard
               title="Suhu Greenhouse"
               icon={Thermometer}
@@ -172,7 +141,7 @@ export function GreenhouseDashboard() {
               }
             />
 
-            {/* Humidity Card */}
+            {}
             <MonitoringCard
               title="Kelembaban"
               icon={Droplets}
@@ -197,7 +166,7 @@ export function GreenhouseDashboard() {
               }
             />
 
-            {/* CO2 Card */}
+            {}
             <ParameterCard
               title="CO₂ Level"
               icon={Activity}
@@ -209,7 +178,7 @@ export function GreenhouseDashboard() {
             />
           </div>
 
-          {/* 24h Trend Chart */}
+          {}
           <TrendChart
             title="Tren 24 Jam Terakhir"
             description="Suhu, kelembaban, dan CO₂ level"
@@ -218,7 +187,7 @@ export function GreenhouseDashboard() {
           />
         </TabsContent>
 
-        {/* Tab: Control Panel */}
+        {}
         <TabsContent value="control">
           <ControlPanel
             autoMode={autoMode}
@@ -228,7 +197,7 @@ export function GreenhouseDashboard() {
           />
         </TabsContent>
 
-        {/* Tab: History */}
+        {}
         <TabsContent value="history">
           <ActionHistoryPanel history={actionHistory} />
         </TabsContent>

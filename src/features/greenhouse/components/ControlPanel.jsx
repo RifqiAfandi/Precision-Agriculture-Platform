@@ -1,39 +1,10 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
-import { Switch } from "../../../components/ui/Switch";
-import { Badge } from "../../../components/ui/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Switch } from "@/components/ui/Switch";
+import { Badge } from "@/components/ui/Badge";
 import { Power, PowerOff, Settings } from "lucide-react";
 import { controlDevices } from "../data/greenhouseData";
-
-/**
- * ControlPanel component for manual/auto control of greenhouse devices
- * Displays operation mode toggle and individual device controls
- * 
- * @component
- * @param {Object} props - Component props
- * @param {boolean} props.autoMode - Whether automatic mode is enabled
- * @param {Object} props.controls - Current state of all control devices
- * @param {boolean} props.controls.exhaustFan - Exhaust fan state
- * @param {boolean} props.controls.roofVent - Roof vent state
- * @param {boolean} props.controls.irrigationSystem - Irrigation system state
- * @param {boolean} props.controls.heatingSystem - Heating system state
- * @param {Function} props.onControlChange - Callback when control is toggled
- * @param {Function} props.onAutoModeToggle - Callback when auto mode is toggled
- * 
- * @example
- * <ControlPanel
- *   autoMode={true}
- *   controls={{
- *     exhaustFan: true,
- *     roofVent: false,
- *     irrigationSystem: false,
- *     heatingSystem: false
- *   }}
- *   onControlChange={(key) => handleControlChange(key)}
- *   onAutoModeToggle={() => toggleAutoMode()}
- * />
- */
 export function ControlPanel({
   autoMode,
   controls,
@@ -42,7 +13,7 @@ export function ControlPanel({
 }) {
   return (
     <div className="space-y-6">
-      {/* Auto Mode Toggle */}
+      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -65,7 +36,7 @@ export function ControlPanel({
         </CardContent>
       </Card>
 
-      {/* Control Switches */}
+      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle>Kontrol Perangkat</CardTitle>

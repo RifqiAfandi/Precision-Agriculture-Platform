@@ -1,16 +1,6 @@
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { FileDown, FileSpreadsheet, FileJson } from "lucide-react";
-
-/**
- * Export Panel Component
- * Provides data export functionality in multiple formats
- * 
- * @param {Object} props
- * @param {Function} props.onExportCSV - CSV export handler
- * @param {Function} props.onExportPDF - PDF export handler  
- * @param {Function} props.onExportJSON - JSON export handler
- */
 const ExportPanel = ({ onExportCSV, onExportPDF, onExportJSON }) => {
   return (
     <Card>

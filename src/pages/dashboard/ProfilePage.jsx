@@ -88,7 +88,7 @@ export function ProfilePage({ user }) {
 
   return (
     <div className="max-w-4xl space-y-6">
-      {/* Header */}
+      {}
       <Card className="glass-card">
         <CardContent className="p-6">
           <div className="flex items-center space-x-6">
@@ -114,7 +114,7 @@ export function ProfilePage({ user }) {
       </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Account Information */}
+        {}
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -160,7 +160,7 @@ export function ProfilePage({ user }) {
           </CardContent>
         </Card>
 
-        {/* Change Password */}
+        {}
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -262,7 +262,7 @@ export function ProfilePage({ user }) {
         </Card>
       </div>
 
-      {/* Notification Setting */}
+      {}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">

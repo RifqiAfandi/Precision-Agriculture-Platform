@@ -1,17 +1,4 @@
-/**
- * Utility functions for greenhouse monitoring and control
- * Pure functions for status calculations, formatting, and validation
- */
-
 import { optimalRanges } from "../data/greenhouseData";
-
-/**
- * Get parameter status based on value and optimal range
- * @param {number} value - Current parameter value
- * @param {number} min - Minimum optimal value
- * @param {number} max - Maximum optimal value
- * @returns {Object} Status object with label, color, and background classes
- */
 export const getStatus = (value, min, max) => {
   if (value >= min && value <= max) {
     return {
@@ -33,65 +20,27 @@ export const getStatus = (value, min, max) => {
     bg: "bg-blue-100",
   };
 };
-
-/**
- * Get temperature status
- * @param {number} temperature - Temperature in Celsius
- * @returns {Object} Status object
- */
 export const getTemperatureStatus = (temperature) => {
   const { min, max } = optimalRanges.temperature;
   return getStatus(temperature, min, max);
 };
-
-/**
- * Get humidity status
- * @param {number} humidity - Humidity percentage
- * @returns {Object} Status object
- */
 export const getHumidityStatus = (humidity) => {
   const { min, max } = optimalRanges.humidity;
   return getStatus(humidity, min, max);
 };
-
-/**
- * Get CO2 level status
- * @param {number} co2Level - CO2 concentration in ppm
- * @returns {Object} Status object
- */
 export const getCO2Status = (co2Level) => {
   const { min, max } = optimalRanges.co2;
   return getStatus(co2Level, min, max);
 };
-
-/**
- * Get soil moisture status
- * @param {number} moisture - Soil moisture percentage
- * @returns {Object} Status object
- */
 export const getSoilMoistureStatus = (moisture) => {
   const { min, max } = optimalRanges.soilMoisture;
   return getStatus(moisture, min, max);
 };
-
-/**
- * Format temperature difference
- * @param {number} insideTemp - Inside temperature
- * @param {number} outsideTemp - Outside temperature
- * @returns {string} Formatted temperature difference
- */
 export const formatTempDifference = (insideTemp, outsideTemp) => {
   const diff = Math.abs(outsideTemp - insideTemp).toFixed(1);
   const comparison = outsideTemp > insideTemp ? "lebih panas" : "lebih dingin";
   return `${diff}°C ${comparison}`;
 };
-
-/**
- * Get recommendation message based on parameter status
- * @param {string} parameter - Parameter name (temp, humidity, co2)
- * @param {number} value - Current value
- * @returns {string} Recommendation message
- */
 export const getRecommendation = (parameter, value) => {
   const ranges = {
     temp: optimalRanges.temperature,
@@ -122,13 +71,6 @@ export const getRecommendation = (parameter, value) => {
 
   return "Kondisi optimal untuk pertumbuhan";
 };
-
-/**
- * Validate control state change
- * @param {boolean} autoMode - Current auto mode state
- * @param {string} controlKey - Control device key
- * @returns {Object} Validation result
- */
 export const validateControlChange = (autoMode, controlKey) => {
   if (autoMode) {
     return {
@@ -156,43 +98,16 @@ export const validateControlChange = (autoMode, controlKey) => {
     message: "Kontrol dapat diubah",
   };
 };
-
-/**
- * Format control action message
- * @param {string} controlLabel - Control device label
- * @param {boolean} newState - New control state
- * @returns {string} Formatted action message
- */
 export const formatControlAction = (controlLabel, newState) => {
   const action = newState ? "Dinyalakan" : "Dimatikan";
   return `${controlLabel} ${action}`;
 };
-
-/**
- * Get badge variant for action type
- * @param {'auto'|'manual'} type - Action type
- * @returns {string} Badge variant
- */
 export const getActionTypeBadgeVariant = (type) => {
   return type === "auto" ? "outline" : "destructive";
 };
-
-/**
- * Get badge variant for action status
- * @param {string} status - Action status
- * @returns {string} Badge variant
- */
 export const getActionStatusBadgeVariant = (status) => {
   return status.includes("Dinyalakan") ? "default" : "secondary";
 };
-
-/**
- * Calculate environmental health score
- * @param {number} temp - Current temperature
- * @param {number} humidity - Current humidity
- * @param {number} co2 - Current CO2 level
- * @returns {Object} Health score object
- */
 export const calculateHealthScore = (temp, humidity, co2) => {
   const tempStatus = getTemperatureStatus(temp);
   const humidityStatus = getHumidityStatus(humidity);
@@ -231,16 +146,8 @@ export const calculateHealthScore = (temp, humidity, co2) => {
     totalParams: 3,
   };
 };
-
-/**
- * Format timestamp for display
- * @param {string} timestamp - ISO timestamp or formatted time
- * @returns {string} Formatted time
- */
 export const formatTimestamp = (timestamp) => {
   if (!timestamp) return "-";
-  
-  // If already in HH:MM format, return as is
   if (/^\d{2}:\d{2}$/.test(timestamp)) {
     return timestamp;
   }

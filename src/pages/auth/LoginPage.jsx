@@ -49,7 +49,7 @@ export function LoginPage({ onNavigate, onLogin }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
+        {}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
@@ -62,7 +62,7 @@ export function LoginPage({ onNavigate, onLogin }) {
           </p>
         </div>
 
-        {/* Login Form */}
+        {}
         <Card className="glass-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Masuk</CardTitle>
@@ -120,7 +120,7 @@ export function LoginPage({ onNavigate, onLogin }) {
               </Button>
             </form>
 
-            {/* Demo Login Info */}
+            {}
             <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
               <p className="font-medium mb-1">Demo Login:</p>
               <p>Email: demo@agriiweb.com</p>
@@ -144,7 +144,7 @@ export function LoginPage({ onNavigate, onLogin }) {
           </CardContent>
         </Card>
 
-        {/* Back to Landing */}
+        {}
         <div className="text-center mt-6">
           <Button
             variant="ghost"

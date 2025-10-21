@@ -1,32 +1,7 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { Badge } from "../../../components/ui/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 
-/**
- * ParameterCard component for displaying single environmental parameter
- * Simplified card for parameters like CO2, light intensity, etc.
- * 
- * @component
- * @param {Object} props - Component props
- * @param {string} props.title - Card title
- * @param {React.ComponentType} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind color class for icon
- * @param {number|string} props.value - Main parameter value
- * @param {string} props.unit - Unit of measurement
- * @param {Object} props.status - Status object with label, color, and bg
- * @param {string} [props.description] - Optional description text
- * 
- * @example
- * <ParameterCard
- *   title="CO₂ Level"
- *   icon={Activity}
- *   iconColor="text-purple-600"
- *   value={420}
- *   unit="ppm"
- *   status={{ label: "Optimal", color: "text-green-600", bg: "bg-green-100" }}
- *   description="Ideal untuk fotosintesis optimal"
- * />
- */
 export function ParameterCard({
   title,
   icon: Icon,

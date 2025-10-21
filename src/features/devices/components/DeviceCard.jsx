@@ -22,20 +22,6 @@ const iconComponents = {
   Gauge,
   Activity,
 };
-
-/**
- * Device Card Component
- * Displays individual device information with actions
- * 
- * @param {Object} props
- * @param {Object} props.device - Device object from catalog
- * @param {boolean} props.isInstalled - Whether device is installed
- * @param {Function} props.onNavigate - Navigation handler
- * @param {Function} props.onInstall - Install handler
- * @param {Function} props.onConfigure - Configure handler
- * @param {boolean} props.showActions - Show action buttons
- * @param {string} props.variant - Card variant (default, compact, detailed)
- */
 const DeviceCard = ({
   device,
   isInstalled = false,
@@ -92,7 +78,7 @@ onClick={() => onNavigate && onNavigate(device.id)}>
       </CardHeader>
 
       <CardContent>
-        {/* Features */}
+        {}
         <div className="space-y-2 mb-4">
           {device.features.slice(0, 3).map((feature, index) => (
             <div key={index} className="flex items-start space-x-2 text-sm">
@@ -102,7 +88,7 @@ onClick={() => onNavigate && onNavigate(device.id)}>
           ))}
         </div>
 
-        {/* Specifications (for detailed variant) */}
+        {}
         {variant === "detailed" && device.specifications && (
           <div className={`mb-4 p-3 ${device.color.light} rounded-lg`}>
             <h4 className="text-xs font-semibold text-gray-700 mb-2">Specifications</h4>
@@ -117,7 +103,7 @@ onClick={() => onNavigate && onNavigate(device.id)}>
           </div>
         )}
 
-        {/* Actions */}
+        {}
         {showActions && (
           <div className="flex gap-2 mt-4">
             {isInstalled ? (
@@ -156,7 +142,7 @@ onClick={() => onNavigate && onNavigate(device.id)}>
           </div>
         )}
 
-        {/* Category badge */}
+        {}
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
           <span className="capitalize">{device.category}</span>
           {device.specifications?.connectivity && (

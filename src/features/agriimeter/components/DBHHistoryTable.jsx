@@ -5,9 +5,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
-import { Badge } from "../../../components/ui/Badge";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { Calendar, Download } from "lucide-react";
 import {
   BarChart,
@@ -24,12 +24,6 @@ import {
   getGrowthRateColor,
 } from "../utils/agriimeterHelpers";
 import { growthData } from "../data/agriimeterData";
-
-/**
- * @param {Object} props
- * @param {Array} props.trees
- * @param {Function} props.onExport
- */
 export function DBHHistoryTable({ trees, onExport }) {
   return (
     <Card className="glass-card">
@@ -51,7 +45,7 @@ export function DBHHistoryTable({ trees, onExport }) {
         </Button>
       </CardHeader>
       <CardContent>
-        {/* Overview Chart */}
+        {}
         <div className="mb-6">
           <h4 className="font-medium mb-3">Rata-rata Pertumbuhan DBH</h4>
           <div className="h-64">
@@ -67,7 +61,7 @@ export function DBHHistoryTable({ trees, onExport }) {
           </div>
         </div>
 
-        {/* Data Table */}
+        {}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

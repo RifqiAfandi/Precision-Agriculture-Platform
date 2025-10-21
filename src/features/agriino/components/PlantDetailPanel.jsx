@@ -10,22 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getRecentHistory } from "../data/agriinoData";
-
-/**
- * PlantDetailPanel displays detailed monitoring data for selected plant
- * Shows 7-day trend chart, current readings, and AI recommendations
- * 
- * @component
- * @param {Object} props - Component props
- * @param {Object} props.plant - Selected plant data
- * @param {number} props.plant.chlorophyll - Chlorophyll index
- * @param {number} props.plant.nitrogen - Nitrogen level (mg/L)
- * @param {string} props.plant.recommendation - AI recommendation
- * @param {string} props.plant.lastMeasurement - Last measurement timestamp
- * 
- * @example
- * <PlantDetailPanel plant={selectedPlant} />
- */
 export function PlantDetailPanel({ plant }) {
   if (!plant) {
     return (
@@ -40,7 +24,7 @@ export function PlantDetailPanel({ plant }) {
 
   return (
     <div className="space-y-6">
-      {/* Trend Chart */}
+      {}
       <div>
         <h4 className="font-medium mb-3 flex items-center space-x-2">
           <BarChart3 className="w-4 h-4" />
@@ -72,7 +56,7 @@ export function PlantDetailPanel({ plant }) {
         </div>
       </div>
 
-      {/* Current Readings */}
+      {}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-green-50 p-4 rounded-lg">
           <p className="text-sm text-green-600 mb-1">Indeks Klorofil</p>
@@ -86,7 +70,7 @@ export function PlantDetailPanel({ plant }) {
         </div>
       </div>
 
-      {/* AI Recommendation */}
+      {}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
         <h4 className="font-medium text-purple-900 mb-2 flex items-center space-x-2">
           <AlertCircle className="w-4 h-4" />

@@ -1,43 +1,6 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { Badge } from "../../../components/ui/Badge";
-
-/**
- * MonitoringCard component for displaying environmental parameter data
- * Shows main parameter value with status badge and additional metrics
- * 
- * @component
- * @param {Object} props - Component props
- * @param {string} props.title - Card title
- * @param {React.ComponentType} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind color class for icon (e.g., "text-red-600")
- * @param {Array<Object>} props.data - Array of data items to display
- * @param {string} props.data[].label - Data label
- * @param {number|string} props.data[].value - Data value
- * @param {Object} [props.data[].status] - Status object with label, color, and bg
- * @param {boolean} [props.data[].isMain] - Whether this is the main metric
- * @param {React.ReactNode} [props.footer] - Optional footer content
- * 
- * @example
- * <MonitoringCard
- *   title="Suhu Greenhouse"
- *   icon={Thermometer}
- *   iconColor="text-red-600"
- *   data={[
- *     {
- *       label: "Dalam Greenhouse",
- *       value: 26.8,
- *       status: { label: "Optimal", color: "text-green-600", bg: "bg-green-100" },
- *       isMain: true
- *     },
- *     {
- *       label: "Luar Greenhouse",
- *       value: "28.5°C"
- *     }
- *   ]}
- *   footer={<div>Additional info</div>}
- * />
- */
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 export function MonitoringCard({ title, icon: Icon, iconColor, data, footer }) {
   return (
     <Card className="glass-card">

@@ -68,7 +68,7 @@ export function RegisterPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
+        {}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
@@ -81,7 +81,7 @@ export function RegisterPage({ onNavigate }) {
           </p>
         </div>
 
-        {/* Register Form */}
+        {}
         <Card className="glass-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">Buat Akun</CardTitle>
@@ -217,7 +217,7 @@ export function RegisterPage({ onNavigate }) {
           </CardContent>
         </Card>
 
-        {/* Back to Landing */}
+        {}
         <div className="text-center mt-6">
           <Button
             variant="ghost"

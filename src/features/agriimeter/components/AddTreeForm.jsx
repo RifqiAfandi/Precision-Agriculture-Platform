@@ -5,26 +5,21 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
-import { Input } from "../../../components/ui/Input";
-import { Label } from "../../../components/ui/Label";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/Select";
+} from "@/components/ui/Select";
 import { Plus, MapPin, TreePine } from "lucide-react";
 import { toast } from "sonner";
 import { speciesOptions } from "../data/agriimeterData";
 import { validateTreeForm } from "../utils/agriimeterHelpers";
-
-/**
- * @param {Object} props
- * @param {Function} props.onSubmit
- */
 export function AddTreeForm({ onSubmit }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -38,21 +33,14 @@ export function AddTreeForm({ onSubmit }) {
   };
 
   const handleSubmit = () => {
-    // Validate form
     const validation = validateTreeForm(formData);
 
     if (!validation.isValid) {
       toast.error(validation.errors[0]);
       return;
     }
-
-    // Call parent submit handler
     onSubmit(formData);
-
-    // Success feedback
     toast.success("Pohon berhasil ditambahkan");
-
-    // Reset form
     setFormData({ name: "", species: "", age: "", location: "" });
   };
 

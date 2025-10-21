@@ -1,18 +1,7 @@
-/**
- * Utility functions for Agriino plant monitoring
- * Pure functions for status, calculations, and validation
- */
-
 import {
   chlorophyllRanges,
   nitrogenRanges,
 } from "../data/agriinoData";
-
-/**
- * Get status color class based on plant health status
- * @param {'excellent'|'good'|'warning'} status - Plant health status
- * @returns {string} Tailwind CSS classes
- */
 export const getStatusColor = (status) => {
   const colors = {
     excellent: "bg-green-100 text-green-700",
@@ -21,12 +10,6 @@ export const getStatusColor = (status) => {
   };
   return colors[status] || "bg-gray-100 text-gray-700";
 };
-
-/**
- * Get status label in Indonesian
- * @param {'excellent'|'good'|'warning'} status - Plant health status
- * @returns {string} Status label
- */
 export const getStatusLabel = (status) => {
   const labels = {
     excellent: "Sangat Baik",
@@ -35,17 +18,8 @@ export const getStatusLabel = (status) => {
   };
   return labels[status] || "Normal";
 };
-
-/**
- * Determine plant health status based on chlorophyll and nitrogen levels
- * @param {number} chlorophyll - Chlorophyll index
- * @param {number} nitrogen - Nitrogen level (mg/L)
- * @returns {'excellent'|'good'|'warning'} Health status
- */
 export const calculatePlantStatus = (chlorophyll, nitrogen) => {
-  // Check chlorophyll level
   if (chlorophyll >= chlorophyllRanges.excellent.min) {
-    // Excellent chlorophyll, check nitrogen
     if (nitrogen >= nitrogenRanges.optimal.min) {
       return "excellent";
     }
@@ -53,22 +27,13 @@ export const calculatePlantStatus = (chlorophyll, nitrogen) => {
   }
 
   if (chlorophyll >= chlorophyllRanges.good.min) {
-    // Good chlorophyll, check nitrogen
     if (nitrogen >= nitrogenRanges.moderate.min) {
       return "good";
     }
     return "warning";
   }
-
-  // Low chlorophyll
   return "warning";
 };
-
-/**
- * Get chlorophyll level status color for table
- * @param {number} chlorophyll - Chlorophyll index
- * @returns {string} Tailwind CSS classes
- */
 export const getChlorophyllColor = (chlorophyll) => {
   if (chlorophyll > 45) {
     return "bg-green-100 text-green-700";
@@ -78,12 +43,6 @@ export const getChlorophyllColor = (chlorophyll) => {
   }
   return "bg-red-100 text-red-700";
 };
-
-/**
- * Get nitrogen level interpretation
- * @param {number} nitrogen - Nitrogen level (mg/L)
- * @returns {Object} Interpretation object
- */
 export const getNitrogenInterpretation = (nitrogen) => {
   if (nitrogen >= nitrogenRanges.high.min) {
     return {
@@ -119,14 +78,6 @@ export const getNitrogenInterpretation = (nitrogen) => {
     recommendation: "Segera lakukan pemupukan nitrogen",
   };
 };
-
-/**
- * Generate AI recommendation based on plant data
- * @param {number} chlorophyll - Chlorophyll index
- * @param {number} nitrogen - Nitrogen level
- * @param {'up'|'down'} trend - Trend direction
- * @returns {string} AI recommendation
- */
 export const generateRecommendation = (chlorophyll, nitrogen, trend) => {
   const status = calculatePlantStatus(chlorophyll, nitrogen);
   const nitrogenInfo = getNitrogenInterpretation(nitrogen);
@@ -155,15 +106,6 @@ export const generateRecommendation = (chlorophyll, nitrogen, trend) => {
 
   return "Monitor kondisi tanaman secara berkala";
 };
-
-/**
- * Validate new plant form data
- * @param {Object} plantData - Plant form data
- * @param {string} plantData.name - Plant name
- * @param {string} plantData.location - Plant location
- * @param {string} [plantData.description] - Plant description
- * @returns {Object} Validation result
- */
 export const validatePlantForm = (plantData) => {
   const errors = {};
 
@@ -184,13 +126,6 @@ export const validatePlantForm = (plantData) => {
     errors,
   };
 };
-
-/**
- * Calculate trend direction from historical data
- * @param {Array} history - Historical data array
- * @param {string} metric - Metric to analyze ('chlorophyll' or 'nitrogen')
- * @returns {'up'|'down'|'stable'} Trend direction
- */
 export const calculateTrend = (history, metric = "chlorophyll") => {
   if (!history || history.length < 2) return "stable";
 
@@ -204,12 +139,6 @@ export const calculateTrend = (history, metric = "chlorophyll") => {
   if (decreasing) return "down";
   return "stable";
 };
-
-/**
- * Format timestamp for display
- * @param {string} timestamp - ISO timestamp or formatted datetime
- * @returns {string} Formatted timestamp
- */
 export const formatTimestamp = (timestamp) => {
   if (!timestamp) return "-";
 
@@ -226,31 +155,13 @@ export const formatTimestamp = (timestamp) => {
     return timestamp;
   }
 };
-
-/**
- * Calculate health score percentage
- * @param {number} chlorophyll - Chlorophyll index
- * @param {number} nitrogen - Nitrogen level
- * @returns {number} Health score (0-100)
- */
 export const calculateHealthScore = (chlorophyll, nitrogen) => {
-  // Normalize chlorophyll (0-60 range to 0-100)
   const chlorophyllScore = Math.min((chlorophyll / 50) * 100, 100);
-
-  // Normalize nitrogen (0-4 range to 0-100)
   const nitrogenScore = Math.min((nitrogen / 3.5) * 100, 100);
-
-  // Weighted average (chlorophyll 60%, nitrogen 40%)
   const healthScore = chlorophyllScore * 0.6 + nitrogenScore * 0.4;
 
   return Math.round(healthScore);
 };
-
-/**
- * Get fertilization schedule recommendation
- * @param {number} nitrogen - Current nitrogen level
- * @returns {Object} Schedule recommendation
- */
 export const getFertilizationSchedule = (nitrogen) => {
   if (nitrogen >= nitrogenRanges.high.min) {
     return {
@@ -286,12 +197,6 @@ export const getFertilizationSchedule = (nitrogen) => {
     color: "text-red-600",
   };
 };
-
-/**
- * Export plant data to CSV format
- * @param {Array} plants - Array of plant objects
- * @returns {string} CSV string
- */
 export const exportToCsv = (plants) => {
   const headers = [
     "Nama Tanaman",

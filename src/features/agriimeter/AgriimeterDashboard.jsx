@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/Tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { TreePine, Ruler, Activity, Target } from "lucide-react";
 import { toast } from "sonner";
 import { TreeCard } from "./components/TreeCard";
 import { TreeDetailPanel } from "./components/TreeDetailPanel";
 import { AddTreeForm } from "./components/AddTreeForm";
 import { DBHHistoryTable } from "./components/DBHHistoryTable";
-import { StatCard } from "../../../components/common/StatCard";
+import { StatCard } from "@/components/common/StatCard";
 import { trees, getTreeStatistics } from "./data/agriimeterData";
 
 export function AgriimeterDashboard() {
@@ -32,7 +32,7 @@ export function AgriimeterDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header Statistics */}
+      {}
       <div className="grid md:grid-cols-4 gap-4">
         <StatCard
           icon={TreePine}
@@ -62,7 +62,7 @@ export function AgriimeterDashboard() {
         />
       </div>
 
-      {/* Tabs Navigation */}
+      {}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="add">Tambah Pohon</TabsTrigger>
@@ -70,15 +70,15 @@ export function AgriimeterDashboard() {
           <TabsTrigger value="history">Riwayat DBH</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Add Tree Form */}
+        {}
         <TabsContent value="add" className="space-y-4">
           <AddTreeForm onSubmit={handleAddTree} />
         </TabsContent>
 
-        {/* Tab 2: Monitoring Map */}
+        {}
         <TabsContent value="monitoring" className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Tree List */}
+            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -101,7 +101,7 @@ export function AgriimeterDashboard() {
               </CardContent>
             </Card>
 
-            {/* Monitoring Detail */}
+            {}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle>Detail Pertumbuhan DBH</CardTitle>
@@ -121,7 +121,7 @@ export function AgriimeterDashboard() {
           </div>
         </TabsContent>
 
-        {/* Tab 3: DBH History */}
+        {}
         <TabsContent value="history" className="space-y-4">
           <DBHHistoryTable trees={trees} onExport={handleExportData} />
         </TabsContent>

@@ -1,17 +1,10 @@
 import React from "react";
-import { Badge } from "../../../components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { MapPin, TrendingUp, TrendingDown, Activity, Eye } from "lucide-react";
 import {
   getStatusColor,
   getStatusLabel,
 } from "../utils/agriimeterHelpers";
-
-/**
- * @param {Object} props
- * @param {Object} props.tree
- * @param {boolean} props.isSelected
- * @param {Function} props.onClick
- */
 export function TreeCard({ tree, isSelected = false, onClick }) {
   const getGrowthIcon = () => {
     if (tree.growthRate > 0.5) {

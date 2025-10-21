@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { Calendar, Download } from "lucide-react";
 import {
   BarChart,
@@ -19,18 +19,6 @@ import {
 } from "recharts";
 import { historicalData } from "../data/agriinoData";
 import { getChlorophyllColor, exportToCsv } from "../utils/agriinoHelpers";
-
-/**
- * HistoryTable component displays historical plant data
- * Shows bar chart overview and detailed table with export functionality
- * 
- * @component
- * @param {Object} props - Component props
- * @param {Array} props.plants - Array of plant objects to display in table
- * 
- * @example
- * <HistoryTable plants={allPlants} />
- */
 export function HistoryTable({ plants }) {
   const handleExport = () => {
     const csv = exportToCsv(plants);
@@ -68,7 +56,7 @@ export function HistoryTable({ plants }) {
         </Button>
       </CardHeader>
       <CardContent>
-        {/* Trend Chart */}
+        {}
         <div className="mb-6">
           <h4 className="font-medium mb-3">
             Tren Rata-rata ({historicalData.length} Hari Terakhir)
@@ -87,7 +75,7 @@ export function HistoryTable({ plants }) {
           </div>
         </div>
 
-        {/* Data Table */}
+        {}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

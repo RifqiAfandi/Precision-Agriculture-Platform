@@ -1,12 +1,3 @@
-/**
- * Device Management Utilities
- * Helper functions for device operations and management
- */
-
-/**
- * Save installed devices to localStorage
- * @param {Array} devices - Array of installed device IDs
- */
 export const saveInstalledDevices = (devices) => {
   try {
     localStorage.setItem("agri-installed-devices", JSON.stringify(devices));
@@ -16,12 +7,6 @@ export const saveInstalledDevices = (devices) => {
     return false;
   }
 };
-
-/**
- * Load installed devices from localStorage
- * @param {Array} defaultDevices - Default devices if none saved
- * @returns {Array} Array of installed device IDs
- */
 export const loadInstalledDevices = (defaultDevices = ["agriino", "agriimeter"]) => {
   try {
     const saved = localStorage.getItem("agri-installed-devices");
@@ -31,13 +16,6 @@ export const loadInstalledDevices = (defaultDevices = ["agriino", "agriimeter"])
     return defaultDevices;
   }
 };
-
-/**
- * Add device to installed list
- * @param {string} deviceId - Device identifier
- * @param {Array} currentDevices - Current installed devices
- * @returns {Array} Updated device list
- */
 export const addDevice = (deviceId, currentDevices) => {
   if (currentDevices.includes(deviceId)) {
     return currentDevices;
@@ -46,25 +24,11 @@ export const addDevice = (deviceId, currentDevices) => {
   saveInstalledDevices(updated);
   return updated;
 };
-
-/**
- * Remove device from installed list
- * @param {string} deviceId - Device identifier
- * @param {Array} currentDevices - Current installed devices
- * @returns {Array} Updated device list
- */
 export const removeDevice = (deviceId, currentDevices) => {
   const updated = currentDevices.filter((id) => id !== deviceId);
   saveInstalledDevices(updated);
   return updated;
 };
-
-/**
- * Validate device installation
- * @param {string} deviceId - Device identifier
- * @param {Object} config - Device configuration
- * @returns {Object} Validation result
- */
 export const validateDeviceInstallation = (deviceId, config) => {
   const errors = {};
 
@@ -85,24 +49,12 @@ export const validateDeviceInstallation = (deviceId, config) => {
     errors,
   };
 };
-
-/**
- * Generate device serial number
- * @param {string} deviceId - Device identifier
- * @returns {string} Generated serial number
- */
 export const generateSerialNumber = (deviceId) => {
   const prefix = deviceId.substring(0, 3).toUpperCase();
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `${prefix}-${timestamp}-${random}`;
 };
-
-/**
- * Format device uptime
- * @param {number} seconds - Uptime in seconds
- * @returns {string} Formatted uptime string
- */
 export const formatUptime = (seconds) => {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
@@ -115,45 +67,25 @@ export const formatUptime = (seconds) => {
 
   return parts.length > 0 ? parts.join(" ") : "< 1m";
 };
-
-/**
- * Calculate device health score
- * @param {Object} deviceMetrics - Device metrics
- * @returns {number} Health score 0-100
- */
 export const calculateDeviceHealth = (deviceMetrics) => {
   let score = 100;
-
-  // Connectivity issues
   if (deviceMetrics.lastSeen) {
     const minutesSinceLastSeen = (Date.now() - new Date(deviceMetrics.lastSeen)) / 60000;
     if (minutesSinceLastSeen > 60) score -= 30;
     else if (minutesSinceLastSeen > 30) score -= 15;
     else if (minutesSinceLastSeen > 10) score -= 5;
   }
-
-  // Error rate
   if (deviceMetrics.errorRate > 0.1) score -= 20;
   else if (deviceMetrics.errorRate > 0.05) score -= 10;
-
-  // Battery level (if applicable)
   if (deviceMetrics.batteryLevel !== undefined) {
     if (deviceMetrics.batteryLevel < 20) score -= 15;
     else if (deviceMetrics.batteryLevel < 50) score -= 5;
   }
-
-  // Signal strength
   if (deviceMetrics.signalStrength < 30) score -= 10;
   else if (deviceMetrics.signalStrength < 50) score -= 5;
 
   return Math.max(0, Math.min(100, score));
 };
-
-/**
- * Get health status from score
- * @param {number} score - Health score 0-100
- * @returns {Object} Status object with label and color
- */
 export const getHealthStatus = (score) => {
   if (score >= 90) {
     return { label: "Excellent", color: "text-green-600", bg: "bg-green-100" };
@@ -167,13 +99,6 @@ export const getHealthStatus = (score) => {
     return { label: "Critical", color: "text-red-600", bg: "bg-red-100" };
   }
 };
-
-/**
- * Check if device needs maintenance
- * @param {Object} device - Device object
- * @param {Object} metrics - Device metrics
- * @returns {boolean} True if maintenance needed
- */
 export const needsMaintenance = (device, metrics) => {
   const healthScore = calculateDeviceHealth(metrics);
   const daysSinceLastMaintenance =
@@ -181,13 +106,6 @@ export const needsMaintenance = (device, metrics) => {
 
   return healthScore < 70 || daysSinceLastMaintenance > 90;
 };
-
-/**
- * Export device configuration
- * @param {Object} device - Device object
- * @param {Object} config - Device configuration
- * @returns {string} JSON configuration string
- */
 export const exportDeviceConfig = (device, config) => {
   const exportData = {
     device: {
@@ -202,17 +120,9 @@ export const exportDeviceConfig = (device, config) => {
 
   return JSON.stringify(exportData, null, 2);
 };
-
-/**
- * Import device configuration
- * @param {string} configString - JSON configuration string
- * @returns {Object} Parsed configuration or null if invalid
- */
 export const importDeviceConfig = (configString) => {
   try {
     const config = JSON.parse(configString);
-
-    // Validate required fields
     if (!config.device || !config.configuration) {
       throw new Error("Invalid configuration format");
     }
@@ -223,12 +133,6 @@ export const importDeviceConfig = (configString) => {
     return null;
   }
 };
-
-/**
- * Get device icon component name
- * @param {string} iconName - Icon name from device data
- * @returns {string} Lucide icon component name
- */
 export const getDeviceIcon = (iconName) => {
   const iconMap = {
     Leaf: "Leaf",
@@ -243,14 +147,6 @@ export const getDeviceIcon = (iconName) => {
 
   return iconMap[iconName] || "Box";
 };
-
-/**
- * Sort devices by criteria
- * @param {Array} devices - Array of devices
- * @param {string} sortBy - Sort criteria (name, category, status)
- * @param {string} order - Sort order (asc, desc)
- * @returns {Array} Sorted devices
- */
 export const sortDevices = (devices, sortBy = "name", order = "asc") => {
   const sorted = [...devices].sort((a, b) => {
     let compareValue = 0;
@@ -274,13 +170,6 @@ export const sortDevices = (devices, sortBy = "name", order = "asc") => {
 
   return sorted;
 };
-
-/**
- * Filter devices by search query
- * @param {Array} devices - Array of devices
- * @param {string} query - Search query
- * @returns {Array} Filtered devices
- */
 export const searchDevices = (devices, query) => {
   if (!query || query.trim() === "") {
     return devices;

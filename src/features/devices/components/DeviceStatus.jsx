@@ -11,17 +11,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { formatUptime, calculateDeviceHealth, getHealthStatus } from "../utils/devicesHelpers";
-
-/**
- * Device Status Component
- * Displays real-time status and metrics for a device
- * 
- * @param {Object} props
- * @param {Object} props.device - Device object
- * @param {Object} props.metrics - Device metrics
- * @param {string} props.variant - Display variant (full, compact, minimal)
- * @param {boolean} props.showHealth - Show health score
- */
 const DeviceStatus = ({
   device,
   metrics = {},
@@ -70,12 +59,10 @@ const DeviceStatus = ({
       </Card>
     );
   }
-
-  // Full variant
   return (
     <Card>
       <CardContent className="p-6 space-y-4">
-        {/* Header with device name and connection status */}
+        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <connectionStatus.icon className={`w-6 h-6 ${connectionStatus.color}`} />
@@ -96,9 +83,9 @@ const DeviceStatus = ({
           )}
         </div>
 
-        {/* Metrics Grid */}
+        {}
         <div className="grid grid-cols-2 gap-4">
-          {/* Uptime */}
+          {}
           {metrics.uptime !== undefined && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gray-400" />
@@ -109,7 +96,7 @@ const DeviceStatus = ({
             </div>
           )}
 
-          {/* Signal Strength */}
+          {}
           {metrics.signalStrength !== undefined && (
             <div className="flex items-center gap-2">
               <Signal className="w-4 h-4 text-gray-400" />
@@ -120,7 +107,7 @@ const DeviceStatus = ({
             </div>
           )}
 
-          {/* Battery Level */}
+          {}
           {metrics.batteryLevel !== undefined && (
             <div className="flex items-center gap-2">
               {metrics.isCharging ? (
@@ -143,7 +130,7 @@ const DeviceStatus = ({
             </div>
           )}
 
-          {/* Error Rate */}
+          {}
           {metrics.errorRate !== undefined && (
             <div className="flex items-center gap-2">
               <AlertTriangle
@@ -163,7 +150,7 @@ const DeviceStatus = ({
           )}
         </div>
 
-        {/* Last Seen */}
+        {}
         {metrics.lastSeen && (
           <div className="pt-3 border-t">
             <p className="text-xs text-gray-500">
@@ -172,7 +159,7 @@ const DeviceStatus = ({
           </div>
         )}
 
-        {/* Data transmission stats */}
+        {}
         {(metrics.dataReceived || metrics.dataSent) && (
           <div className="pt-3 border-t">
             <div className="flex justify-between text-xs text-gray-500">

@@ -22,14 +22,6 @@ const priorityConfig = {
     icon: Sun,
   },
 };
-
-/**
- * AI Insights Panel Component
- * Displays AI-generated insights and recommendations
- * 
- * @param {Object} props
- * @param {Array} props.insights - Array of insight objects
- */
 const AIInsightsPanel = ({ insights }) => {
   return (
     <Card>

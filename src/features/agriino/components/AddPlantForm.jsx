@@ -5,25 +5,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
-import { Input } from "../../../components/ui/Input";
-import { Label } from "../../../components/ui/Label";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import { Plus, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { validatePlantForm } from "../utils/agriinoHelpers";
-
-/**
- * AddPlantForm component for registering new plants
- * Includes form validation and GPS location info
- * 
- * @component
- * @param {Object} props - Component props
- * @param {Function} props.onSubmit - Submit handler receiving plant data
- * 
- * @example
- * <AddPlantForm onSubmit={(data) => handleAddPlant(data)} />
- */
 export function AddPlantForm({ onSubmit }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -39,18 +27,13 @@ export function AddPlantForm({ onSubmit }) {
     const validation = validatePlantForm(formData);
 
     if (!validation.isValid) {
-      // Show first error
       const firstError = Object.values(validation.errors)[0];
       toast.error(firstError);
       return;
     }
-
-    // Call parent handler
     if (onSubmit) {
       onSubmit(formData);
     }
-
-    // Reset form
     setFormData({ name: "", description: "", location: "" });
     toast.success("Tanaman berhasil ditambahkan");
   };

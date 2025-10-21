@@ -136,7 +136,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {}
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
@@ -156,7 +156,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           {dashboardStats.map((stat, index) => (
             <div
@@ -177,7 +177,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
         </div>
       </div>
 
-      {/* Product Status Cards */}
+      {}
       {productStatus.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {productStatus.map((product) => (
@@ -234,7 +234,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   </div>
                 )}
 
-                {/* Product-specific data preview */}
+                {}
                 <div className="pt-4 border-t border-gray-100">
                   {product.id === "agriino" && (
                     <div className="space-y-2">
@@ -334,7 +334,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
             </Card>
           ))}
 
-          {/* Add Device Card */}
+          {}
           {availableDevicesData.length > 0 && (
             <Card className="glass-card hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 border-dashed border-gray-300 hover:border-green-400">
               <CardContent className="p-8 text-center">
@@ -383,7 +383,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
         </Card>
       )}
 
-      {/* Recent Alerts */}
+      {}
       {recentAlerts.length > 0 && (
         <Card className="glass-card">
           <CardHeader>

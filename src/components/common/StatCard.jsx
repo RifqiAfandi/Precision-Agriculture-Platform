@@ -1,15 +1,5 @@
 import React from "react";
 import { Card, CardContent } from "../ui/Card";
-
-/** 
- * @param {Object} props
- * @param {React.Component} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind color classes
- * @param {string} props.label - Label statistik
- * @param {string|number} props.value - Nilai statistik
- * @param {string} props.unit - Unit 
- * @param {string} props.className - Additional classes
- */
 export function StatCard({
   icon: Icon,
   iconColor = "bg-gray-100 text-gray-600",
