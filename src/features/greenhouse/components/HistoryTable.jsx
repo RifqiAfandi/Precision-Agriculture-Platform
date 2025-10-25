@@ -55,18 +55,20 @@ export function HistoryTable({ greenhouses, onExport }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Waktu</TableHead>
-                <TableHead>Greenhouse</TableHead>
-                <TableHead>Aksi</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Alasan</TableHead>
-                <TableHead>Tipe</TableHead>
-              </TableRow>
-            </TableHeader>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Waktu</TableHead>
+                    <TableHead className="whitespace-nowrap">Greenhouse</TableHead>
+                    <TableHead className="whitespace-nowrap">Aksi</TableHead>
+                    <TableHead className="whitespace-nowrap">Status</TableHead>
+                    <TableHead className="whitespace-nowrap">Alasan</TableHead>
+                    <TableHead className="whitespace-nowrap">Tipe</TableHead>
+                  </TableRow>
+                </TableHeader>
             <TableBody>
               {sortedHistory.length > 0 ? (
                 sortedHistory.map((record, idx) => {
@@ -99,6 +101,8 @@ export function HistoryTable({ greenhouses, onExport }) {
               )}
             </TableBody>
           </Table>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

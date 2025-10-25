@@ -31,8 +31,8 @@ export function GreenhouseDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid md:grid-cols-4 gap-4">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         <StatCard
           icon={Home}
           iconColor="bg-green-100 text-green-600"
@@ -69,15 +69,15 @@ export function GreenhouseDashboard() {
         <TabsContent value="add" className="space-y-4">
           <AddGreenhouseForm onSubmit={handleAddGreenhouse} />
         </TabsContent>
-        <TabsContent value="monitoring" className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-6">
+        <TabsContent value="monitoring" className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Home className="w-5 h-5 text-green-600" />
+                <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+                  <Home className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                   <span>Lokasi Greenhouse</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs md:text-sm">
                   Klik untuk melihat detail monitoring
                 </CardDescription>
               </CardHeader>
@@ -94,8 +94,8 @@ export function GreenhouseDashboard() {
             </Card>
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle>Detail Monitoring</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-base md:text-lg">Detail Monitoring</CardTitle>
+                <CardDescription className="text-xs md:text-sm">
                   {selectedGreenhouse
                     ? `Update terakhir: ${selectedGreenhouse.lastUpdate}`
                     : "Pilih greenhouse untuk melihat detail monitoring"}

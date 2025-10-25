@@ -70,20 +70,22 @@ export function WeatherHistoryTable({ stations, onExport }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Waktu</TableHead>
-                <TableHead>Station</TableHead>
-                <TableHead>Suhu</TableHead>
-                <TableHead>Kelembaban</TableHead>
-                <TableHead>Angin</TableHead>
-                <TableHead>Hujan</TableHead>
-                <TableHead>AQI</TableHead>
-                <TableHead>CO₂</TableHead>
-              </TableRow>
-            </TableHeader>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Waktu</TableHead>
+                    <TableHead className="whitespace-nowrap">Station</TableHead>
+                    <TableHead className="whitespace-nowrap">Suhu</TableHead>
+                    <TableHead className="whitespace-nowrap">Kelembaban</TableHead>
+                    <TableHead className="whitespace-nowrap">Angin</TableHead>
+                    <TableHead className="whitespace-nowrap">Hujan</TableHead>
+                    <TableHead className="whitespace-nowrap">AQI</TableHead>
+                    <TableHead className="whitespace-nowrap">CO₂</TableHead>
+                  </TableRow>
+                </TableHeader>
             <TableBody>
               {sortedRecords.length > 0 ? (
                 sortedRecords.map((record, idx) => (
@@ -115,6 +117,8 @@ export function WeatherHistoryTable({ stations, onExport }) {
               )}
             </TableBody>
           </Table>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

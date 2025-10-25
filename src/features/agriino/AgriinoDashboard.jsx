@@ -32,8 +32,8 @@ export function AgriinoDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid md:grid-cols-4 gap-4">
+    <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         <StatCard
           icon={Leaf}
           iconColor="text-green-600"
@@ -71,15 +71,15 @@ export function AgriinoDashboard() {
         <TabsContent value="add">
           <AddPlantForm onSubmit={handleAddPlant} />
         </TabsContent>
-        <TabsContent value="monitoring" className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-6">
+        <TabsContent value="monitoring" className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MapPin className="w-5 h-5 text-green-600" />
+                <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+                  <MapPin className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                   <span>Lokasi Tanaman</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs md:text-sm">
                   Klik untuk melihat detail monitoring
                 </CardDescription>
               </CardHeader>
@@ -96,8 +96,8 @@ export function AgriinoDashboard() {
             </Card>
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle>Detail Monitoring</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-base md:text-lg">Detail Monitoring</CardTitle>
+                <CardDescription className="text-xs md:text-sm">
                   {selectedPlant
                     ? `Pengukuran terakhir: ${selectedPlant.lastMeasurement}`
                     : "Pilih tanaman untuk melihat detail"}

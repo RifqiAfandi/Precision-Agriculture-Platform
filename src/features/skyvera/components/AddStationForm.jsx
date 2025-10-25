@@ -30,55 +30,58 @@ export function AddStationForm({ onSubmit }) {
   return (
     <Card className="glass-card">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Cloud className="w-5 h-5 text-blue-600" />
+        <CardTitle className="flex items-center space-x-1.5 sm:space-x-2 text-sm sm:text-base md:text-lg">
+          <Cloud className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           <span>Tambah Weather Station Baru</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Daftarkan weather station baru ke sistem monitoring cuaca
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nama Station</Label>
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="name" className="text-xs sm:text-sm">Nama Station</Label>
               <Input
                 id="name"
                 placeholder="Contoh: SkyVera Station #1"
                 value={formData.name}
                 onChange={(e) => handleChange("name", e.target.value)}
+                className="h-8 sm:h-10 text-xs sm:text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="location">Lokasi</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="location" className="text-xs sm:text-sm">Lokasi</Label>
               <Input
                 id="location"
                 placeholder="Contoh: Area Utara - Sektor A"
                 value={formData.location}
                 onChange={(e) => handleChange("location", e.target.value)}
+                className="h-8 sm:h-10 text-xs sm:text-sm"
               />
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="altitude">Ketinggian (mdpl)</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="altitude" className="text-xs sm:text-sm">Ketinggian (mdpl)</Label>
               <Input
                 id="altitude"
                 type="number"
                 placeholder="Contoh: 125"
                 value={formData.altitude}
                 onChange={(e) => handleChange("altitude", e.target.value)}
+                className="h-8 sm:h-10 text-xs sm:text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="stationType">Tipe Station</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="stationType" className="text-xs sm:text-sm">Tipe Station</Label>
               <Select
                 value={formData.stationType}
                 onValueChange={(value) => handleChange("stationType", value)}
               >
-                <SelectTrigger id="stationType">
+                <SelectTrigger id="stationType" className="h-8 sm:h-10 text-xs sm:text-sm">
                   <SelectValue placeholder="Pilih tipe station" />
                 </SelectTrigger>
                 <SelectContent>
@@ -91,13 +94,13 @@ export function AddStationForm({ onSubmit }) {
             </div>
           </div>
 
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-2 sm:pt-4">
             <Button
               type="submit"
               disabled={!isFormValid}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 h-8 sm:h-10 text-xs sm:text-sm"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
               Tambah Station
             </Button>
           </div>
