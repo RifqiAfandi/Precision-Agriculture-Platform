@@ -2,16 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent } from "../ui/Card";
 
-/**
- * StatCard Component - Displays a statistic with an icon
- * @param {Object} props - Component props
- * @param {React.ComponentType} props.icon - Lucide icon component
- * @param {string} props.iconColor - Tailwind classes for icon background and text color
- * @param {string} props.label - Label text for the statistic
- * @param {string|number} props.value - The value to display
- * @param {string} props.unit - Optional unit to display after value
- * @param {string} props.className - Additional CSS classes
- */
 export function StatCard({
   icon: IconComponent,
   iconColor = "bg-gray-100 text-gray-600",

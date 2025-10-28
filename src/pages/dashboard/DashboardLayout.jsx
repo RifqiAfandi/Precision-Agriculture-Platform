@@ -27,14 +27,6 @@ import { ProfilePage } from "./ProfilePage";
 import AddDeviceDialog from "@/features/devices/components/AddDeviceDialog";
 import { loadInstalledDevices, addDevice } from "@/features/devices/utils/devicesHelpers";
 
-/**
- * DashboardLayout Component - Main dashboard layout with sidebar and navigation
- * @param {Object} props - Component props
- * @param {Object} props.user - Current user object
- * @param {Function} props.onLogout - Logout handler
- * @param {boolean} props.darkMode - Dark mode state
- * @param {Function} props.toggleDarkMode - Dark mode toggle handler
- */
 export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

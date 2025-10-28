@@ -14,7 +14,6 @@ import {
 import { getParameterStatus } from "../data/skyveraData";
 
 export function WeatherHistoryTable({ stations, onExport }) {
-  // Collect recent data from all stations
   const allRecords = stations.flatMap((station) =>
     station.history.slice(-5).map((record) => ({
       ...record,
@@ -23,7 +22,6 @@ export function WeatherHistoryTable({ stations, onExport }) {
     }))
   );
 
-  // Sort by time (most recent first)
   const sortedRecords = allRecords.sort((a, b) => {
     return b.time.localeCompare(a.time);
   });

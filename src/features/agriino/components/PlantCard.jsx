@@ -4,19 +4,6 @@ import { Badge } from "@/components/ui/Badge";
 import { MapPin, Eye, TrendingUp, TrendingDown } from "lucide-react";
 import { getStatusColor, getStatusLabel } from "../utils/agriinoHelpers";
 
-/**
- * PlantCard Component - Displays plant information card
- * @param {Object} props - Component props
- * @param {Object} props.plant - Plant data object
- * @param {string} props.plant.id - Plant ID
- * @param {string} props.plant.name - Plant name
- * @param {string} props.plant.description - Plant description
- * @param {string} props.plant.location - Plant location
- * @param {string} props.plant.status - Plant status (optimal, warning, critical)
- * @param {string} props.plant.trend - Growth trend (up, down)
- * @param {boolean} props.isSelected - Whether the card is selected
- * @param {Function} props.onClick - Click handler
- */
 export function PlantCard({ plant, isSelected, onClick }) {
   return (
     <div

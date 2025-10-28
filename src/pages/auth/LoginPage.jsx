@@ -14,12 +14,6 @@ import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { ArrowLeft, Mail, Lock, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 
-/**
- * LoginPage Component - User login page
- * @param {Object} props - Component props
- * @param {Function} props.onNavigate - Navigation handler
- * @param {Function} props.onLogin - Login success handler
- */
 export function LoginPage({ onNavigate, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

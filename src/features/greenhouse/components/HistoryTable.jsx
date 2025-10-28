@@ -18,7 +18,6 @@ export function HistoryTable({ greenhouses, onExport }) {
     manual: { color: "bg-purple-100 text-purple-800", label: "Manual" },
   };
 
-  // Collect all history from all greenhouses
   const allHistory = greenhouses.flatMap((greenhouse) =>
     greenhouse.actionHistory.map((action) => ({
       ...action,
@@ -26,7 +25,6 @@ export function HistoryTable({ greenhouses, onExport }) {
     }))
   );
 
-  // Sort by time (most recent first)
   const sortedHistory = allHistory.sort((a, b) => {
     return b.time.localeCompare(a.time);
   });

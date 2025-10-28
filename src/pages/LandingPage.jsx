@@ -11,11 +11,6 @@ import {
 import { Cloud, Home, ArrowRight, Leaf, ChevronDown, ArrowUp } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 
-/**
- * LandingPage Component - Main landing page for the application
- * @param {Object} props - Component props
- * @param {Function} props.onNavigate - Navigation handler function
- */
 export function LandingPage({ onNavigate }) {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -59,10 +54,8 @@ export function LandingPage({ onNavigate }) {
   ];
 
   useEffect(() => {
-    // Enable smooth scrolling
     document.documentElement.style.scrollBehavior = "smooth";
 
-    // Handle scroll event for back-to-top button
     const handleScroll = () => {
       if (window.scrollY > 400) {
         setShowBackToTop(true);

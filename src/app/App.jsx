@@ -3,9 +3,6 @@ import PropTypes from "prop-types";
 import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "@/pages";
 import { Toaster } from "@/components/ui/Sonner";
 
-/**
- * Main App Component - Handles routing and authentication
- */
 export default function App() {
   const [currentPage, setCurrentPage] = useState("landing");
   const [user, setUser] = useState(null);
