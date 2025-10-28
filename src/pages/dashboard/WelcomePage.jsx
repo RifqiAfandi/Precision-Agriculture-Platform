@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import {
   Leaf,
+  Cloud,
   Home,
   Activity,
   TrendingUp,
@@ -17,7 +18,6 @@ import {
   CheckCircle,
   ArrowRight,
   MapPin,
-  TreePine,
   Ruler,
   Plus,
   Gauge,
@@ -28,6 +28,10 @@ import { DeviceCard } from "@/features/devices";
 import { getAvailableDevices, getDeviceById } from "@/features/devices/data/devicesData";
 
 export function WelcomePage({ user, onNavigate, installedDevices }) {
+  const totalWarnings = 
+    (installedDevices.includes("agriino") ? 1 : 0) +
+    (installedDevices.includes("skyvera") ? 1 : 0);
+
   const dashboardStats = [
     {
       title: "Total Perangkat",
@@ -54,12 +58,12 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
     },
     {
       title: "Peringatan",
-      value: installedDevices.includes("skyvera") ? "3" : "2",
-      change: "1 perlu perhatian",
-      trend: "warning",
+      value: totalWarnings.toString(),
+      change: totalWarnings > 0 ? `${totalWarnings} perlu perhatian` : "Tidak ada peringatan",
+      trend: totalWarnings > 0 ? "warning" : "safe",
       icon: AlertTriangle,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: totalWarnings > 0 ? "text-orange-600" : "text-green-600",
+      bgColor: totalWarnings > 0 ? "bg-orange-50" : "bg-green-50",
     },
     {
       title: "Status Sistem",
@@ -73,6 +77,13 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
   ];
 
   const getProductStatus = () => {
+    const iconMap = {
+      'agriino': Leaf,
+      'agriimeter': Cloud,
+      'greenhouse': Home,
+      'skyvera': Gauge,
+    };
+
     return installedDevices
       .map(deviceId => {
         const device = getDeviceById(deviceId);
@@ -82,7 +93,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
           id: device.id,
           name: device.name,
           description: device.description,
-          icon: device.icon,
+          icon: iconMap[device.id] || device.icon,
           status: 'active',
           devices: device.id === 'agriino' ? 5 : device.id === 'agriimeter' ? 3 : 1,
           lastUpdate: device.id === 'skyvera' ? '30 detik lalu' : device.id === 'greenhouse' ? '1 menit lalu' : device.id === 'agriino' ? '2 menit lalu' : '5 menit lalu',
@@ -217,17 +228,20 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   </span>
                 </div>
 
-                {product.alerts > 0 && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Peringatan</span>
-                    <Badge
-                      variant="destructive"
-                      className="bg-orange-100 text-orange-700"
-                    >
-                      {product.alerts}
-                    </Badge>
-                  </div>
-                )}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Peringatan</span>
+                  <Badge
+                    variant={product.alerts > 0 ? "destructive" : "default"}
+                    className={
+                      product.alerts > 0
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-green-100 text-green-700"
+                    }
+                  >
+                    {product.alerts}
+                  </Badge>
+                </div>
+
                 <div className="pt-4 border-t border-gray-100">
                   {product.id === "agriino" && (
                     <div className="space-y-2">
