@@ -1,288 +1,205 @@
-# 🌱 Precision Agriculture Platform - Frontend
+# Precision Agriculture Platform - Frontend
 
 Platform monitoring IoT pertanian berbasis AI dengan React + Vite.
 
-## 📋 Overview
+## Overview
 
-Web application untuk monitoring dan kontrol sistem IoT pertanian yang terintegrasi dengan berbagai perangkat:
+Web application untuk monitoring dan kontrol sistem IoT pertanian:
 - **Agriino** - Monitoring Klorofil & Nitrogen
 - **Agriimeter** - Pengukur DBH Pohon
 - **Greenhouse Compax** - Monitoring & Kontrol Rumah Kaca
 - **SkyVera** - Weather Station Professional
 
-## 🚀 Quick Start
+## Prerequisites
 
-### Prerequisites
 - Node.js v22.20.0
 - npm v10.9.3
 
-### Installation
-```bash
-# Clone repository
-git clone https://github.com/RifqiAfandi/Precision-Agriculture-Platform-FE.git
-cd Precision-Agriculture-Platform-FE
+## Installation
 
-# Install dependencies
+```bash
 npm install
-
-# Run development server
-npm run dev
-```
-
-### Available Scripts
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run lint     # Run ESLint
+npm run dev      # Development server
+npm run build    # Production build
 npm run preview  # Preview production build
 ```
 
-## 📁 Project Structure
+Server: `http://localhost:5173`
+
+## Project Structure
 
 ```
 src/
-├── app/                          # Application core
-│   ├── App.jsx                   # Root component
-│   └── main.jsx                  # Entry point
+├── app/                      # Root
+│   ├── App.jsx
+│   └── main.jsx
 │
-├── features/                     # Feature-based modules
-│   ├── agriimeter/               # ✅ Refactored (see REFACTORING_AGRIIMETER.md)
+├── features/                 # Feature modules
+│   ├── agriimeter/
 │   │   ├── AgriimeterDashboard.jsx
-│   │   ├── components/           # Sub-components
-│   │   │   ├── TreeCard.jsx
-│   │   │   ├── TreeDetailPanel.jsx
-│   │   │   ├── AddTreeForm.jsx
-│   │   │   └── DBHHistoryTable.jsx
-│   │   ├── data/                 # Data layer
-│   │   │   └── agriimeterData.js
-│   │   └── utils/                # Utility functions
-│   │       └── agriimeterHelpers.js
-│   │
-│   ├── greenhouse/               # ✅ Refactored (see REFACTORING_GREENHOUSE.md)
+│   │   ├── components/
+│   │   ├── data/
+│   │   └── utils/
+│   ├── greenhouse/
 │   │   ├── GreenhouseDashboard.jsx
-│   │   ├── components/           # Sub-components
-│   │   │   ├── MonitoringCard.jsx
-│   │   │   ├── ParameterCard.jsx
-│   │   │   ├── ControlPanel.jsx
-│   │   │   ├── TrendChart.jsx
-│   │   │   └── ActionHistoryPanel.jsx
-│   │   ├── data/                 # Data layer
-│   │   │   └── greenhouseData.js
-│   │   └── utils/                # Utility functions
-│   │       └── greenhouseHelpers.js
-│   │
-│   ├── agriino/                  # ✅ Refactored (see REFACTORING_AGRIINO.md)
+│   │   ├── components/
+│   │   ├── data/
+│   │   └── utils/
+│   ├── agriino/
 │   │   ├── AgriinoDashboard.jsx
-│   │   ├── components/           # Sub-components
-│   │   │   ├── PlantCard.jsx
-│   │   │   ├── PlantDetailPanel.jsx
-│   │   │   ├── AddPlantForm.jsx
-│   │   │   └── HistoryTable.jsx
-│   │   ├── data/                 # Data layer
-│   │   │   └── agriinoData.js
-│   │   └── utils/                # Utility functions
-│   │       └── agriinoHelpers.js
-│   │
-│   └── skyvera/                  # ✅ Refactored (see REFACTORING_SKYVERA.md)
+│   │   ├── components/
+│   │   ├── data/
+│   │   └── utils/
+│   └── skyvera/
 │       ├── SkyVeraDashboard.jsx
-│       ├── components/           # Sub-components
-│       │   ├── WeatherParameterCard.jsx
-│       │   ├── WeatherOverviewCard.jsx
-│       │   ├── AIInsightsPanel.jsx
-│       │   ├── ForecastPanel.jsx
-│       │   └── ExportPanel.jsx
-│       ├── data/                 # Data layer
-│       │   └── skyveraData.js
-│       └── utils/                # Utility functions
-│           └── skyveraHelpers.js
+│       ├── components/
+│       ├── data/
+│       └── utils/
 │
-├── components/                   # ✅ Reorganized for better readability
-│   ├── common/                   # Shared components
-│   │   ├── Logo.jsx              # Application logo
-│   │   ├── StatCard.jsx          # Reusable stat card
-│   │   └── index.js              # Barrel export
-│   │
-│   ├── charts/                   # Chart components (ready for future use)
-│   │   └── (prepared for chart components)
-│   │
-│   ├── layout/                   # Layout & page components
-│   │   ├── Dashboard.jsx         # Main dashboard layout
-│   │   │
-│   │   ├── pages/                # Public-facing pages
-│   │   │   ├── LandingPage.jsx
-│   │   │   ├── LoginPage.jsx
-│   │   │   ├── RegisterPage.jsx
-│   │   │   └── index.js
-│   │   │
-│   │   ├── dashboardPages/       # Dashboard-specific pages
-│   │   │   ├── WelcomePage.jsx
-│   │   │   ├── ProfilePage.jsx
-│   │   │   ├── AddDeviceDialog.jsx
-│   │   │   └── index.js
-│   │   │
-│   │   └── index.js              # Barrel export
-│   │
-│   └── ui/                       # Shadcn UI components
-│       ├── Button.jsx
-│       ├── Card.jsx
-│       ├── Input.jsx
-│       └── ... (40+ components)
+├── components/
+│   ├── common/               # Shared components
+│   │   ├── Logo.jsx
+│   │   └── StatCard.jsx
+│   ├── layout/               # Layout components
+│   │   ├── Dashboard.jsx
+│   │   ├── pages/            # Public pages
+│   │   └── dashboardPages/   # Dashboard pages
+│   └── ui/                   # Shadcn UI (40+ components)
 │
-├── hooks/                        # Custom React hooks
+├── services/                 # API integration
+│   └── api.js
+│
+├── contexts/                 # React contexts
+│   └── AuthContext.jsx
+│
+├── hooks/
 │   └── useMobile.js
 │
-└── styles/                       # Global styles
+└── styles/
     └── index.css
 ```
 
-## 🎯 Code Quality Standards
+## Code Quality
 
-### Component Guidelines
-- ✅ Main components < 200 lines
-- ✅ Sub-components < 150 lines
-- ✅ Single responsibility principle
-- ✅ JSDoc comments for all exports
-- ✅ Props documented in comments
+### Standards
+- Main components < 200 lines
+- Sub-components < 150 lines
+- Single responsibility
+- JSDoc comments
+- Props documented
 
-### Folder Organization
-- ✅ Feature-based structure (`features/[name]/`)
-- ✅ Data separated (`data/[name]Data.js`)
-- ✅ Utilities separated (`utils/[name]Helpers.js`)
-- ✅ Components modular (`components/[Name].jsx`)
-- ✅ Shared components in `components/common/`
-- ✅ Layout components in `components/layout/`
-- ✅ Page components organized by type (`pages/`, `dashboardPages/`)
+### Organization
+- Feature-based structure
+- Data layer separated
+- Utilities separated
+- Components modular
+- Shared components in common/
+- Layout components organized
 
-## 📊 Refactoring Progress
+## Refactoring Progress
 
-| Dashboard | Status | Lines Before | Lines After | Reduction |
-|-----------|--------|--------------|-------------|-----------|
-| Agriimeter | ✅ Complete | 750 | 150 | 80% |
-| Greenhouse | ✅ Complete | 280 | 140 | 50% |
-| Agriino | ✅ Complete | 620 | 130 | 79% |
-| SkyVera | ✅ Complete | 600 | 180 | 70% |
+| Dashboard | Status | Reduction |
+|-----------|--------|-----------|
+| Agriimeter | Complete | 80% |
+| Greenhouse | Complete | 50% |
+| Agriino | Complete | 79% |
+| SkyVera | Complete | 70% |
 
-**Progress: 4/4 dashboards (100%) completed! 🎉🎉🎉**
+**Total:** 1,850 → 600 lines (67.6% reduction)
 
-**Total Impact:**
-- **Lines Eliminated:** 1,850 lines → 600 lines (67.6% reduction)
-- **Files Created:** 33 organized files
-- **Utility Functions:** 61 documented functions
-- **Components Extracted:** 21 reusable components
+## Tech Stack
 
-**See detailed refactoring docs:**
-- [FINAL_REFACTORING_SUMMARY.md](FINAL_REFACTORING_SUMMARY.md) - Complete achievement report
-- [REFACTORING_AGRIIMETER.md](REFACTORING_AGRIIMETER.md) - Agriimeter full report
-- [REFACTORING_GREENHOUSE.md](REFACTORING_GREENHOUSE.md) - Greenhouse full report
-- [REFACTORING_AGRIINO.md](REFACTORING_AGRIINO.md) - Agriino full report (Best Practice)
-- [REFACTORING_SKYVERA.md](REFACTORING_SKYVERA.md) - SkyVera full report
-- [COMPONENT_STRUCTURE_REORGANIZATION.md](COMPONENT_STRUCTURE_REORGANIZATION.md) - Component structure improvement
-- [CODE_CLEANUP_SUMMARY.md](CODE_CLEANUP_SUMMARY.md) - Code cleanup report
+- React 19.1.1
+- Vite 7.1.2
+- Tailwind CSS 4.1.12
+- Radix UI + shadcn/ui
+- Lucide React 0.542.0
+- Recharts 3.2.0
+- Sonner 2.0.7
 
-## 🛠️ Tech Stack
+## Authentication
 
-- **Framework:** React 19.1.1
-- **Build Tool:** Vite 7.1.2
-- **Styling:** Tailwind CSS 4.1.12
-- **UI Components:** Radix UI + shadcn/ui
-- **Icons:** Lucide React 0.542.0
-- **Charts:** Recharts 3.2.0
-- **Notifications:** Sonner 2.0.7
+Backend API terintegrasi di folder `../Precision-Agriculture-Platform-BE`
 
-## 🎨 UI Components
-
-This project uses [shadcn/ui](https://ui.shadcn.com/) components:
-- Fully customizable
-- Built with Radix UI primitives
-- Tailwind CSS styled
-- TypeScript ready
-
-## 📖 Development Guidelines
-
-### Adding New Features
-1. Create feature folder in `src/features/[name]/`
-2. Separate data, utils, and components
-3. Use shared components from `components/common/`
-4. Keep files under 150 lines
-5. Add JSDoc comments
-
-### Code Style
-- Use ES6+ features
-- Functional components with hooks
-- Consistent naming conventions
-- No code duplication
-- Pure utility functions
-
-### Best Practices
-- ✅ Component composition over monoliths
-- ✅ Separation of concerns (data/logic/UI)
-- ✅ Reusable components
-- ✅ Clear prop interfaces
-- ✅ Single responsibility
-
-## 🧪 Testing
-
-Testing setup (coming soon):
-- Unit tests: Jest + React Testing Library
-- E2E tests: Playwright
-- Component tests: Storybook
-
-## 📝 Documentation
-
-- **Code Documentation:** JSDoc comments in source files
-- **Architecture:** See `REFACTORING_*.md` files
-- **API Integration:** Coming soon
-- **Component Library:** Coming soon
-
-## 🔧 Configuration Files
-
-- `vite.config.js` - Vite configuration
-- `tailwind.config.js` - Tailwind CSS config
-- `eslint.config.js` - ESLint rules
-- `package.json` - Dependencies & scripts
-
-## 🚀 Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+### Environment Setup
+Create `.env`:
+```env
+VITE_API_URL=http://localhost:8000/api
 ```
 
-Build output will be in `dist/` directory.
+### API Integration
+- **Service:** `src/services/api.js`
+- **Context:** `src/contexts/AuthContext.jsx`
+- **Auth Pages:** `src/components/layout/pages/`
 
-## 🤝 Contributing
+### Usage
+```jsx
+import { useAuth } from '@/contexts/AuthContext';
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Follow code quality standards
-4. Keep components under 150 lines
+function Component() {
+  const { user, login, logout } = useAuth();
+  
+  const handleLogin = async () => {
+    await login(email, password);
+  };
+}
+```
+
+## Development
+
+### Adding Features
+1. Create folder in `src/features/[name]/`
+2. Separate data, utils, components
+3. Keep files < 150 lines
+4. Add JSDoc comments
+
+### Code Style
+- ES6+ features
+- Functional components
+- Hooks only
+- No duplication
+- Pure utilities
+
+### Best Practices
+- Component composition
+- Separation of concerns
+- Reusable components
+- Clear prop interfaces
+- Single responsibility
+
+## Configuration
+
+- `vite.config.js` - Vite config
+- `tailwind.config.js` - Tailwind CSS
+- `eslint.config.js` - ESLint rules
+- `package.json` - Dependencies
+
+## Deployment
+
+```bash
+npm run build      # Build to dist/
+npm run preview    # Test build locally
+```
+
+## Contributing
+
+1. Fork repository
+2. Create feature branch
+3. Follow code standards
+4. Keep components < 150 lines
 5. Add JSDoc comments
-6. Commit changes (`git commit -m 'Add AmazingFeature'`)
-7. Push to branch (`git push origin feature/AmazingFeature`)
-8. Open Pull Request
+6. Commit changes
+7. Open Pull Request
 
-## 📄 License
+## Author
 
-This project is proprietary software owned by PT Precision Agriculture Indonesia.
+**RifqiAfandi**  
+Repository: [Precision-Agriculture-Platform-FE](https://github.com/RifqiAfandi/Precision-Agriculture-Platform-FE)  
+Branch: development
 
-## 👥 Team
+## Status
 
-- **Owner:** RifqiAfandi
-- **Repository:** [Precision-Agriculture-Platform-FE](https://github.com/RifqiAfandi/Precision-Agriculture-Platform-FE)
-- **Branch:** development
-
-## 📞 Support
-
-For questions or issues:
-- Create an issue on GitHub
-- Contact: info@agriiweb.com
-
----
-
-**Project Status:** 🟢 Active Development  
-**Last Updated:** 2025-10-20  
-**Code Quality:** 98% (after complete refactoring + component reorganization)  
-**Architecture:** Feature-based + Clean component structure
+**Active Development**  
+Last Updated: 2025-10-20  
+Code Quality: 98%  
+Architecture: Feature-based + Clean structure

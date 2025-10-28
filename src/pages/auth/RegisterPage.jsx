@@ -19,8 +19,9 @@ import {
   Building,
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
+import { useAuth } from "@/contexts/AuthContext";
 
-export function RegisterPage({ onNavigate }) {
+export function RegisterPage({ onNavigate, onLogin }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,16 +31,16 @@ export function RegisterPage({ onNavigate }) {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
+    // Validation
     if (!formData.name || !formData.email || !formData.password) {
-      setError("Semua field wajib diisi");
+      setError("Nama, email, dan password harus diisi");
       setIsLoading(false);
       return;
     }
@@ -56,9 +57,28 @@ export function RegisterPage({ onNavigate }) {
       return;
     }
 
-    setIsLoading(false);
-    alert("Registrasi berhasil! Silakan login dengan akun baru Anda.");
-    onNavigate("login");
+    // Prepare data
+    const userData = {
+      email: formData.email,
+      name: formData.name,
+      company: formData.company || undefined,
+      password: formData.password,
+      confirm_password: formData.confirmPassword,
+    };
+
+    try {
+      const result = await register(userData);
+      
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan yang tidak terduga");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (field, value) => {

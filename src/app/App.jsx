@@ -2,19 +2,22 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "@/pages";
 import { Toaster } from "@/components/ui/Sonner";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
-export default function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState("landing");
-  const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("agri-user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (isAuthenticated && user) {
       setCurrentPage("dashboard");
+    } else if (!isAuthenticated && currentPage === "dashboard") {
+      setCurrentPage("landing");
     }
+  }, [isAuthenticated, user]);
 
+  useEffect(() => {
     const savedDarkMode = localStorage.getItem("agri-dark-mode");
     if (savedDarkMode === "true") {
       setDarkMode(true);
@@ -23,15 +26,11 @@ export default function App() {
   }, []);
 
   const handleLogin = (userData) => {
-    const user = { id: "1", ...userData };
-    setUser(user);
-    localStorage.setItem("agri-user", JSON.stringify(user));
     setCurrentPage("dashboard");
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("agri-user");
+  const handleLogout = async () => {
+    await logout();
     setCurrentPage("landing");
   };
 
@@ -47,6 +46,18 @@ export default function App() {
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat...</p>
+        </div>
+      </div>
+    );
+  }
+
   const renderPage = () => {
     switch (currentPage) {
       case "landing":
@@ -54,7 +65,7 @@ export default function App() {
       case "login":
         return <LoginPage onNavigate={setCurrentPage} onLogin={handleLogin} />;
       case "register":
-        return <RegisterPage onNavigate={setCurrentPage} />;
+        return <RegisterPage onNavigate={setCurrentPage} onLogin={handleLogin} />;
       case "dashboard":
         return (
           <DashboardLayout
@@ -74,5 +85,13 @@ export default function App() {
       {renderPage()}
       <Toaster />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

@@ -13,19 +13,19 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { ArrowLeft, Mail, Lock, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function LoginPage({ onNavigate, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (!email || !password) {
       setError("Email dan password harus diisi");
@@ -33,18 +33,19 @@ export function LoginPage({ onNavigate, onLogin }) {
       return;
     }
 
-    if (email === "demo@agriiweb.com" && password === "demo123") {
-      onLogin({ name: "Demo User", email: email });
-    } else if (email && password) {
-      const name =
-        email.split("@")[0].charAt(0).toUpperCase() +
-        email.split("@")[0].slice(1);
-      onLogin({ name: name, email: email });
-    } else {
-      setError("Email atau password salah");
+    try {
+      const result = await login(email, password);
+      
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan yang tidak terduga");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -120,11 +121,9 @@ export function LoginPage({ onNavigate, onLogin }) {
             </form>
 
             <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
-              <p className="font-medium mb-1">Demo Login:</p>
-              <p>Email: demo@agriiweb.com</p>
-              <p>Password: demo123</p>
-              <p className="text-xs mt-1 text-blue-600">
-                Atau gunakan email/password apa saja untuk demo
+              <p className="font-medium mb-1">Info:</p>
+              <p className="text-xs text-blue-600">
+                Silakan login dengan email dan password yang telah terdaftar di database
               </p>
             </div>
 
