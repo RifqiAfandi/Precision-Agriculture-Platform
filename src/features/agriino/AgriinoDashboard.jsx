@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -7,8 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { MapPin } from "lucide-react";
-import { plants, getAgriinoStats, getPlantById } from "./data/agriinoData";
+import { MapPin, Loader2 } from "lucide-react";
 import { StatCard } from "@/components/common/StatCard";
 import { PlantCard } from "./components/PlantCard";
 import { PlantDetailPanel } from "./components/PlantDetailPanel";
@@ -20,16 +19,127 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
+import api from "@/services/api";
+import { toast } from "sonner";
+
 export function AgriinoDashboard() {
   const [activeTab, setActiveTab] = useState("monitoring");
   const [selectedPlantId, setSelectedPlantId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalPlants: 0,
+    avgChlorophyll: '0',
+    avgNitrogen: '0',
+    needsAttention: 0,
+  });
+  const [plants, setPlants] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [selectedPlant, setSelectedPlant] = useState(null);
 
-  const stats = getAgriinoStats();
-  const selectedPlant = getPlantById(selectedPlantId);
-  
-  const handleAddPlant = () => {
-    setActiveTab("monitoring");
+  // Fetch dashboard data
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  // Update selected plant when plants or selectedPlantId changes
+  useEffect(() => {
+    if (selectedPlantId && plants.length > 0) {
+      const plant = plants.find(p => p.id === selectedPlantId);
+      if (plant) {
+        fetchPlantDetails(selectedPlantId);
+      }
+    } else {
+      setSelectedPlant(null);
+    }
+  }, [selectedPlantId, plants]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch stats and plants in parallel
+      const [statsData, plantsData, devicesData] = await Promise.all([
+        api.getAgriinoStats().catch(() => ({
+          total_plants: 0,
+          avg_chlorophyll: 0,
+          avg_nitrogen: 0,
+          needs_attention: 0,
+        })),
+        api.getPlants().catch(() => []),
+        api.getDevices().catch(() => [])
+      ]);
+
+      setStats({
+        totalPlants: statsData.total_plants || 0,
+        avgChlorophyll: statsData.avg_chlorophyll || '0',
+        avgNitrogen: statsData.avg_nitrogen || '0',
+        needsAttention: statsData.needs_attention || 0,
+      });
+
+      setPlants(Array.isArray(plantsData) ? plantsData : []);
+      setDevices(Array.isArray(devicesData) ? devicesData : []);
+
+      // Auto-select first plant if none selected
+      if (!selectedPlantId && plantsData.length > 0) {
+        setSelectedPlantId(plantsData[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Gagal memuat data dashboard: ' + (error.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const fetchPlantDetails = async (plantId) => {
+    try {
+      const plantData = await api.getPlant(plantId);
+      setSelectedPlant(plantData);
+    } catch (error) {
+      console.error('Error fetching plant details:', error);
+      toast.error('Gagal memuat detail tanaman');
+    }
+  };
+
+  const handleAddPlant = async (formData) => {
+    try {
+      // Get first device or show error
+      if (devices.length === 0) {
+        toast.error('Anda belum memiliki device. Silakan tambahkan device terlebih dahulu.');
+        return;
+      }
+
+      const plantData = {
+        device: devices[0].id, // Use first device
+        name: formData.name,
+        description: formData.description || '',
+        location: formData.location,
+        // Add coordinates if available from GPS
+        latitude: null,
+        longitude: null,
+      };
+
+      await api.createPlant(plantData);
+      toast.success('Tanaman berhasil ditambahkan');
+      
+      // Refresh data
+      await fetchDashboardData();
+      
+      // Switch to monitoring tab
+      setActiveTab("monitoring");
+    } catch (error) {
+      console.error('Error adding plant:', error);
+      toast.error('Gagal menambahkan tanaman');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">

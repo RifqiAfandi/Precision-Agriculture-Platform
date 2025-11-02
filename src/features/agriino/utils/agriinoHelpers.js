@@ -7,6 +7,7 @@ export const getStatusColor = (status) => {
     excellent: "bg-green-100 text-green-700",
     good: "bg-blue-100 text-blue-700",
     warning: "bg-orange-100 text-orange-700",
+    critical: "bg-red-100 text-red-700",
   };
   return colors[status] || "bg-gray-100 text-gray-700";
 };
@@ -15,6 +16,7 @@ export const getStatusLabel = (status) => {
     excellent: "Sangat Baik",
     good: "Baik",
     warning: "Perlu Perhatian",
+    critical: "Kritis",
   };
   return labels[status] || "Normal";
 };
@@ -205,19 +207,21 @@ export const exportToCsv = (plants) => {
     "Indeks Klorofil",
     "Nitrogen (mg/L)",
     "Status",
+    "Trend",
     "Rekomendasi",
     "Pengukuran Terakhir",
   ];
 
   const rows = plants.map((plant) => [
-    plant.name,
-    plant.location,
-    plant.description,
-    plant.chlorophyll,
-    plant.nitrogen,
+    plant.name || '-',
+    plant.location || '-',
+    plant.description || '-',
+    plant.current_chlorophyll != null ? plant.current_chlorophyll.toFixed(1) : '-',
+    plant.current_nitrogen != null ? plant.current_nitrogen.toFixed(1) : '-',
     getStatusLabel(plant.status),
-    plant.recommendation,
-    plant.lastMeasurement,
+    plant.trend === 'up' ? 'Naik' : plant.trend === 'down' ? 'Turun' : 'Stabil',
+    plant.recommendation || '-',
+    plant.last_measurement || '-',
   ]);
 
   const csv = [

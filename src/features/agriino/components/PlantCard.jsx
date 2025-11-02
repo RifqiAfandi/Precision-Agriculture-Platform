@@ -31,8 +31,10 @@ export function PlantCard({ plant, isSelected, onClick }) {
         <div className="flex items-center space-x-1 sm:space-x-2 ml-1.5 sm:ml-2 flex-shrink-0">
           {plant.trend === "up" ? (
             <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
-          ) : (
+          ) : plant.trend === "down" ? (
             <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
+          ) : (
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" style={{ transform: 'rotate(90deg)' }} />
           )}
           <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
         </div>
@@ -45,10 +47,10 @@ PlantCard.propTypes = {
   plant: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    location: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(["optimal", "warning", "critical"]).isRequired,
-    trend: PropTypes.oneOf(["up", "down"]).isRequired,
+    description: PropTypes.string,
+    location: PropTypes.string,
+    status: PropTypes.oneOf(["excellent", "good", "warning", "critical"]),
+    trend: PropTypes.oneOf(["up", "down", "stable"]),
   }).isRequired,
   isSelected: PropTypes.bool,
   onClick: PropTypes.func.isRequired,

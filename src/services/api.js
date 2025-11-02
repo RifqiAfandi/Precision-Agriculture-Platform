@@ -193,6 +193,199 @@ class ApiService {
     const userStr = localStorage.getItem('agri-user');
     return userStr ? JSON.parse(userStr) : null;
   }
+
+  // ==========================================
+  // AGRIINO API METHODS
+  // ==========================================
+
+  /**
+   * Get dashboard statistics
+   */
+  async getAgriinoStats() {
+    return await this.request('/agriino/stats/', {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Get recent alerts (plants needing attention)
+   */
+  async getAgriinoAlerts() {
+    return await this.request('/agriino/alerts/', {
+      method: 'GET',
+    });
+  }
+
+  // ========== DEVICES ==========
+
+  /**
+   * Get all user's devices
+   */
+  async getDevices() {
+    const data = await this.request('/agriino/devices/', {
+      method: 'GET',
+    });
+    // Handle pagination - return results array or data itself
+    return Array.isArray(data) ? data : (data.results || []);
+  }
+
+  /**
+   * Get device details
+   */
+  async getDevice(deviceId) {
+    return await this.request(`/agriino/devices/${deviceId}/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Create new device
+   */
+  async createDevice(deviceData) {
+    return await this.request('/agriino/devices/', {
+      method: 'POST',
+      body: JSON.stringify(deviceData),
+    });
+  }
+
+  /**
+   * Update device
+   */
+  async updateDevice(deviceId, deviceData) {
+    return await this.request(`/agriino/devices/${deviceId}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(deviceData),
+    });
+  }
+
+  /**
+   * Delete device
+   */
+  async deleteDevice(deviceId) {
+    return await this.request(`/agriino/devices/${deviceId}/`, {
+      method: 'DELETE',
+    });
+  }
+
+  /**
+   * Regenerate device API key
+   */
+  async regenerateDeviceApiKey(deviceId) {
+    return await this.request(`/agriino/devices/${deviceId}/regenerate_api_key/`, {
+      method: 'POST',
+    });
+  }
+
+  /**
+   * Get device's plants
+   */
+  async getDevicePlants(deviceId) {
+    return await this.request(`/agriino/devices/${deviceId}/plants/`, {
+      method: 'GET',
+    });
+  }
+
+  // ========== PLANTS ==========
+
+  /**
+   * Get all plants
+   */
+  async getPlants() {
+    const data = await this.request('/agriino/plants/', {
+      method: 'GET',
+    });
+    // Handle pagination - return results array or data itself
+    return Array.isArray(data) ? data : (data.results || []);
+  }
+
+  /**
+   * Get plant details with history
+   */
+  async getPlant(plantId) {
+    return await this.request(`/agriino/plants/${plantId}/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Create new plant
+   */
+  async createPlant(plantData) {
+    return await this.request('/agriino/plants/', {
+      method: 'POST',
+      body: JSON.stringify(plantData),
+    });
+  }
+
+  /**
+   * Update plant
+   */
+  async updatePlant(plantId, plantData) {
+    return await this.request(`/agriino/plants/${plantId}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(plantData),
+    });
+  }
+
+  /**
+   * Delete plant
+   */
+  async deletePlant(plantId) {
+    return await this.request(`/agriino/plants/${plantId}/`, {
+      method: 'DELETE',
+    });
+  }
+
+  /**
+   * Get plant history
+   * @param {string} plantId 
+   * @param {number} days - Number of days (default: 7)
+   * @param {number} limit - Max records (default: 100)
+   */
+  async getPlantHistory(plantId, days = 7, limit = 100) {
+    return await this.request(`/agriino/plants/${plantId}/history/?days=${days}&limit=${limit}`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Get plant latest reading
+   */
+  async getPlantLatestReading(plantId) {
+    return await this.request(`/agriino/plants/${plantId}/latest_reading/`, {
+      method: 'GET',
+    });
+  }
+
+  // ========== READINGS ==========
+
+  /**
+   * Get all readings
+   */
+  async getReadings() {
+    return await this.request('/agriino/readings/', {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Create manual reading
+   */
+  async createReading(readingData) {
+    return await this.request('/agriino/readings/', {
+      method: 'POST',
+      body: JSON.stringify(readingData),
+    });
+  }
+
+  /**
+   * Get reading details
+   */
+  async getReading(readingId) {
+    return await this.request(`/agriino/readings/${readingId}/`, {
+      method: 'GET',
+    });
+  }
 }
 
 export default new ApiService();
