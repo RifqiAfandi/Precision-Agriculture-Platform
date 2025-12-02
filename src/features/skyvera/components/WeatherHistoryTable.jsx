@@ -29,19 +29,19 @@ export function WeatherHistoryTable({ stations, onExport }) {
   const getAQIBadge = (aqi) => {
     const status = getParameterStatus(aqi, "aqi");
     const colors = {
-      good: "bg-green-100 text-green-800",
-      moderate: "bg-yellow-100 text-yellow-800",
-      unhealthy_sensitive: "bg-orange-100 text-orange-800",
-      unhealthy: "bg-red-100 text-red-800",
+      good: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400",
+      moderate: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400",
+      unhealthy_sensitive: "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400",
+      unhealthy: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400",
     };
-    return colors[status.status] || "bg-gray-100 text-gray-800";
+    return colors[status.status] || "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300";
   };
 
   const getWindBadge = (wind) => {
-    if (wind <= 20) return "bg-green-100 text-green-800";
-    if (wind <= 40) return "bg-blue-100 text-blue-800";
-    if (wind <= 60) return "bg-orange-100 text-orange-800";
-    return "bg-red-100 text-red-800";
+    if (wind <= 20) return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400";
+    if (wind <= 40) return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400";
+    if (wind <= 60) return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400";
+    return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400";
   };
 
   return (
@@ -50,7 +50,7 @@ export function WeatherHistoryTable({ stations, onExport }) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <span>Riwayat Data Cuaca</span>
             </CardTitle>
             <CardDescription>
@@ -60,7 +60,7 @@ export function WeatherHistoryTable({ stations, onExport }) {
           <Button
             variant="outline"
             onClick={onExport}
-            className="border-blue-200 hover:bg-blue-50"
+            className="border-blue-200 dark:border-slate-600 hover:bg-blue-50 dark:hover:bg-slate-700"
           >
             <Download className="w-4 h-4 mr-2" />
             Ekspor
@@ -70,7 +70,7 @@ export function WeatherHistoryTable({ stations, onExport }) {
       <CardContent>
         <div className="overflow-x-auto -mx-4 sm:mx-0">
           <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden rounded-md border">
+            <div className="overflow-hidden rounded-md border dark:border-slate-700">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -108,7 +108,7 @@ export function WeatherHistoryTable({ stations, onExport }) {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={8} className="text-center py-8 text-gray-500 dark:text-gray-400">
                     Belum ada data riwayat
                   </TableCell>
                 </TableRow>

@@ -108,11 +108,11 @@ export function AddTreeForm({ onSubmit }) {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
-          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
+        <div className="flex items-center space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
           <div>
-            <p className="font-medium text-blue-900">GPS Otomatis</p>
-            <p className="text-sm text-blue-700">
+            <p className="font-medium text-blue-900 dark:text-blue-300">GPS Otomatis</p>
+            <p className="text-sm text-blue-700 dark:text-blue-400">
               Koordinat GPS akan direkam otomatis saat menyimpan
             </p>
           </div>

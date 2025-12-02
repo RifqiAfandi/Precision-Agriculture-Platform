@@ -14,8 +14,8 @@ import {
 
 export function HistoryTable({ greenhouses, onExport }) {
   const actionTypeConfig = {
-    auto: { color: "bg-blue-100 text-blue-800", label: "Otomatis" },
-    manual: { color: "bg-purple-100 text-purple-800", label: "Manual" },
+    auto: { color: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400", label: "Otomatis" },
+    manual: { color: "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400", label: "Manual" },
   };
 
   const allHistory = greenhouses.flatMap((greenhouse) =>
@@ -35,7 +35,7 @@ export function HistoryTable({ greenhouses, onExport }) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-green-600" />
+              <Clock className="w-5 h-5 text-green-600 dark:text-green-400" />
               <span>Riwayat Aksi Kontrol</span>
             </CardTitle>
             <CardDescription>
@@ -45,7 +45,7 @@ export function HistoryTable({ greenhouses, onExport }) {
           <Button
             variant="outline"
             onClick={onExport}
-            className="border-green-200 hover:bg-green-50"
+            className="border-green-200 dark:border-slate-600 hover:bg-green-50 dark:hover:bg-slate-700"
           >
             <Download className="w-4 h-4 mr-2" />
             Ekspor
@@ -55,7 +55,7 @@ export function HistoryTable({ greenhouses, onExport }) {
       <CardContent>
         <div className="overflow-x-auto -mx-4 sm:mx-0">
           <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden rounded-md border">
+            <div className="overflow-hidden rounded-md border dark:border-slate-700">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -79,7 +79,7 @@ export function HistoryTable({ greenhouses, onExport }) {
                       <TableCell>
                         <Badge variant="outline">{record.status}</Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-400">
                         {record.reason}
                       </TableCell>
                       <TableCell>
@@ -92,7 +92,7 @@ export function HistoryTable({ greenhouses, onExport }) {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={6} className="text-center py-8 text-gray-500 dark:text-gray-400">
                     Belum ada riwayat aksi
                   </TableCell>
                 </TableRow>

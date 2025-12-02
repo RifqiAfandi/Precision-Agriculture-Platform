@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Button } from "@/components/ui/Button";
-
 import { Badge } from "@/components/ui/Badge";
 import {
   User,
@@ -142,7 +141,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-green-50/30 via-white to-blue-50/30 flex overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-green-50/30 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex overflow-hidden">
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -153,11 +152,11 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
       <div
         className={`${
           sidebarCollapsed ? "lg:w-20" : "lg:w-72"
-        } w-72 transition-all duration-300 bg-white/80 backdrop-blur-lg border-r border-green-100 flex flex-col fixed inset-y-0 left-0 z-50 ${
+        } w-72 transition-all duration-300 bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-r border-green-100 dark:border-slate-700 flex flex-col fixed inset-y-0 left-0 z-50 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
-        <div className="p-4 lg:p-6 border-b border-green-100">
+        <div className="p-4 lg:p-6 border-b border-green-100 dark:border-slate-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {sidebarCollapsed ? (
@@ -189,7 +188,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl transition-all duration-200 text-left group ${
                   currentPage === item.id
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
-                    : "hover:bg-green-50 text-gray-700"
+                    : "hover:bg-green-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300"
                 }`}
               >
                 <item.icon
@@ -208,7 +207,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                         className={`text-xs ${
                           currentPage === item.id
                             ? "bg-white/20 text-white"
-                            : "bg-green-100 text-green-700"
+                            : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                         }`}
                       >
                         Aktif
@@ -219,7 +218,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                     className={`text-xs truncate ${
                       currentPage === item.id
                         ? "text-white/80"
-                        : "text-gray-500"
+                        : "text-gray-500 dark:text-gray-400"
                     }`}
                   >
                     {item.description}
@@ -233,7 +232,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 setShowAddDevice(true);
                 setSidebarOpen(false);
               }}
-              className={`w-full lg:hidden flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-left group border-2 border-dashed border-gray-300 hover:border-green-400 hover:bg-green-50 text-gray-600 hover:text-green-700`}
+              className={`w-full lg:hidden flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-left group border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 hover:text-green-700`}
             >
               <Plus className="w-5 h-5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
@@ -244,7 +243,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
           </div>
         </nav>
 
-        <div className="p-3 lg:p-4 border-t border-green-100 space-y-2">
+        <div className="p-3 lg:p-4 border-t border-green-100 dark:border-slate-700 space-y-2">
           <button
             onClick={() => {
               setCurrentPage("profile");
@@ -252,8 +251,8 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
             }}
             className={`w-full flex items-center space-x-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl transition-all duration-200 ${
               currentPage === "profile"
-                ? "bg-green-100 text-green-800"
-                : "hover:bg-green-50 text-gray-700"
+                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                : "hover:bg-green-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300"
             }`}
           >
             <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -261,7 +260,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
             </div>
             <div className={`flex-1 min-w-0 ${sidebarCollapsed ? "hidden lg:block" : ""}`}>
               <p className="font-medium truncate text-sm lg:text-base">{user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
             </div>
           </button>
 
@@ -282,7 +281,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
           sidebarCollapsed ? "lg:ml-20" : "lg:ml-72"
         } ml-0`}
       >
-        <header className="bg-white/80 backdrop-blur-lg border-b border-green-100 px-4 lg:px-6 py-3 lg:py-4 sticky top-0 z-30">
+        <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-b border-green-100 dark:border-slate-700 px-4 lg:px-6 py-3 lg:py-4 sticky top-0 z-30">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 lg:space-x-4 flex-1 min-w-0">
               <Button
@@ -304,11 +303,11 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
               </Button>
               
               <div className="min-w-0 flex-1">
-                <h2 className="text-base lg:text-xl font-bold text-gray-900 truncate">
+                <h2 className="text-base lg:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
                   {menuItems.find((item) => item.id === currentPage)?.label ||
                     "Dashboard"}
                 </h2>
-                <p className="text-xs lg:text-sm text-gray-500 flex items-center space-x-1 lg:space-x-2">
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 flex items-center space-x-1 lg:space-x-2">
                   <Calendar className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
                   <span className="truncate hidden sm:inline">{getCurrentDate()}</span>
                   <span className="truncate sm:hidden">
@@ -326,7 +325,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 onClick={() => setShowAddDevice(true)}
                 variant="outline"
                 size="sm"
-                className="hidden lg:flex items-center space-x-2 border-green-200 text-green-700 hover:bg-green-50"
+                className="hidden lg:flex items-center space-x-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-slate-700"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Alat</span>
@@ -352,9 +351,9 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
                 )}
               </Button>
 
-              <div className="hidden md:flex items-center space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 bg-green-50 rounded-lg">
+              <div className="hidden md:flex items-center space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
-                <span className="text-xs lg:text-sm font-medium text-green-700">
+                <span className="text-xs lg:text-sm font-medium text-green-700 dark:text-green-400">
                   Online
                 </span>
               </div>

@@ -84,8 +84,8 @@ export function LandingPage({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 relative scroll-smooth">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-md border-b border-green-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative scroll-smooth">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 dark:bg-slate-800/75 backdrop-blur-md border-b border-green-100 dark:border-slate-700">
         <div className="container mx-auto flex justify-between items-center px-6 py-4">
           <Logo size="lg" variant="default" textClassName="black" />
           <div className="space-x-4">
@@ -110,13 +110,13 @@ export function LandingPage({ onNavigate }) {
       <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-4 sm:px-6 lg:px-8 pt-20">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight animate-fade-in">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 leading-tight animate-fade-in">
               Precision Agriculture Platform
             </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-600 mb-4 sm:mb-6 leading-relaxed font-medium animate-fade-in-delay-1">
+            <p className="text-xl sm:text-2xl md:text-3xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed font-medium animate-fade-in-delay-1">
               Smart Farming Made Simple
             </p>
-            <p className="text-base sm:text-lg md:text-xl text-gray-500 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-delay-2">
+            <p className="text-base sm:text-lg md:text-xl text-gray-500 dark:text-gray-400 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-delay-2">
               Platform monitoring IoT pertanian berbasis AI yang membantu petani
               modern mengoptimalkan hasil panen dengan teknologi sensor canggih
               dan analisis data real-time.
@@ -134,7 +134,7 @@ export function LandingPage({ onNavigate }) {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto px-8 py-6 text-lg border-2 border-green-200 text-green-700 hover:bg-green-50 shadow hover:shadow-lg transition-all duration-300"
+                className="w-full sm:w-auto px-8 py-6 text-lg border-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-slate-700 shadow hover:shadow-lg transition-all duration-300"
                 onClick={() => scrollToSection("solutions")}
               >
                 Pelajari Lebih Lanjut
@@ -159,7 +159,7 @@ export function LandingPage({ onNavigate }) {
         {/* Scroll indicator */}
         <button
           onClick={() => scrollToSection("solutions")}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer bg-white/50 hover:bg-white/80 rounded-full p-3 transition-all duration-300 shadow-md"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer bg-white/50 dark:bg-slate-700/50 hover:bg-white/80 dark:hover:bg-slate-600/80 rounded-full p-3 transition-all duration-300 shadow-md"
           aria-label="Scroll to next section"
         >
           <ChevronDown className="w-6 h-6 text-gray-600" />
@@ -167,13 +167,13 @@ export function LandingPage({ onNavigate }) {
       </section>
 
       {/* Solutions Section */}
-      <section id="solutions" className="min-h-screen flex flex-col justify-center items-center relative px-4 sm:px-6 lg:px-8 py-20 bg-white">
+      <section id="solutions" className="min-h-screen flex flex-col justify-center items-center relative px-4 sm:px-6 lg:px-8 py-20 bg-white dark:bg-slate-900">
         <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-16 sm:mb-20">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Solusi IoT Pertanian Terdepan
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Produk unggulan yang dirancang khusus untuk membantu petani modern
               meningkatkan produktivitas dan efisiensi melalui teknologi AI dan
               IoT.
@@ -193,10 +193,10 @@ export function LandingPage({ onNavigate }) {
                   >
                     <product.icon className={`w-8 h-8 ${product.color}`} />
                   </div>
-                  <CardTitle className="text-2xl text-gray-900 mb-2">
+                  <CardTitle className="text-2xl text-gray-900 dark:text-gray-100 mb-2">
                     {product.name}
                   </CardTitle>
-                  <CardDescription className="text-lg text-gray-600">
+                  <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
                     {product.description}
                   </CardDescription>
                 </CardHeader>
@@ -210,7 +210,7 @@ export function LandingPage({ onNavigate }) {
                         <div
                           className={`w-2 h-2 ${product.bgColor} rounded-full flex-shrink-0`}
                         ></div>
-                        <span className="text-base text-gray-700">{feature}</span>
+                        <span className="text-base text-gray-700 dark:text-gray-300">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -223,7 +223,7 @@ export function LandingPage({ onNavigate }) {
         {/* Scroll indicator */}
         <button
           onClick={() => scrollToSection("cta")}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-full p-3 transition-all duration-300 shadow-md"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full p-3 transition-all duration-300 shadow-md"
           aria-label="Scroll to next section"
         >
           <ChevronDown className="w-6 h-6 text-gray-600" />
@@ -251,13 +251,13 @@ export function LandingPage({ onNavigate }) {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-green-50 via-white to-blue-50 relative">
+      <section id="cta" className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative">
         <div className="container mx-auto max-w-4xl text-center">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 lg:p-16 border border-gray-100">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 sm:p-12 lg:p-16 border border-gray-100 dark:border-slate-700">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Siap Memulai Revolusi Pertanian Digital?
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">
               Bergabunglah dengan ribuan petani yang telah merasakan manfaat
               teknologi AI untuk pertanian modern.
             </p>

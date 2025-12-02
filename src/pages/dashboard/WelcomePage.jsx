@@ -193,8 +193,8 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                    <product.icon className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-green-50 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                    <product.icon className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">{product.name}</CardTitle>
@@ -203,7 +203,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                 </div>
                 <Badge
                   variant="default"
-                  className="bg-green-100 text-green-700"
+                  className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                 >
                   Aktif
                 </Badge>
@@ -218,12 +218,12 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                       ? "Stasiun Cuaca"
                       : "Perangkat Aktif"}
                   </span>
-                  <span className="font-medium">{product.devices} unit</span>
+                  <span className="font-medium dark:text-gray-200">{product.devices} unit</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Update Terakhir</span>
-                  <span className="font-medium text-green-600">
+                  <span className="font-medium text-green-600 dark:text-green-400">
                     {product.lastUpdate}
                   </span>
                 </div>
@@ -242,20 +242,20 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   </Badge>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
+                <div className="pt-4 border-t border-gray-100 dark:border-slate-700">
                   {product.id === "agriino" && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           Rata-rata Klorofil
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.avgChlorophyll}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Nitrogen (mg/L)</span>
-                        <span className="font-medium">
+                        <span className="text-gray-500 dark:text-gray-400">Nitrogen (mg/L)</span>
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.avgNitrogen}
                         </span>
                       </div>
@@ -265,20 +265,20 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   {product.id === "agriimeter" && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center">
                           <Ruler className="w-3 h-3 mr-1" />
                           Rata-rata DBH
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.avgDBH} cm
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Laju Pertumbuhan
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.growthRate} cm/bulan
                         </span>
                       </div>
@@ -288,14 +288,14 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   {product.id === "greenhouse" && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Suhu Dalam</span>
-                        <span className="font-medium">
+                        <span className="text-gray-500 dark:text-gray-400">Suhu Dalam</span>
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.insideTemp}°C
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">CO₂ Level</span>
-                        <span className="font-medium">
+                        <span className="text-gray-500 dark:text-gray-400">CO₂ Level</span>
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.co2Level} ppm
                         </span>
                       </div>
@@ -305,26 +305,26 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   {product.id === "skyvera" && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center">
                           <Thermometer className="w-3 h-3 mr-1" />
                           Suhu
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.temperature}°C
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center">
                           <Wind className="w-3 h-3 mr-1" />
                           Angin
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-gray-200">
                           {product.data.windSpeed} km/h
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">AQI</span>
-                        <span className="font-medium">{product.data.aqi}</span>
+                        <span className="text-gray-500 dark:text-gray-400">AQI</span>
+                        <span className="font-medium dark:text-gray-200">{product.data.aqi}</span>
                       </div>
                     </div>
                   )}
@@ -341,15 +341,15 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
             </Card>
           ))}
           {availableDevicesData.length > 0 && (
-            <Card className="glass-card hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 border-dashed border-gray-300 hover:border-green-400">
+            <Card className="glass-card hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-green-400">
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-green-50 transition-colors">
-                  <Plus className="w-8 h-8 text-gray-400 group-hover:text-green-600 transition-colors" />
+                <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-green-50 dark:group-hover:bg-green-900/30 transition-colors">
+                  <Plus className="w-8 h-8 text-gray-400 dark:text-gray-500 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Tambah Perangkat
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
                   Pasang perangkat IoT baru untuk monitoring yang lebih lengkap
                 </p>
                 <div className="space-y-1">
@@ -357,7 +357,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                     <Badge
                       key={index}
                       variant="outline"
-                      className="bg-green-50 text-green-700 border-green-200 block"
+                      className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 block"
                     >
                       {device.name}
                     </Badge>
@@ -370,13 +370,13 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
       ) : (
         <Card className="glass-card text-center py-12">
           <CardContent>
-            <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
-              <Plus className="w-10 h-10 text-gray-400" />
+            <div className="w-20 h-20 mx-auto bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-6">
+              <Plus className="w-10 h-10 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Belum Ada Perangkat
             </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               Mulai dengan menambahkan perangkat IoT pertama Anda untuk
               monitoring pertanian yang lebih efektif
             </p>
@@ -403,7 +403,7 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
               {recentAlerts.map((alert, index) => (
                 <div
                   key={index}
-                  className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg"
+                  className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg"
                 >
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${
@@ -416,15 +416,15 @@ export function WelcomePage({ user, onNavigate, installedDevices }) {
                   ></div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
                         {alert.product}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {alert.time}
                       </span>
                     </div>
-                    <p className="text-gray-700 mb-1">{alert.message}</p>
-                    <p className="text-sm text-gray-500 flex items-center">
+                    <p className="text-gray-700 dark:text-gray-300 mb-1">{alert.message}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                       <MapPin className="w-3 h-3 mr-1" />
                       {alert.location}
                     </p>

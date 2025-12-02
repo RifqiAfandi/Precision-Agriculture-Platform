@@ -95,13 +95,13 @@ export function ProfilePage({ user }) {
               <User className="w-12 h-12 text-white" />
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">{user.name}</h2>
-              <p className="text-gray-600 flex items-center justify-center sm:justify-start space-x-2 mt-2">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{user.name}</h2>
+              <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center sm:justify-start space-x-2 mt-2">
                 <Mail className="w-4 h-4" />
                 <span className="text-sm sm:text-base">{user.email}</span>
               </p>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-4">
-                <Badge className="bg-green-100 text-green-700 px-3 py-1">
+                <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Akun Terverifikasi
                 </Badge>
@@ -128,7 +128,7 @@ export function ProfilePage({ user }) {
                 id="fullName"
                 value={user.name}
                 disabled
-                className="bg-gray-50 text-sm"
+                className="bg-gray-50 dark:bg-slate-700 text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -138,7 +138,7 @@ export function ProfilePage({ user }) {
                 type="email"
                 value={user.email}
                 disabled
-                className="bg-gray-50 text-sm"
+                className="bg-gray-50 dark:bg-slate-700 text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -147,11 +147,11 @@ export function ProfilePage({ user }) {
                 id="userId"
                 value={user.id}
                 disabled
-                className="bg-gray-50 text-sm"
+                className="bg-gray-50 dark:bg-slate-700 text-sm"
               />
             </div>
-            <div className="pt-2 bg-blue-50 p-3 rounded-lg">
-              <p className="text-xs text-blue-800">
+            <div className="pt-2 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+              <p className="text-xs text-blue-800 dark:text-blue-300">
                 Untuk mengubah informasi akun, hubungi administrator sistem.
               </p>
             </div>
@@ -282,11 +282,11 @@ export function ProfilePage({ user }) {
               }).map(([key, label]) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
                 >
                   <div className="flex-1 min-w-0 pr-4">
-                    <p className="font-medium text-sm text-gray-900">{label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {key === "emailAlerts" && "Notifikasi melalui email"}
                       {key === "smsAlerts" && "Notifikasi melalui SMS"}
                       {key === "pushNotifications" && "Notifikasi push browser"}
@@ -305,12 +305,12 @@ export function ProfilePage({ user }) {
               ))}
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-5 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center space-x-2">
                 <Shield className="w-5 h-5" />
                 <span>Informasi Keamanan</span>
               </h4>
-              <ul className="text-sm text-blue-800 space-y-2">
+              <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">•</span>
                   <span>Password terakhir diubah: 15 Juli 2024</span>

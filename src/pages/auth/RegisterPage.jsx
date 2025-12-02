@@ -86,16 +86,16 @@ export function RegisterPage({ onNavigate, onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Daftar Akun Baru
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Bergabung dengan platform IoT pertanian terdepan
           </p>
         </div>
@@ -211,22 +211,22 @@ export function RegisterPage({ onNavigate, onLogin }) {
             </form>
 
             <div className="mt-6 text-center space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Sudah punya akun?{" "}
                 <button
                   onClick={() => onNavigate("login")}
-                  className="text-green-600 hover:text-green-700 font-medium"
+                  className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 font-medium"
                 >
                   Masuk di sini
                 </button>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Dengan mendaftar, Anda menyetujui{" "}
-                <span className="text-green-600 underline cursor-pointer">
+                <span className="text-green-600 dark:text-green-400 underline cursor-pointer">
                   Syarat & Ketentuan
                 </span>{" "}
                 dan{" "}
-                <span className="text-green-600 underline cursor-pointer">
+                <span className="text-green-600 dark:text-green-400 underline cursor-pointer">
                   Kebijakan Privasi
                 </span>
               </p>
@@ -237,7 +237,7 @@ export function RegisterPage({ onNavigate, onLogin }) {
           <Button
             variant="ghost"
             onClick={() => onNavigate("landing")}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali ke Beranda
