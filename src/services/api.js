@@ -386,6 +386,188 @@ class ApiService {
       method: 'GET',
     });
   }
+
+  // ==========================================
+  // KRIGING ANALYSIS API METHODS
+  // ==========================================
+
+  /**
+   * Perform Kriging analysis on nitrogen data from Firebase
+   * @param {Object} analysisData - Analysis request data
+   * @param {Array} analysisData.device_data - Array of device readings with lat, lng, nitrogen
+   * @param {number} analysisData.grid_resolution - Grid resolution (default: 20)
+   * @param {string} analysisData.variogram_model - Variogram model (default: 'spherical')
+   * @param {number} analysisData.low_threshold - Low nitrogen threshold (default: 1.5)
+   * @param {number} analysisData.high_threshold - High nitrogen threshold (default: 2.5)
+   */
+  async performKrigingAnalysis(analysisData) {
+    return await this.request('/agriino/analyze/', {
+      method: 'POST',
+      body: JSON.stringify(analysisData),
+      skipAuth: true,
+    });
+  }
+
+  /**
+   * Quick Kriging analysis with simplified request format
+   * @param {Array} points - Array of {lat, lng, nitrogen} objects
+   * @param {Object} options - Optional parameters (resolution, model, thresholds)
+   */
+  async quickKrigingAnalysis(points, options = {}) {
+    return await this.request('/agriino/quick-analyze/', {
+      method: 'POST',
+      body: JSON.stringify({
+        points,
+        resolution: options.resolution || 20,
+        model: options.model || 'spherical',
+        low_threshold: options.lowThreshold || 1.5,
+        high_threshold: options.highThreshold || 2.5,
+      }),
+      skipAuth: true,
+    });
+  }
+
+  /**
+   * Sync device data from Firebase to backend database
+   * @param {Array} devices - Array of device data from Firebase
+   * @param {boolean} saveToDb - Whether to persist data (default: false)
+   */
+  async syncFirebaseDevices(devices, saveToDb = false) {
+    return await this.request('/agriino/sync/', {
+      method: 'POST',
+      body: JSON.stringify({
+        devices,
+        save_to_db: saveToDb,
+      }),
+      skipAuth: true,
+    });
+  }
+
+  /**
+   * Get API health status
+   */
+  async getApiHealth() {
+    return await this.request('/agriino/health/', {
+      method: 'GET',
+      skipAuth: true,
+    });
+  }
+
+  // ==========================================
+  // AREA MANAGEMENT API METHODS
+  // ==========================================
+
+  /**
+   * Get all areas
+   */
+  async getAreas() {
+    const data = await this.request('/agriino/areas/', {
+      method: 'GET',
+    });
+    return Array.isArray(data) ? data : (data.results || []);
+  }
+
+  /**
+   * Get area details
+   */
+  async getArea(areaId) {
+    return await this.request(`/agriino/areas/${areaId}/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Create new area
+   * @param {Object} areaData - Area data
+   * @param {string} areaData.name - Area name
+   * @param {string} areaData.description - Area description
+   * @param {Array} areaData.polygon_coordinates - Array of [lat, lng] pairs
+   * @param {number} areaData.center_latitude - Center latitude
+   * @param {number} areaData.center_longitude - Center longitude
+   * @param {Array} areaData.device_ids - Array of device IDs to add
+   */
+  async createArea(areaData) {
+    return await this.request('/agriino/areas/', {
+      method: 'POST',
+      body: JSON.stringify(areaData),
+    });
+  }
+
+  /**
+   * Update area
+   */
+  async updateArea(areaId, areaData) {
+    return await this.request(`/agriino/areas/${areaId}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(areaData),
+    });
+  }
+
+  /**
+   * Delete area
+   */
+  async deleteArea(areaId) {
+    return await this.request(`/agriino/areas/${areaId}/`, {
+      method: 'DELETE',
+    });
+  }
+
+  /**
+   * Add device to area
+   */
+  async addDeviceToArea(areaId, deviceId) {
+    return await this.request(`/agriino/areas/${areaId}/add_device/`, {
+      method: 'POST',
+      body: JSON.stringify({ device_id: deviceId }),
+    });
+  }
+
+  /**
+   * Remove device from area
+   */
+  async removeDeviceFromArea(areaId, deviceId) {
+    return await this.request(`/agriino/areas/${areaId}/remove_device/`, {
+      method: 'DELETE',
+      body: JSON.stringify({ device_id: deviceId }),
+    });
+  }
+
+  /**
+   * Get devices in an area
+   */
+  async getAreaDevices(areaId) {
+    return await this.request(`/agriino/areas/${areaId}/devices/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Get analysis history for an area
+   */
+  async getAreaAnalysisHistory(areaId) {
+    return await this.request(`/agriino/areas/${areaId}/analysis_history/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Get analysis result details
+   */
+  async getAnalysisResult(analysisId) {
+    return await this.request(`/agriino/analysis-results/${analysisId}/`, {
+      method: 'GET',
+    });
+  }
+
+  /**
+   * Get all analysis results
+   */
+  async getAnalysisResults() {
+    const data = await this.request('/agriino/analysis-results/', {
+      method: 'GET',
+    });
+    return Array.isArray(data) ? data : (data.results || []);
+  }
 }
 
 export default new ApiService();

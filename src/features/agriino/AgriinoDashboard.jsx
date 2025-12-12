@@ -7,12 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, Target } from "lucide-react";
 import { StatCard } from "@/components/common/StatCard";
 import { PlantCard } from "./components/PlantCard";
 import { PlantDetailPanel } from "./components/PlantDetailPanel";
 import { AddPlantForm } from "./components/AddPlantForm";
 import { HistoryTable } from "./components/HistoryTable";
+import { KrigingMap } from "./components/KrigingMap";
 import {
   Leaf,
   BarChart3,
@@ -173,9 +174,10 @@ export function AgriinoDashboard() {
         />
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="add">Tambah Tanaman</TabsTrigger>
           <TabsTrigger value="monitoring">Peta Monitoring</TabsTrigger>
+          <TabsTrigger value="kriging">Analisis Kriging</TabsTrigger>
           <TabsTrigger value="history">Riwayat Data</TabsTrigger>
         </TabsList>
         <TabsContent value="add">
@@ -218,6 +220,22 @@ export function AgriinoDashboard() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        <TabsContent value="kriging">
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+                <Target className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                <span>Analisis Kriging Nitrogen</span>
+              </CardTitle>
+              <CardDescription className="text-xs md:text-sm">
+                Interpolasi spasial untuk analisis nitrogen pada area pertanian
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <KrigingMap />
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="history">
           <HistoryTable plants={plants} />
