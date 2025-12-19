@@ -70,7 +70,7 @@ const AnalysisHistory = ({ onSelectAnalysis }) => {
 
   if (history.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
         <p>Belum ada riwayat analisis</p>
         <p className="text-sm">Lakukan analisis Kriging untuk melihat riwayat</p>
@@ -83,30 +83,30 @@ const AnalysisHistory = ({ onSelectAnalysis }) => {
       {history.map((item) => (
         <div
           key={item.id}
-          className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+          className="p-3 border dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer transition-colors"
           onClick={() => onSelectAnalysis && onSelectAnalysis(item.id)}
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-green-600" />
-              <span className="font-medium">Analisis #{item.id}</span>
+              <BarChart3 className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="font-medium text-gray-900 dark:text-gray-100">Analisis #{item.id}</span>
             </div>
             <Badge variant={item.status === 'completed' ? 'default' : 'secondary'}>
               {item.status === 'completed' ? 'Selesai' : item.status}
             </Badge>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
+          <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
             <div>
-              <span className="text-gray-400">Min:</span> {item.min_value?.toFixed(3)}
+              <span className="text-gray-400 dark:text-gray-500">Min:</span> {item.min_value?.toFixed(3)}
             </div>
             <div>
-              <span className="text-gray-400">Avg:</span> {item.mean_value?.toFixed(3)}
+              <span className="text-gray-400 dark:text-gray-500">Avg:</span> {item.mean_value?.toFixed(3)}
             </div>
             <div>
-              <span className="text-gray-400">Max:</span> {item.max_value?.toFixed(3)}
+              <span className="text-gray-400 dark:text-gray-500">Max:</span> {item.max_value?.toFixed(3)}
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
             <Calendar className="w-3 h-3" />
             {new Date(item.created_at).toLocaleString('id-ID')}
           </div>

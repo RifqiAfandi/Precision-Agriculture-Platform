@@ -7,12 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { MapPin, Loader2, Target } from "lucide-react";
+import { Loader2, Target, Activity, Calendar } from "lucide-react";
 import { StatCard } from "@/components/common/StatCard";
-import { PlantCard } from "./components/PlantCard";
-import { PlantDetailPanel } from "./components/PlantDetailPanel";
-import { AddPlantForm } from "./components/AddPlantForm";
-import { HistoryTable } from "./components/HistoryTable";
+import { RealTimeMonitoring } from "./components/RealTimeMonitoring";
+import { WeeklyHistoryTable } from "./components/WeeklyHistoryTable";
 import { KrigingMap } from "./components/KrigingMap";
 import {
   Leaf,
@@ -20,118 +18,81 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
-import api from "@/services/api";
 import { toast } from "sonner";
+import { 
+  realTimeDataStore, 
+  classifyNitrogen, 
+  NITROGEN_THRESHOLDS 
+} from "@/services/dummyDataGenerator";
 
 export function AgriinoDashboard() {
   const [activeTab, setActiveTab] = useState("monitoring");
-  const [selectedPlantId, setSelectedPlantId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalPlants: 0,
-    avgChlorophyll: '0',
+    totalDevices: 0,
     avgNitrogen: '0',
+    avgSpad: '0',
     needsAttention: 0,
   });
-  const [plants, setPlants] = useState([]);
   const [devices, setDevices] = useState([]);
-  const [selectedPlant, setSelectedPlant] = useState(null);
 
-  // Fetch dashboard data
+  // Initialize and subscribe to real-time data
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  // Update selected plant when plants or selectedPlantId changes
-  useEffect(() => {
-    if (selectedPlantId && plants.length > 0) {
-      const plant = plants.find(p => p.id === selectedPlantId);
-      if (plant) {
-        fetchPlantDetails(selectedPlantId);
-      }
-    } else {
-      setSelectedPlant(null);
-    }
-  }, [selectedPlantId, plants]);
-
-  const fetchDashboardData = async () => {
-    try {
+    const initializeData = () => {
       setLoading(true);
       
-      // Fetch stats and plants in parallel
-      const [statsData, plantsData, devicesData] = await Promise.all([
-        api.getAgriinoStats().catch(() => ({
-          total_plants: 0,
-          avg_chlorophyll: 0,
-          avg_nitrogen: 0,
-          needs_attention: 0,
-        })),
-        api.getPlants().catch(() => []),
-        api.getDevices().catch(() => [])
-      ]);
-
-      setStats({
-        totalPlants: statsData.total_plants || 0,
-        avgChlorophyll: statsData.avg_chlorophyll || '0',
-        avgNitrogen: statsData.avg_nitrogen || '0',
-        needsAttention: statsData.needs_attention || 0,
-      });
-
-      setPlants(Array.isArray(plantsData) ? plantsData : []);
-      setDevices(Array.isArray(devicesData) ? devicesData : []);
-
-      // Auto-select first plant if none selected
-      if (!selectedPlantId && plantsData.length > 0) {
-        setSelectedPlantId(plantsData[0].id);
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Gagal memuat data dashboard: ' + (error.message || 'Unknown error'));
-    } finally {
+      // Start the real-time data store
+      realTimeDataStore.start(60000); // Update every minute
+      
+      // Get initial data
+      const currentData = realTimeDataStore.getCurrentData();
+      updateStatsFromDevices(currentData);
+      setDevices(currentData);
       setLoading(false);
+    };
+
+    initializeData();
+
+    // Subscribe to data updates
+    const unsubscribe = realTimeDataStore.subscribe((data) => {
+      updateStatsFromDevices(data);
+      setDevices(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // Calculate statistics from device data
+  const updateStatsFromDevices = (deviceData) => {
+    if (!deviceData || deviceData.length === 0) {
+      setStats({
+        totalDevices: 0,
+        avgNitrogen: '0',
+        avgSpad: '0',
+        needsAttention: 0,
+      });
+      return;
     }
-  };
 
-  const fetchPlantDetails = async (plantId) => {
-    try {
-      const plantData = await api.getPlant(plantId);
-      setSelectedPlant(plantData);
-    } catch (error) {
-      console.error('Error fetching plant details:', error);
-      toast.error('Gagal memuat detail tanaman');
-    }
-  };
+    const nitrogenValues = deviceData.map(d => d.nitrogen);
+    const spadValues = deviceData.map(d => d.spad);
+    
+    const avgNitrogen = nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length;
+    const avgSpad = spadValues.reduce((a, b) => a + b, 0) / spadValues.length;
+    
+    // Count devices that need attention (deficient nitrogen)
+    const needsAttention = deviceData.filter(
+      d => classifyNitrogen(d.nitrogen) === 'deficient'
+    ).length;
 
-  const handleAddPlant = async (formData) => {
-    try {
-      // Get first device or show error
-      if (devices.length === 0) {
-        toast.error('Anda belum memiliki device. Silakan tambahkan device terlebih dahulu.');
-        return;
-      }
-
-      const plantData = {
-        device: devices[0].id, // Use first device
-        name: formData.name,
-        description: formData.description || '',
-        location: formData.location,
-        // Add coordinates if available from GPS
-        latitude: null,
-        longitude: null,
-      };
-
-      await api.createPlant(plantData);
-      toast.success('Tanaman berhasil ditambahkan');
-      
-      // Refresh data
-      await fetchDashboardData();
-      
-      // Switch to monitoring tab
-      setActiveTab("monitoring");
-    } catch (error) {
-      console.error('Error adding plant:', error);
-      toast.error('Gagal menambahkan tanaman');
-    }
+    setStats({
+      totalDevices: deviceData.length,
+      avgNitrogen: avgNitrogen.toFixed(3),
+      avgSpad: avgSpad.toFixed(2),
+      needsAttention,
+    });
   };
 
   if (loading) {
@@ -144,26 +105,27 @@ export function AgriinoDashboard() {
 
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">
+      {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         <StatCard
           icon={Leaf}
           iconColor="text-green-600"
-          label="Total Tanaman"
-          value={stats.totalPlants}
+          label="Total Device"
+          value={stats.totalDevices}
         />
 
         <StatCard
           icon={BarChart3}
           iconColor="text-blue-600"
-          label="Rata-rata Klorofil"
-          value={stats.avgChlorophyll}
+          label="Rata-rata Nitrogen"
+          value={stats.avgNitrogen}
         />
 
         <StatCard
           icon={TrendingUp}
           iconColor="text-purple-600"
-          label="Nitrogen (mg/L)"
-          value={stats.avgNitrogen}
+          label="Rata-rata SPAD"
+          value={stats.avgSpad}
         />
 
         <StatCard
@@ -173,54 +135,55 @@ export function AgriinoDashboard() {
           value={stats.needsAttention}
         />
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="add">Tambah Tanaman</TabsTrigger>
-          <TabsTrigger value="monitoring">Peta Monitoring</TabsTrigger>
-          <TabsTrigger value="kriging">Analisis Kriging</TabsTrigger>
-          <TabsTrigger value="history">Riwayat Data</TabsTrigger>
-        </TabsList>
-        <TabsContent value="add">
-          <AddPlantForm onSubmit={handleAddPlant} />
-        </TabsContent>
-        <TabsContent value="monitoring" className="space-y-3 sm:space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
-                  <MapPin className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
-                  <span>Lokasi Tanaman</span>
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm">
-                  Klik untuk melihat detail monitoring
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {plants.map((plant) => (
-                  <PlantCard
-                    key={plant.id}
-                    plant={plant}
-                    isSelected={selectedPlantId === plant.id}
-                    onClick={() => setSelectedPlantId(plant.id)}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="text-base md:text-lg">Detail Monitoring</CardTitle>
-                <CardDescription className="text-xs md:text-sm">
-                  {selectedPlant
-                    ? `Pengukuran terakhir: ${selectedPlant.lastMeasurement}`
-                    : "Pilih tanaman untuk melihat detail"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PlantDetailPanel plant={selectedPlant} />
-              </CardContent>
-            </Card>
+
+      {/* Nitrogen Classification Legend */}
+      <Card className="glass-card">
+        <CardContent className="py-3">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <span className="font-medium text-gray-600">Klasifikasi Nitrogen:</span>
+            {Object.entries(NITROGEN_THRESHOLDS).map(([key, value]) => (
+              <div key={key} className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: value.color }}
+                />
+                <span>
+                  {value.label}: {key === 'deficient' ? `<${value.max}%` : 
+                    key === 'high' ? `>${value.min}%` : 
+                    `${value.min}-${value.max}%`}
+                </span>
+              </div>
+            ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+            <Activity className="w-4 h-4" />
+            <span className="hidden sm:inline">Peta Monitoring</span>
+            <span className="sm:hidden">Monitoring</span>
+          </TabsTrigger>
+          <TabsTrigger value="kriging" className="flex items-center gap-2">
+            <Target className="w-4 h-4" />
+            <span className="hidden sm:inline">Analisis Kriging</span>
+            <span className="sm:hidden">Kriging</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            <span className="hidden sm:inline">Riwayat Data</span>
+            <span className="sm:hidden">Riwayat</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Peta Monitoring - Real-time data with line chart */}
+        <TabsContent value="monitoring" className="space-y-3 sm:space-y-4">
+          <RealTimeMonitoring />
         </TabsContent>
+
+        {/* Analisis Kriging */}
         <TabsContent value="kriging">
           <Card className="glass-card">
             <CardHeader>
@@ -229,7 +192,8 @@ export function AgriinoDashboard() {
                 <span>Analisis Kriging Nitrogen</span>
               </CardTitle>
               <CardDescription className="text-xs md:text-sm">
-                Interpolasi spasial untuk analisis nitrogen pada area pertanian
+                Interpolasi spasial untuk analisis nitrogen pada area pertanian.
+                Pilih area di peta satelit untuk melakukan analisis Kriging.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -237,10 +201,14 @@ export function AgriinoDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Riwayat Data - Weekly averages */}
         <TabsContent value="history">
-          <HistoryTable plants={plants} />
+          <WeeklyHistoryTable />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+export default AgriinoDashboard;

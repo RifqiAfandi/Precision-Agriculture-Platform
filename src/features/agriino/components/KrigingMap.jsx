@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { 
-  MapPin, 
-  Play, 
-  Loader2, 
-  RefreshCw, 
+import {
+  MapPin,
+  Play,
+  Loader2,
+  RefreshCw,
   Target,
   Layers,
   Info,
@@ -17,203 +19,39 @@ import {
   XCircle,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
+  Square,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/services/api';
-import firebaseService from '@/services/firebase';
+import { realTimeDataStore, classifyNitrogen, getClassificationColor, NITROGEN_THRESHOLDS } from '@/services/dummyDataGenerator';
 
-// Nitrogen classification thresholds
-const DEFAULT_THRESHOLDS = {
-  low: 1.5,
-  high: 2.5,
-};
+// MapTiler API Key
+const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY || 'bedLj81C0j3GdguncpGN';
 
-// Map marker colors
+// Map marker colors based on nitrogen classification
+// Deficient = Red (merah), Subnormal = Dark Orange (orange tua), Normal = Light Orange (orange muda), High = Yellow (kuning)
 const MARKER_COLORS = {
-  low: { fill: '#ef4444', border: '#dc2626', bg: 'bg-red-500', text: 'text-red-500' },
-  normal: { fill: '#3b82f6', border: '#2563eb', bg: 'bg-blue-500', text: 'text-blue-500' },
-  high: { fill: '#22c55e', border: '#16a34a', bg: 'bg-green-500', text: 'text-green-500' },
-  unknown: { fill: '#6b7280', border: '#4b5563', bg: 'bg-gray-500', text: 'text-gray-500' },
-};
-
-/**
- * Classify nitrogen level
- */
-const classifyNitrogen = (value, thresholds = DEFAULT_THRESHOLDS) => {
-  if (value === undefined || value === null) return 'unknown';
-  if (value < thresholds.low) return 'low';
-  if (value > thresholds.high) return 'high';
-  return 'normal';
+  deficient: { fill: '#ef4444', border: '#dc2626', label: 'Deficient' },
+  subnormal: { fill: '#ff8c00', border: '#e67e00', label: 'Subnormal' },
+  normal: { fill: '#ffa500', border: '#e69500', label: 'Normal' },
+  high: { fill: '#ffd700', border: '#e6c200', label: 'High' },
+  unknown: { fill: '#6b7280', border: '#4b5563', label: 'Unknown' },
 };
 
 /**
  * Get classification label in Indonesian
  */
 const getClassificationLabel = (classification) => {
-  switch (classification) {
-    case 'low': return 'Rendah';
-    case 'high': return 'Tinggi';
-    case 'normal': return 'Normal';
-    default: return 'Unknown';
-  }
-};
-
-/**
- * DeviceMarker Component - Represents a device on the map
- */
-const DeviceMarker = ({ device, isSelected, onClick }) => {
-  const classification = classifyNitrogen(device.nitrogen);
-  const colors = MARKER_COLORS[classification];
-
-  return (
-    <div
-      className={`
-        relative cursor-pointer transition-all duration-200
-        ${isSelected ? 'z-10 scale-125' : 'hover:scale-110'}
-      `}
-      onClick={() => onClick(device)}
-      title={`${device.device_id}: Nitrogen ${device.nitrogen?.toFixed(3) || 'N/A'}`}
-    >
-      <div
-        className={`
-          w-8 h-8 rounded-full flex items-center justify-center
-          border-2 shadow-lg
-          ${colors.bg} border-white
-        `}
-      >
-        <MapPin className="w-4 h-4 text-white" />
-      </div>
-      {isSelected && (
-        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 translate-y-full">
-          <div className="bg-white rounded-md shadow-lg p-2 text-xs whitespace-nowrap">
-            <p className="font-medium">{device.device_id}</p>
-            <p className={colors.text}>N: {device.nitrogen?.toFixed(3) || 'N/A'}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-DeviceMarker.propTypes = {
-  device: PropTypes.object.isRequired,
-  isSelected: PropTypes.bool,
-  onClick: PropTypes.func.isRequired,
-};
-
-/**
- * Simple Map Component using absolute positioning
- * In production, replace with Google Maps or Leaflet
- */
-const SimpleMap = ({ 
-  devices, 
-  gridPoints, 
-  selectedDevice, 
-  onDeviceClick,
-  bounds,
-  showGrid 
-}) => {
-  const mapRef = useRef(null);
-  
-  // Calculate device position on map
-  const getDevicePosition = (device) => {
-    if (!bounds || !device.lat || !device.lng) return { left: '50%', top: '50%' };
-    
-    const latRange = bounds.max_lat - bounds.min_lat || 0.01;
-    const lngRange = bounds.max_lng - bounds.min_lng || 0.01;
-    
-    const left = ((device.lng - bounds.min_lng) / lngRange) * 100;
-    const top = (1 - (device.lat - bounds.min_lat) / latRange) * 100;
-    
-    return {
-      left: `${Math.max(5, Math.min(95, left))}%`,
-      top: `${Math.max(5, Math.min(95, top))}%`,
-    };
+  const labels = {
+    deficient: 'Defisien',
+    subnormal: 'Subnormal',
+    normal: 'Normal',
+    high: 'Tinggi',
+    unknown: 'Unknown',
   };
-
-  return (
-    <div 
-      ref={mapRef}
-      className="relative w-full h-96 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-gray-200 overflow-hidden"
-    >
-      {/* Grid overlay for Kriging results */}
-      {showGrid && gridPoints.length > 0 && (
-        <div className="absolute inset-0 opacity-50">
-          {gridPoints.map((point, idx) => {
-            const pos = getDevicePosition({ lat: point.latitude, lng: point.longitude });
-            const colors = MARKER_COLORS[point.classification];
-            return (
-              <div
-                key={idx}
-                className="absolute w-3 h-3 rounded-sm transform -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  left: pos.left,
-                  top: pos.top,
-                  backgroundColor: colors.fill,
-                  opacity: 0.6,
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
-      
-      {/* Device markers */}
-      {devices.map((device) => {
-        const pos = getDevicePosition(device);
-        return (
-          <div
-            key={device.device_id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2"
-            style={{ left: pos.left, top: pos.top }}
-          >
-            <DeviceMarker
-              device={device}
-              isSelected={selectedDevice?.device_id === device.device_id}
-              onClick={onDeviceClick}
-            />
-          </div>
-        );
-      })}
-      
-      {/* Map legend */}
-      <div className="absolute bottom-2 right-2 bg-white/90 rounded-md p-2 text-xs shadow-md">
-        <div className="flex items-center gap-1 mb-1">
-          <div className="w-3 h-3 rounded-full bg-red-500" />
-          <span>Rendah (&lt;{DEFAULT_THRESHOLDS.low})</span>
-        </div>
-        <div className="flex items-center gap-1 mb-1">
-          <div className="w-3 h-3 rounded-full bg-blue-500" />
-          <span>Normal</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span>Tinggi (&gt;{DEFAULT_THRESHOLDS.high})</span>
-        </div>
-      </div>
-      
-      {/* No devices message */}
-      {devices.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>Tidak ada device yang ditemukan</p>
-            <p className="text-sm">Sambungkan ke Firebase untuk melihat data</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-SimpleMap.propTypes = {
-  devices: PropTypes.array.isRequired,
-  gridPoints: PropTypes.array,
-  selectedDevice: PropTypes.object,
-  onDeviceClick: PropTypes.func.isRequired,
-  bounds: PropTypes.object,
-  showGrid: PropTypes.bool,
+  return labels[classification] || 'Unknown';
 };
 
 /**
@@ -222,7 +60,7 @@ SimpleMap.propTypes = {
 const DeviceDetailsPanel = ({ device }) => {
   if (!device) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         <Info className="w-8 h-8 mx-auto mb-2 opacity-50" />
         <p>Pilih device untuk melihat detail</p>
       </div>
@@ -230,12 +68,13 @@ const DeviceDetailsPanel = ({ device }) => {
   }
 
   const classification = classifyNitrogen(device.nitrogen);
-  const colors = MARKER_COLORS[classification];
-  
-  const StatusIcon = classification === 'low' 
-    ? XCircle 
-    : classification === 'high' 
-      ? CheckCircle 
+  const colors = MARKER_COLORS[classification] || MARKER_COLORS.unknown;
+
+  const StatusIcon =
+    classification === 'deficient'
+      ? XCircle
+      : classification === 'high'
+      ? CheckCircle
       : AlertTriangle;
 
   return (
@@ -243,68 +82,68 @@ const DeviceDetailsPanel = ({ device }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="font-semibold">{device.device_id}</h4>
-          <p className="text-sm text-gray-500">
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100">{device.device_id}</h4>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {device.lat?.toFixed(6)}, {device.lng?.toFixed(6)}
           </p>
         </div>
-        <Badge className={`${colors.bg} text-white`}>
+        <Badge style={{ backgroundColor: colors.fill, color: 'white' }}>
           {getClassificationLabel(classification)}
         </Badge>
       </div>
 
       {/* Main metrics */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-50 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
+        <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-1">
             <Target className="w-4 h-4" />
             <span>Nitrogen</span>
           </div>
-          <p className={`text-xl font-bold ${colors.text}`}>
+          <p className="text-xl font-bold" style={{ color: colors.fill }}>
             {device.nitrogen?.toFixed(4) || 'N/A'}
           </p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
+        <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-1">
             <Layers className="w-4 h-4" />
             <span>SPAD</span>
           </div>
-          <p className="text-xl font-bold text-purple-600">
+          <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
             {device.spad?.toFixed(2) || 'N/A'}
           </p>
         </div>
       </div>
 
       {/* RGB Values */}
-      <div className="bg-gray-50 rounded-lg p-3">
-        <p className="text-sm text-gray-500 mb-2">RGB Values</p>
+      <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">RGB Values</p>
         <div className="grid grid-cols-3 gap-2 text-center text-sm">
           <div>
             <p className="font-medium text-red-500">R</p>
-            <p>{device.R?.toFixed(1) || 'N/A'}</p>
+            <p className="text-gray-900 dark:text-gray-100">{device.R?.toFixed(1) || 'N/A'}</p>
           </div>
           <div>
             <p className="font-medium text-green-500">G</p>
-            <p>{device.G?.toFixed(1) || 'N/A'}</p>
+            <p className="text-gray-900 dark:text-gray-100">{device.G?.toFixed(1) || 'N/A'}</p>
           </div>
           <div>
             <p className="font-medium text-blue-500">B</p>
-            <p>{device.B?.toFixed(1) || 'N/A'}</p>
+            <p className="text-gray-900 dark:text-gray-100">{device.B?.toFixed(1) || 'N/A'}</p>
           </div>
         </div>
       </div>
 
       {/* Classification Info */}
-      <div className="flex items-center gap-2 text-sm">
-        <StatusIcon className={`w-4 h-4 ${colors.text}`} />
+      <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <StatusIcon className="w-4 h-4" style={{ color: colors.fill }} />
         <span>
           Klasifikasi EQ1: <strong>{device.class_eq1 || 'N/A'}</strong>
         </span>
       </div>
-      
+
       {/* Timestamp */}
       {device.timestamp && (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 dark:text-gray-500">
           Update: {new Date(device.timestamp).toLocaleString('id-ID')}
         </p>
       )}
@@ -324,16 +163,17 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
     return (
       <div className="text-center py-8">
         <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-blue-500" />
-        <p className="text-gray-500">Sedang melakukan analisis Kriging...</p>
+        <p className="text-gray-500 dark:text-gray-400">Sedang melakukan analisis Kriging...</p>
       </div>
     );
   }
 
   if (!analysisResult) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
-        <p>Klik "Mulai Analisis" untuk menjalankan interpolasi Kriging</p>
+        <p>Pilih area di peta dan klik "Mulai Analisis"</p>
+        <p className="text-sm mt-2">untuk menjalankan interpolasi Kriging</p>
       </div>
     );
   }
@@ -344,62 +184,76 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
     <div className="space-y-4">
       {/* Summary */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-blue-50 rounded-lg p-3">
-          <p className="text-sm text-blue-600 mb-1">Rata-rata Nitrogen</p>
-          <p className="text-xl font-bold">{statistics.mean_value?.toFixed(4)}</p>
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3">
+          <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">Rata-rata Nitrogen</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{statistics.mean_value?.toFixed(4)}</p>
         </div>
-        <div className="bg-purple-50 rounded-lg p-3">
-          <p className="text-sm text-purple-600 mb-1">Std Deviasi</p>
-          <p className="text-xl font-bold">{statistics.std_value?.toFixed(4)}</p>
+        <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-3">
+          <p className="text-sm text-purple-600 dark:text-purple-400 mb-1">Std Deviasi</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{statistics.std_value?.toFixed(4)}</p>
         </div>
       </div>
 
       {/* Min/Max */}
-      <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+      <div className="flex items-center justify-between bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
         <div className="flex items-center gap-2">
           <TrendingDown className="w-4 h-4 text-red-500" />
-          <span className="text-sm">Min: {statistics.min_value?.toFixed(4)}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">Min: {statistics.min_value?.toFixed(4)}</span>
         </div>
         <Minus className="w-4 h-4 text-gray-400" />
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-green-500" />
-          <span className="text-sm">Max: {statistics.max_value?.toFixed(4)}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">Max: {statistics.max_value?.toFixed(4)}</span>
         </div>
       </div>
 
       {/* Classification counts */}
       <div className="space-y-2">
-        <p className="text-sm font-medium text-gray-700">Distribusi Klasifikasi</p>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-red-50 rounded-lg p-2 text-center">
-            <p className="text-2xl font-bold text-red-600">{statistics.low_count}</p>
-            <p className="text-xs text-red-500">Rendah</p>
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Distribusi Klasifikasi</p>
+        <div className="grid grid-cols-4 gap-1">
+          <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-2 text-center">
+            <p className="text-lg font-bold text-red-600 dark:text-red-400">{statistics.deficient_count || 0}</p>
+            <p className="text-xs text-red-600 dark:text-red-400">Defisien</p>
           </div>
-          <div className="bg-blue-50 rounded-lg p-2 text-center">
-            <p className="text-2xl font-bold text-blue-600">{statistics.normal_count}</p>
-            <p className="text-xs text-blue-500">Normal</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 140, 0, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#ff8c00' }}>{statistics.subnormal_count || 0}</p>
+            <p className="text-xs" style={{ color: '#ff8c00' }}>Subnormal</p>
           </div>
-          <div className="bg-green-50 rounded-lg p-2 text-center">
-            <p className="text-2xl font-bold text-green-600">{statistics.high_count}</p>
-            <p className="text-xs text-green-500">Tinggi</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 165, 0, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#ffa500' }}>{statistics.normal_count || 0}</p>
+            <p className="text-xs" style={{ color: '#ffa500' }}>Normal</p>
+          </div>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#d4a500' }}>{statistics.high_count || 0}</p>
+            <p className="text-xs" style={{ color: '#d4a500' }}>Tinggi</p>
           </div>
         </div>
       </div>
 
       {/* Variogram Info */}
-      <div className="bg-gray-50 rounded-lg p-3 text-sm">
-        <p className="font-medium text-gray-700 mb-2">Parameter Variogram</p>
-        <div className="grid grid-cols-2 gap-2 text-gray-600">
-          <p>Model: <strong>{variogram_params.model}</strong></p>
-          <p>Range: <strong>{variogram_params.range?.toFixed(4)}</strong></p>
-          <p>Nugget: <strong>{variogram_params.nugget?.toFixed(4)}</strong></p>
-          <p>Sill: <strong>{variogram_params.sill?.toFixed(4)}</strong></p>
+      {variogram_params && (
+        <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3 text-sm">
+          <p className="font-medium text-gray-700 dark:text-gray-300 mb-2">Parameter Variogram</p>
+          <div className="grid grid-cols-2 gap-2 text-gray-600 dark:text-gray-400">
+            <p>
+              Model: <strong className="text-gray-900 dark:text-gray-100">{variogram_params.model}</strong>
+            </p>
+            <p>
+              Range: <strong className="text-gray-900 dark:text-gray-100">{variogram_params.range?.toFixed(4)}</strong>
+            </p>
+            <p>
+              Nugget: <strong className="text-gray-900 dark:text-gray-100">{variogram_params.nugget?.toFixed(4)}</strong>
+            </p>
+            <p>
+              Sill: <strong className="text-gray-900 dark:text-gray-100">{variogram_params.sill?.toFixed(4)}</strong>
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Thresholds */}
-      <div className="text-xs text-gray-400">
-        Threshold: Rendah &lt; {thresholds.low} | Tinggi &gt; {thresholds.high}
+      <div className="text-xs text-gray-400 dark:text-gray-500">
+        Threshold: Defisien &lt; {thresholds?.deficient || 1.8} | Subnormal {thresholds?.deficient || 1.8} - {thresholds?.subnormal || 2.71} | Normal {thresholds?.subnormal || 2.71} - {thresholds?.normal || 3.31} | Tinggi &gt; {thresholds?.normal || 3.31}
       </div>
     </div>
   );
@@ -411,10 +265,17 @@ AnalysisResultsPanel.propTypes = {
 };
 
 /**
- * Main KrigingMap Component
- * Integrates Firebase data, Google Maps markers, and Kriging analysis
+ * Main KrigingMap Component with MapTiler
  */
 export function KrigingMap({ areaId, areaName }) {
+  // Refs
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const markersRef = useRef([]);
+  const polygonRef = useRef(null);
+  const drawPointsRef = useRef([]);
+  const isDrawingRef = useRef(false);
+
   // State
   const [devices, setDevices] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -422,19 +283,21 @@ export function KrigingMap({ areaId, areaName }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [showGrid, setShowGrid] = useState(true);
-  const [firebaseConnected, setFirebaseConnected] = useState(false);
   const [activeTab, setActiveTab] = useState('devices');
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [selectedArea, setSelectedArea] = useState(null);
 
   // Calculate bounds from devices
-  const bounds = React.useMemo(() => {
+  const bounds = useMemo(() => {
     if (devices.length === 0) return null;
-    
-    const lats = devices.map(d => d.lat).filter(Boolean);
-    const lngs = devices.map(d => d.lng).filter(Boolean);
-    
+
+    const lats = devices.map((d) => d.lat).filter(Boolean);
+    const lngs = devices.map((d) => d.lng).filter(Boolean);
+
     if (lats.length === 0 || lngs.length === 0) return null;
-    
-    const padding = 0.001;
+
+    const padding = 0.002;
     return {
       min_lat: Math.min(...lats) - padding,
       max_lat: Math.max(...lats) + padding,
@@ -443,61 +306,277 @@ export function KrigingMap({ areaId, areaName }) {
     };
   }, [devices]);
 
-  // Initialize Firebase and subscribe to updates
+  // Initialize Map
   useEffect(() => {
-    let unsubscribe = null;
+    if (map.current || !mapContainer.current) return;
 
-    const initFirebase = async () => {
-      try {
-        setIsLoading(true);
-        await firebaseService.initialize();
-        
-        unsubscribe = firebaseService.subscribeToDevices('devices', (data) => {
-          setDevices(data);
-          setFirebaseConnected(true);
-        });
-      } catch (error) {
-        console.error('Firebase initialization error:', error);
-        toast.error('Gagal terhubung ke Firebase');
-        // Load mock data for demo
-        loadMockData();
-      } finally {
-        setIsLoading(false);
+    map.current = new maplibregl.Map({
+      container: mapContainer.current,
+      style: `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`,
+      center: [113.7176052, -8.1653927], // Default center (from database.txt)
+      zoom: 17,
+    });
+
+    // Add navigation controls
+    map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    map.current.on('load', () => {
+      setMapLoaded(true);
+      
+      // Add source for polygon drawing
+      map.current.addSource('draw-polygon', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
+      // Add polygon fill layer
+      map.current.addLayer({
+        id: 'draw-polygon-fill',
+        type: 'fill',
+        source: 'draw-polygon',
+        paint: {
+          'fill-color': '#22c55e',
+          'fill-opacity': 0.2,
+        },
+      });
+
+      // Add polygon outline layer
+      map.current.addLayer({
+        id: 'draw-polygon-outline',
+        type: 'line',
+        source: 'draw-polygon',
+        paint: {
+          'line-color': '#22c55e',
+          'line-width': 2,
+        },
+      });
+
+      // Add kriging result source - for heatmap/fill visualization
+      map.current.addSource('kriging-grid', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
+      // Add kriging grid layer as filled squares for area visualization
+      map.current.addLayer({
+        id: 'kriging-grid-layer',
+        type: 'fill',
+        source: 'kriging-grid',
+        paint: {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': 0.75,
+        },
+      });
+
+      // Add kriging grid outline layer
+      map.current.addLayer({
+        id: 'kriging-grid-outline',
+        type: 'line',
+        source: 'kriging-grid',
+        paint: {
+          'line-color': ['get', 'color'],
+          'line-width': 0.5,
+          'line-opacity': 0.3,
+        },
+      });
+    });
+
+    // Handle map click for polygon drawing
+    map.current.on('click', (e) => {
+      if (!isDrawingRef.current) return;
+
+      const point = [e.lngLat.lng, e.lngLat.lat];
+      drawPointsRef.current.push(point);
+
+      // Update polygon source - show polygon even with 2 points as line
+      if (drawPointsRef.current.length >= 2) {
+        const polygon = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[...drawPointsRef.current, drawPointsRef.current[0]]],
+              },
+            },
+          ],
+        };
+        map.current.getSource('draw-polygon').setData(polygon);
       }
-    };
-
-    initFirebase();
+      
+      if (drawPointsRef.current.length >= 3) {
+        setSelectedArea([...drawPointsRef.current]);
+      }
+    });
 
     return () => {
-      if (unsubscribe) unsubscribe();
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, []);
 
-  // Load mock data for demo purposes
-  const loadMockData = useCallback(() => {
-    const mockDevices = [
-      { device_id: 'DEV001', lat: -8.1653927, lng: 113.7176052, nitrogen: 2.11, spad: 24.83, R: 1569.4, G: 5980.8, B: 1236.8, class_eq1: 'RED' },
-      { device_id: 'DEV002', lat: -8.1658, lng: 113.7180, nitrogen: 1.85, spad: 22.15, R: 1420.2, G: 5500.3, B: 1180.5, class_eq1: 'YELLOW' },
-      { device_id: 'DEV003', lat: -8.1650, lng: 113.7170, nitrogen: 1.32, spad: 18.90, R: 1800.5, G: 4200.1, B: 1050.3, class_eq1: 'RED' },
-      { device_id: 'DEV004', lat: -8.1660, lng: 113.7165, nitrogen: 2.78, spad: 28.45, R: 1200.8, G: 6500.2, B: 1350.7, class_eq1: 'GREEN' },
-      { device_id: 'DEV005', lat: -8.1655, lng: 113.7185, nitrogen: 1.95, spad: 23.50, R: 1480.3, G: 5700.6, B: 1220.4, class_eq1: 'YELLOW' },
-    ];
-    setDevices(mockDevices);
+  // Load device data from dummy generator
+  useEffect(() => {
+    const loadData = () => {
+      setIsLoading(true);
+      // Start the data store
+      realTimeDataStore.start(60000);
+      const data = realTimeDataStore.getCurrentData();
+      setDevices(data);
+      setIsLoading(false);
+    };
+
+    loadData();
+
+    // Subscribe to updates
+    const unsubscribe = realTimeDataStore.subscribe((data) => {
+      setDevices(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  // Refresh data from Firebase
-  const handleRefresh = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await firebaseService.getDevicesOnce('devices');
-      setDevices(data);
-      toast.success('Data berhasil diperbarui');
-    } catch (error) {
-      console.error('Refresh error:', error);
-      toast.error('Gagal memperbarui data');
-    } finally {
-      setIsLoading(false);
+  // Update markers when devices change
+  useEffect(() => {
+    if (!map.current || !mapLoaded || devices.length === 0) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    // Add new markers
+    devices.forEach((device) => {
+      if (!device.lat || !device.lng) return;
+
+      const classification = classifyNitrogen(device.nitrogen);
+      const colors = MARKER_COLORS[classification] || MARKER_COLORS.unknown;
+
+      // Create marker element with proper positioning
+      const el = document.createElement('div');
+      el.className = 'kriging-marker';
+      el.style.cssText = `
+        width: 28px;
+        height: 28px;
+        background-color: ${colors.fill};
+        border: 3px solid ${colors.border};
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        position: relative;
+      `;
+      // Use text color based on background brightness
+      const textColor = colors.fill === '#ffff00' ? '#333' : 'white';
+      el.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="${textColor}"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
+
+      // Handle click for device selection
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSelectedDevice(device);
+        setActiveTab('devices');
+      });
+
+      // Create popup
+      const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 15,
+      }).setHTML(`
+        <div style="padding: 8px; font-size: 12px;">
+          <strong>${device.device_id}</strong><br/>
+          Nitrogen: <span style="color: ${colors.fill}">${device.nitrogen?.toFixed(3) || 'N/A'}</span><br/>
+          SPAD: ${device.spad?.toFixed(2) || 'N/A'}<br/>
+          <span style="color: ${colors.fill}">${getClassificationLabel(classification)}</span>
+        </div>
+      `);
+
+      const marker = new maplibregl.Marker({ 
+        element: el,
+        anchor: 'center'  // Fix marker position during zoom
+      })
+        .setLngLat([device.lng, device.lat])
+        .setPopup(popup)
+        .addTo(map.current);
+
+      markersRef.current.push(marker);
+    });
+
+    // Fit bounds to show all markers
+    if (bounds && devices.length > 0) {
+      map.current.fitBounds(
+        [
+          [bounds.min_lng, bounds.min_lat],
+          [bounds.max_lng, bounds.max_lat],
+        ],
+        { padding: 50 }
+      );
     }
+  }, [devices, mapLoaded, bounds]);
+
+  // Handle refresh
+  const handleRefresh = useCallback(() => {
+    setIsLoading(true);
+    const data = realTimeDataStore.getCurrentData();
+    setDevices(data);
+    setIsLoading(false);
+    toast.success('Data berhasil diperbarui');
+  }, []);
+
+  // Toggle drawing mode
+  const handleToggleDrawing = useCallback(() => {
+    if (isDrawing) {
+      // Stop drawing
+      isDrawingRef.current = false;
+      setIsDrawing(false);
+    } else {
+      // Start drawing - clear previous polygon
+      drawPointsRef.current = [];
+      setSelectedArea(null);
+      if (map.current && map.current.getSource('draw-polygon')) {
+        map.current.getSource('draw-polygon').setData({
+          type: 'FeatureCollection',
+          features: [],
+        });
+      }
+      isDrawingRef.current = true;
+      setIsDrawing(true);
+      toast.info('Klik pada peta untuk menggambar area analisis');
+    }
+  }, [isDrawing]);
+
+  // Clear polygon
+  const handleClearPolygon = useCallback(() => {
+    drawPointsRef.current = [];
+    setSelectedArea(null);
+    setAnalysisResult(null);
+    isDrawingRef.current = false;
+    setIsDrawing(false);
+    if (map.current && map.current.getSource('draw-polygon')) {
+      map.current.getSource('draw-polygon').setData({
+        type: 'FeatureCollection',
+        features: [],
+      });
+    }
+    if (map.current && map.current.getSource('kriging-grid')) {
+      map.current.getSource('kriging-grid').setData({
+        type: 'FeatureCollection',
+        features: [],
+      });
+    }
+    toast.info('Area analisis dihapus');
   }, []);
 
   // Perform Kriging analysis
@@ -512,7 +591,7 @@ export function KrigingMap({ areaId, areaName }) {
 
     try {
       // Prepare device data for backend
-      const deviceData = devices.map(d => ({
+      const deviceData = devices.map((d) => ({
         device_id: d.device_id,
         lat: d.lat,
         lng: d.lng,
@@ -525,6 +604,19 @@ export function KrigingMap({ areaId, areaName }) {
         timestamp: d.timestamp,
       }));
 
+      // Determine analysis bounds (selected area or all devices)
+      let analysisBounds = bounds;
+      if (selectedArea && selectedArea.length >= 3) {
+        const lngs = selectedArea.map((p) => p[0]);
+        const lats = selectedArea.map((p) => p[1]);
+        analysisBounds = {
+          min_lat: Math.min(...lats),
+          max_lat: Math.max(...lats),
+          min_lng: Math.min(...lngs),
+          max_lng: Math.max(...lngs),
+        };
+      }
+
       // Call backend Kriging API
       const result = await api.performKrigingAnalysis({
         device_data: deviceData,
@@ -532,13 +624,24 @@ export function KrigingMap({ areaId, areaName }) {
         area_name: areaName,
         grid_resolution: 15,
         variogram_model: 'spherical',
-        low_threshold: DEFAULT_THRESHOLDS.low,
-        high_threshold: DEFAULT_THRESHOLDS.high,
-        ...bounds,
+        low_threshold: NITROGEN_THRESHOLDS.deficient.max,
+        high_threshold: NITROGEN_THRESHOLDS.normal.max,
+        ...analysisBounds,
       });
 
       if (result.success) {
         setAnalysisResult(result);
+        
+        // Update map with kriging grid as filled polygons
+        if (map.current && map.current.getSource('kriging-grid') && result.grid_points) {
+          const gridFeatures = createGridPolygons(result.grid_points, selectedArea || analysisBounds);
+
+          map.current.getSource('kriging-grid').setData({
+            type: 'FeatureCollection',
+            features: gridFeatures,
+          });
+        }
+        
         toast.success('Analisis Kriging berhasil!');
       } else {
         throw new Error(result.message || 'Analisis gagal');
@@ -546,27 +649,145 @@ export function KrigingMap({ areaId, areaName }) {
     } catch (error) {
       console.error('Analysis error:', error);
       toast.error(`Gagal melakukan analisis: ${error.message || 'Unknown error'}`);
-      
-      // Demo: Generate mock analysis result
-      const mockResult = generateMockAnalysisResult(devices);
+
+      // Generate mock analysis result for demo
+      const mockResult = generateMockAnalysisResult(devices, selectedArea || bounds);
       setAnalysisResult(mockResult);
+      
+      // Update map with mock grid as filled polygons
+      if (map.current && map.current.getSource('kriging-grid') && mockResult.grid_points) {
+        const gridFeatures = createGridPolygons(mockResult.grid_points, selectedArea || bounds);
+
+        map.current.getSource('kriging-grid').setData({
+          type: 'FeatureCollection',
+          features: gridFeatures,
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
-  }, [devices, bounds, areaId, areaName]);
+  }, [devices, bounds, areaId, areaName, selectedArea]);
+
+  // Create grid polygons from grid points for area visualization
+  const createGridPolygons = (gridPoints, boundsData) => {
+    if (!gridPoints || gridPoints.length === 0) return [];
+    
+    // Calculate cell size based on bounds
+    const resolution = Math.sqrt(gridPoints.length) || 12;
+    let cellLat, cellLng;
+    
+    if (boundsData) {
+      if (Array.isArray(boundsData)) {
+        // selectedArea is array of points
+        const lngs = boundsData.map((p) => p[0]);
+        const lats = boundsData.map((p) => p[1]);
+        cellLat = (Math.max(...lats) - Math.min(...lats)) / resolution;
+        cellLng = (Math.max(...lngs) - Math.min(...lngs)) / resolution;
+      } else {
+        // bounds object
+        cellLat = (boundsData.max_lat - boundsData.min_lat) / resolution;
+        cellLng = (boundsData.max_lng - boundsData.min_lng) / resolution;
+      }
+    } else {
+      cellLat = 0.0001;
+      cellLng = 0.0001;
+    }
+    
+    return gridPoints.map((point) => {
+      const lat = point.latitude;
+      const lng = point.longitude;
+      const halfLat = cellLat / 2;
+      const halfLng = cellLng / 2;
+      
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [lng - halfLng, lat - halfLat],
+            [lng + halfLng, lat - halfLat],
+            [lng + halfLng, lat + halfLat],
+            [lng - halfLng, lat + halfLat],
+            [lng - halfLng, lat - halfLat],
+          ]],
+        },
+        properties: {
+          value: point.predicted_value,
+          color: getClassificationColor(point.classification),
+          classification: point.classification,
+        },
+      };
+    });
+  };
 
   // Generate mock analysis result for demo
-  const generateMockAnalysisResult = (deviceList) => {
-    const nitrogenValues = deviceList.map(d => d.nitrogen);
+  const generateMockAnalysisResult = (deviceList, boundsData) => {
+    const nitrogenValues = deviceList.map((d) => d.nitrogen);
     const gridPoints = [];
-    
-    if (bounds) {
-      const resolution = 10;
+
+    // Helper function to check if point is inside polygon
+    const isPointInPolygon = (point, polygon) => {
+      if (!polygon || !Array.isArray(polygon)) return true;
+      let inside = false;
+      const x = point[0], y = point[1];
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i][0], yi = polygon[i][1];
+        const xj = polygon[j][0], yj = polygon[j][1];
+        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    };
+
+    let minLat, maxLat, minLng, maxLng;
+    let polygonPoints = null;
+
+    if (boundsData) {
+      if (Array.isArray(boundsData)) {
+        // selectedArea is array of points
+        polygonPoints = boundsData;
+        const lngs = boundsData.map((p) => p[0]);
+        const lats = boundsData.map((p) => p[1]);
+        minLat = Math.min(...lats);
+        maxLat = Math.max(...lats);
+        minLng = Math.min(...lngs);
+        maxLng = Math.max(...lngs);
+      } else {
+        // bounds object
+        minLat = boundsData.min_lat;
+        maxLat = boundsData.max_lat;
+        minLng = boundsData.min_lng;
+        maxLng = boundsData.max_lng;
+      }
+
+      const resolution = 15;
       for (let i = 0; i < resolution; i++) {
         for (let j = 0; j < resolution; j++) {
-          const lat = bounds.min_lat + (i / resolution) * (bounds.max_lat - bounds.min_lat);
-          const lng = bounds.min_lng + (j / resolution) * (bounds.max_lng - bounds.min_lng);
-          const value = nitrogenValues[Math.floor(Math.random() * nitrogenValues.length)] + (Math.random() - 0.5) * 0.5;
+          const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
+          const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
+          
+          // Only include points inside the polygon if polygon is defined
+          if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
+            continue;
+          }
+          
+          // Generate nitrogen value based on proximity to devices with interpolation
+          let value;
+          if (deviceList.length > 0) {
+            // Simple IDW interpolation for more realistic values
+            let weightSum = 0;
+            let valueSum = 0;
+            deviceList.forEach(device => {
+              const dist = Math.sqrt(Math.pow(lat - device.lat, 2) + Math.pow(lng - device.lng, 2));
+              const weight = 1 / Math.max(dist, 0.0001);
+              weightSum += weight;
+              valueSum += weight * device.nitrogen;
+            });
+            value = valueSum / weightSum + (Math.random() - 0.5) * 0.3;
+          } else {
+            value = nitrogenValues[Math.floor(Math.random() * nitrogenValues.length)] + (Math.random() - 0.5) * 0.5;
+          }
+          
           gridPoints.push({
             latitude: lat,
             longitude: lng,
@@ -578,10 +799,15 @@ export function KrigingMap({ areaId, areaName }) {
       }
     }
 
+    const deficientCount = gridPoints.filter((p) => p.classification === 'deficient').length;
+    const subnormalCount = gridPoints.filter((p) => p.classification === 'subnormal').length;
+    const normalCount = gridPoints.filter((p) => p.classification === 'normal').length;
+    const highCount = gridPoints.filter((p) => p.classification === 'high').length;
+
     return {
       success: true,
       grid_points: gridPoints,
-      input_points: deviceList.map(d => ({
+      input_points: deviceList.map((d) => ({
         ...d,
         latitude: d.lat,
         longitude: d.lng,
@@ -592,9 +818,10 @@ export function KrigingMap({ areaId, areaName }) {
         max_value: Math.max(...nitrogenValues),
         mean_value: nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length,
         std_value: 0.35,
-        low_count: gridPoints.filter(p => p.classification === 'low').length,
-        normal_count: gridPoints.filter(p => p.classification === 'normal').length,
-        high_count: gridPoints.filter(p => p.classification === 'high').length,
+        deficient_count: deficientCount,
+        subnormal_count: subnormalCount,
+        normal_count: normalCount,
+        high_count: highCount,
         total_points: gridPoints.length,
       },
       variogram_params: {
@@ -603,32 +830,59 @@ export function KrigingMap({ areaId, areaName }) {
         sill: 0.25,
         range: 0.002,
       },
-      thresholds: DEFAULT_THRESHOLDS,
-      bounds,
+      thresholds: {
+        deficient: NITROGEN_THRESHOLDS.deficient.max,
+        subnormal: NITROGEN_THRESHOLDS.subnormal.max,
+        normal: NITROGEN_THRESHOLDS.normal.max,
+      },
+      bounds: boundsData,
     };
   };
+
+  // Toggle grid visibility
+  const handleToggleGrid = useCallback(() => {
+    setShowGrid(!showGrid);
+    if (map.current) {
+      const visibility = !showGrid ? 'visible' : 'none';
+      if (map.current.getLayer('kriging-grid-layer')) {
+        map.current.setLayoutProperty('kriging-grid-layer', 'visibility', visibility);
+      }
+      if (map.current.getLayer('kriging-grid-outline')) {
+        map.current.setLayoutProperty('kriging-grid-outline', 'visibility', visibility);
+      }
+    }
+  }, [showGrid]);
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-green-600" />
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+            <MapPin className="w-5 h-5 text-green-600 dark:text-green-400" />
             Peta Analisis Kriging
           </h3>
-          <p className="text-sm text-gray-500">
-            {devices.length} device terdeteksi
-            {firebaseConnected && <span className="text-green-500 ml-2">● Connected</span>}
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {devices.length} device terdeteksi | MapTiler Satellite
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant={isDrawing ? 'default' : 'outline'}
             size="sm"
-            onClick={handleRefresh}
-            disabled={isLoading}
+            onClick={handleToggleDrawing}
+            className={isDrawing ? 'bg-orange-500 hover:bg-orange-600' : ''}
           >
+            <Square className="w-4 h-4 mr-1" />
+            {isDrawing ? 'Selesai Gambar' : 'Pilih Area'}
+          </Button>
+          {selectedArea && (
+            <Button variant="outline" size="sm" onClick={handleClearPolygon}>
+              <Trash2 className="w-4 h-4 mr-1" />
+              Hapus Area
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
@@ -648,6 +902,15 @@ export function KrigingMap({ areaId, areaName }) {
         </div>
       </div>
 
+      {/* Drawing Instructions */}
+      {isDrawing && (
+        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-3 text-sm text-orange-700 dark:text-orange-400">
+          <p className="font-medium">Mode Pemilihan Area Aktif</p>
+          <p>Klik pada peta untuk menambahkan titik sudut area. Minimal 3 titik untuk membentuk area.</p>
+          {selectedArea && <p className="mt-1">Sudut terbentuk: {selectedArea.length} titik</p>}
+        </div>
+      )}
+
       {/* Map and Details */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Map */}
@@ -655,35 +918,36 @@ export function KrigingMap({ areaId, areaName }) {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Peta Lokasi Device</CardTitle>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={showGrid}
-                  onChange={(e) => setShowGrid(e.target.checked)}
-                  className="rounded"
+                  onChange={handleToggleGrid}
+                  className="rounded border-gray-300 dark:border-slate-600"
                 />
-                Tampilkan Grid
+                Tampilkan Grid Kriging
               </label>
             </div>
-            <CardDescription>
-              Klik marker untuk melihat detail device
-            </CardDescription>
+            <CardDescription>Klik marker untuk melihat detail device</CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <div className="h-96 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-              </div>
-            ) : (
-              <SimpleMap
-                devices={devices}
-                gridPoints={analysisResult?.grid_points || []}
-                selectedDevice={selectedDevice}
-                onDeviceClick={setSelectedDevice}
-                bounds={bounds}
-                showGrid={showGrid && analysisResult}
-              />
-            )}
+            <div
+              ref={mapContainer}
+              className="w-full h-96 rounded-lg border-2 border-gray-200 dark:border-slate-700"
+              style={{ minHeight: '400px' }}
+            />
+            {/* Map Legend */}
+            <div className="mt-3 flex flex-wrap gap-3 text-sm">
+              {Object.entries(NITROGEN_THRESHOLDS).map(([key, value]) => (
+                <div key={key} className="flex items-center gap-1">
+                  <div
+                    className="w-4 h-4 rounded-full border-2 border-white shadow"
+                    style={{ backgroundColor: value.color }}
+                  />
+                  <span className="capitalize">{value.label}</span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -701,10 +965,7 @@ export function KrigingMap({ areaId, areaName }) {
             {activeTab === 'devices' ? (
               <DeviceDetailsPanel device={selectedDevice} />
             ) : (
-              <AnalysisResultsPanel 
-                analysisResult={analysisResult} 
-                isAnalyzing={isAnalyzing}
-              />
+              <AnalysisResultsPanel analysisResult={analysisResult} isAnalyzing={isAnalyzing} />
             )}
           </CardContent>
         </Card>
@@ -720,26 +981,29 @@ export function KrigingMap({ areaId, areaName }) {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
               {devices.map((device) => {
                 const classification = classifyNitrogen(device.nitrogen);
-                const colors = MARKER_COLORS[classification];
+                const colors = MARKER_COLORS[classification] || MARKER_COLORS.unknown;
                 const isSelected = selectedDevice?.device_id === device.device_id;
-                
+
                 return (
                   <div
                     key={device.device_id}
                     className={`
                       p-2 rounded-lg border cursor-pointer transition-all
-                      ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}
+                      ${isSelected ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'}
                     `}
                     onClick={() => setSelectedDevice(device)}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium truncate">{device.device_id}</span>
-                      <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
+                      <span className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">{device.device_id}</span>
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: colors.fill }}
+                      />
                     </div>
-                    <p className={`text-lg font-bold ${colors.text}`}>
+                    <p className="text-lg font-bold" style={{ color: colors.fill }}>
                       {device.nitrogen?.toFixed(3) || 'N/A'}
                     </p>
-                    <p className="text-xs text-gray-500">{getClassificationLabel(classification)}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{getClassificationLabel(classification)}</p>
                   </div>
                 );
               })}

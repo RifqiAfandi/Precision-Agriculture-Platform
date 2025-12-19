@@ -1,8 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import PropTypes from "prop-types";
-import { LandingPage, LoginPage, RegisterPage, DashboardLayout } from "@/pages";
 import { Toaster } from "@/components/ui/Sonner";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+
+// Lazy load pages for better initial load performance
+const LandingPage = lazy(() => import("@/pages/LandingPage").then(m => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import("@/pages/auth/LoginPage").then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
+const DashboardLayout = lazy(() => import("@/pages/dashboard/DashboardLayout").then(m => ({ default: m.DashboardLayout })));
+
+// Loading spinner component
+const PageLoader = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+      <p className="mt-4 text-gray-600 dark:text-gray-400">Memuat...</p>
+    </div>
+  </div>
+);
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState("landing");
@@ -82,7 +97,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      {renderPage()}
+      <Suspense fallback={<PageLoader />}>
+        {renderPage()}
+      </Suspense>
       <Toaster />
     </div>
   );

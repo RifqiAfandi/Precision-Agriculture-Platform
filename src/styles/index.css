@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -560,4 +560,14 @@ html {
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
+}
+
+/* MapLibre Marker Styles - Fix position during zoom */
+.maplibregl-marker {
+  position: absolute !important;
+  will-change: transform;
+}
+
+.kriging-marker {
+  transform-origin: center center;
 }

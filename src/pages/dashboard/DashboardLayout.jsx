@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -20,13 +20,25 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { WelcomePage } from "./WelcomePage";
-import { AgriinoDashboard } from "@/features/agriino/AgriinoDashboard";
-import { AgriimeterDashboard } from "@/features/agriimeter/AgriimeterDashboard";
-import { GreenhouseDashboard } from "@/features/greenhouse/GreenhouseDashboard";
-import SkyVeraDashboard from "@/features/skyvera/SkyVeraDashboard";
-import { ProfilePage } from "./ProfilePage";
 import AddDeviceDialog from "@/features/devices/components/AddDeviceDialog";
 import { loadInstalledDevices, addDevice } from "@/features/devices/utils/devicesHelpers";
+
+// Lazy load feature dashboards for better performance
+const AgriinoDashboard = lazy(() => import("@/features/agriino/AgriinoDashboard").then(m => ({ default: m.AgriinoDashboard })));
+const AgriimeterDashboard = lazy(() => import("@/features/agriimeter/AgriimeterDashboard").then(m => ({ default: m.AgriimeterDashboard })));
+const GreenhouseDashboard = lazy(() => import("@/features/greenhouse/GreenhouseDashboard").then(m => ({ default: m.GreenhouseDashboard })));
+const SkyVeraDashboard = lazy(() => import("@/features/skyvera/SkyVeraDashboard"));
+const ProfilePage = lazy(() => import("./ProfilePage").then(m => ({ default: m.ProfilePage })));
+
+// Feature loading spinner
+const FeatureLoader = () => (
+  <div className="flex-1 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-500 mx-auto"></div>
+      <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">Memuat fitur...</p>
+    </div>
+  </div>
+);
 
 export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("welcome");
@@ -76,28 +88,30 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
       icon: Leaf,
       description: "Monitoring Klorofil & Nitrogen",
       status: "active",
+      always: true, // Agriino selalu ditampilkan
     },
-    {
-      id: "agriimeter",
-      label: "Agriimeter",
-      icon: Cloud,
-      description: "Pengukur DBH Pohon",
-      status: "active",
-    },
-    {
-      id: "greenhouse",
-      label: "Greenhouse Compax",
-      icon: Home,
-      description: "Monitoring Rumah Kaca",
-      status: "active",
-    },
-    {
-      id: "skyvera",
-      label: "SkyVera",
-      icon: Gauge,
-      description: "Weather Station Professional",
-      status: "active",
-    },
+    // Alat lainnya di-disable (hide) untuk sementara
+    // {
+    //   id: "agriimeter",
+    //   label: "Agriimeter",
+    //   icon: Cloud,
+    //   description: "Pengukur DBH Pohon",
+    //   status: "active",
+    // },
+    // {
+    //   id: "greenhouse",
+    //   label: "Greenhouse Compax",
+    //   icon: Home,
+    //   description: "Monitoring Rumah Kaca",
+    //   status: "active",
+    // },
+    // {
+    //   id: "skyvera",
+    //   label: "SkyVera",
+    //   icon: Gauge,
+    //   description: "Weather Station Professional",
+    //   status: "active",
+    // },
   ].filter((item) => item.always || installedDevices.includes(item.id));
 
   const getCurrentDate = () => {
@@ -110,34 +124,42 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   };
 
   const renderContent = () => {
-    switch (currentPage) {
-      case "welcome":
-        return (
-          <WelcomePage
-            user={user}
-            onNavigate={setCurrentPage}
-            installedDevices={installedDevices}
-          />
-        );
-      case "agriino":
-        return <AgriinoDashboard />;
-      case "agriimeter":
-        return <AgriimeterDashboard />;
-      case "greenhouse":
-        return <GreenhouseDashboard />;
-      case "skyvera":
-        return <SkyVeraDashboard />;
-      case "profile":
-        return <ProfilePage user={user} />;
-      default:
-        return (
-          <WelcomePage
-            user={user}
-            onNavigate={setCurrentPage}
-            installedDevices={installedDevices}
-          />
-        );
+    const content = (() => {
+      switch (currentPage) {
+        case "welcome":
+          return (
+            <WelcomePage
+              user={user}
+              onNavigate={setCurrentPage}
+              installedDevices={installedDevices}
+            />
+          );
+        case "agriino":
+          return <AgriinoDashboard />;
+        case "agriimeter":
+          return <AgriimeterDashboard />;
+        case "greenhouse":
+          return <GreenhouseDashboard />;
+        case "skyvera":
+          return <SkyVeraDashboard />;
+        case "profile":
+          return <ProfilePage user={user} />;
+        default:
+          return (
+            <WelcomePage
+              user={user}
+              onNavigate={setCurrentPage}
+              installedDevices={installedDevices}
+            />
+          );
+      }
+    })();
+
+    // Wrap lazy-loaded components with Suspense
+    if (currentPage !== "welcome") {
+      return <Suspense fallback={<FeatureLoader />}>{content}</Suspense>;
     }
+    return content;
   };
 
   return (
