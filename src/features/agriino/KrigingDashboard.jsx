@@ -131,7 +131,7 @@ export function KrigingDashboard() {
     refresh: refreshDevices 
   } = useFirebaseDevices('devices', {
     realtime: true,
-    thresholds: { low: 1.5, high: 2.5 },
+    thresholds: { low: 1.80, high: 3.31 },
   });
 
   // Kriging analysis hook
@@ -143,7 +143,14 @@ export function KrigingDashboard() {
   } = useKrigingAnalysis({
     gridResolution: 15,
     variogramModel: 'spherical',
-    thresholds: { low: 1.5, high: 2.5 },
+    thresholds: { 
+      low: 1.80, 
+      high: 3.31,
+      deficient: 1.80,
+      subnormal: 2.71,
+      normal: 3.31 
+    },
+    influenceRadius: 0.05, // 50 meters
   });
 
   // Handle analysis

@@ -7,19 +7,25 @@
  * subnormal: 1.80 - 2.71
  * normal: 2.71 - 3.31
  * high: >3.31
+ * no_data: outside sensor influence radius (neutral/gray)
  * 
  * Colors based on features_update.txt:
- * Deficient = Red (merah)
- * Subnormal = Dark Orange (orange tua)
- * Normal = Light Orange (orange muda)
- * High = Yellow (kuning)
+ * Deficient = Red (merah) - #ef4444
+ * Subnormal = Dark Orange (orange tua) - #ff8c00
+ * Normal = Light Orange (orange muda) - #ffa500
+ * High = Yellow (kuning) - #ffd700
+ * No Data = Gray (abu-abu netral) - #9ca3af
  */
 export const NITROGEN_THRESHOLDS = {
   deficient: { max: 1.80, color: '#ef4444', label: 'Deficient' },
   subnormal: { min: 1.80, max: 2.71, color: '#ff8c00', label: 'Subnormal' },
   normal: { min: 2.71, max: 3.31, color: '#ffa500', label: 'Normal' },
   high: { min: 3.31, color: '#ffd700', label: 'High' },
+  no_data: { color: '#9ca3af', label: 'No Data' },
 };
+
+// Default influence radius in kilometers (0.05 km = 50 meters)
+export const DEFAULT_INFLUENCE_RADIUS = 0.05;
 
 /**
  * Base location for devices (based on database.txt)

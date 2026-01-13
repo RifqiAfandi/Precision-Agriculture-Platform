@@ -31,14 +31,18 @@ import { realTimeDataStore, classifyNitrogen, getClassificationColor, NITROGEN_T
 const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY || 'bedLj81C0j3GdguncpGN';
 
 // Map marker colors based on nitrogen classification
-// Deficient = Red (merah), Subnormal = Dark Orange (orange tua), Normal = Light Orange (orange muda), High = Yellow (kuning)
+// Deficient = Red (merah), Subnormal = Dark Orange (orange tua), Normal = Light Orange (orange muda), High = Yellow (kuning), No Data = Gray
 const MARKER_COLORS = {
   deficient: { fill: '#ef4444', border: '#dc2626', label: 'Deficient' },
   subnormal: { fill: '#ff8c00', border: '#e67e00', label: 'Subnormal' },
   normal: { fill: '#ffa500', border: '#e69500', label: 'Normal' },
   high: { fill: '#ffd700', border: '#e6c200', label: 'High' },
+  no_data: { fill: '#9ca3af', border: '#6b7280', label: 'No Data' },
   unknown: { fill: '#6b7280', border: '#4b5563', label: 'Unknown' },
 };
+
+// Default influence radius in kilometers (50 meters)
+const DEFAULT_INFLUENCE_RADIUS_KM = 0.05;
 
 /**
  * Get classification label in Indonesian
@@ -210,7 +214,7 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
       {/* Classification counts */}
       <div className="space-y-2">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Distribusi Klasifikasi</p>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-5 gap-1">
           <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-2 text-center">
             <p className="text-lg font-bold text-red-600 dark:text-red-400">{statistics.deficient_count || 0}</p>
             <p className="text-xs text-red-600 dark:text-red-400">Defisien</p>
@@ -226,6 +230,10 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
           <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)' }}>
             <p className="text-lg font-bold" style={{ color: '#d4a500' }}>{statistics.high_count || 0}</p>
             <p className="text-xs" style={{ color: '#d4a500' }}>Tinggi</p>
+          </div>
+          <div className="bg-gray-100 dark:bg-gray-700/30 rounded-lg p-2 text-center">
+            <p className="text-lg font-bold text-gray-500 dark:text-gray-400">{statistics.no_data_count || 0}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">No Data</p>
           </div>
         </div>
       </div>
@@ -246,6 +254,9 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
             </p>
             <p>
               Sill: <strong className="text-gray-900 dark:text-gray-100">{variogram_params.sill?.toFixed(4)}</strong>
+            </p>
+            <p className="col-span-2">
+              Influence Radius: <strong className="text-gray-900 dark:text-gray-100">{((variogram_params.influence_radius || 0.05) * 1000).toFixed(0)}m</strong>
             </p>
           </div>
         </div>
@@ -739,6 +750,41 @@ export function KrigingMap({ areaId, areaName }) {
       return inside;
     };
 
+    // Helper function to calculate haversine distance in km
+    const haversineDistance = (lat1, lng1, lat2, lng2) => {
+      const R = 6371; // Earth's radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    };
+
+    // Check if point is within influence radius of any device
+    const isWithinInfluenceRadius = (lat, lng, devices, radiusKm = DEFAULT_INFLUENCE_RADIUS_KM) => {
+      for (const device of devices) {
+        const dist = haversineDistance(lat, lng, device.lat, device.lng);
+        if (dist <= radiusKm) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Get minimum distance to any device
+    const getMinDistanceToDevice = (lat, lng, devices) => {
+      let minDist = Infinity;
+      for (const device of devices) {
+        const dist = haversineDistance(lat, lng, device.lat, device.lng);
+        if (dist < minDist) {
+          minDist = dist;
+        }
+      }
+      return minDist;
+    };
+
     let minLat, maxLat, minLng, maxLng;
     let polygonPoints = null;
 
@@ -771,21 +817,25 @@ export function KrigingMap({ areaId, areaName }) {
             continue;
           }
           
+          // Check if point is within influence radius of any device
+          const withinInfluence = isWithinInfluenceRadius(lat, lng, deviceList);
+          
           // Generate nitrogen value based on proximity to devices with interpolation
-          let value;
-          if (deviceList.length > 0) {
+          let value = 0;
+          let classification = 'no_data';
+          
+          if (withinInfluence && deviceList.length > 0) {
             // Simple IDW interpolation for more realistic values
             let weightSum = 0;
             let valueSum = 0;
             deviceList.forEach(device => {
-              const dist = Math.sqrt(Math.pow(lat - device.lat, 2) + Math.pow(lng - device.lng, 2));
+              const dist = haversineDistance(lat, lng, device.lat, device.lng);
               const weight = 1 / Math.max(dist, 0.0001);
               weightSum += weight;
               valueSum += weight * device.nitrogen;
             });
             value = valueSum / weightSum + (Math.random() - 0.5) * 0.3;
-          } else {
-            value = nitrogenValues[Math.floor(Math.random() * nitrogenValues.length)] + (Math.random() - 0.5) * 0.5;
+            classification = classifyNitrogen(value);
           }
           
           gridPoints.push({
@@ -793,7 +843,7 @@ export function KrigingMap({ areaId, areaName }) {
             longitude: lng,
             predicted_value: value,
             variance: 0.1,
-            classification: classifyNitrogen(value),
+            classification: classification,
           });
         }
       }
@@ -803,6 +853,7 @@ export function KrigingMap({ areaId, areaName }) {
     const subnormalCount = gridPoints.filter((p) => p.classification === 'subnormal').length;
     const normalCount = gridPoints.filter((p) => p.classification === 'normal').length;
     const highCount = gridPoints.filter((p) => p.classification === 'high').length;
+    const noDataCount = gridPoints.filter((p) => p.classification === 'no_data').length;
 
     return {
       success: true,
@@ -814,21 +865,24 @@ export function KrigingMap({ areaId, areaName }) {
         classification: classifyNitrogen(d.nitrogen),
       })),
       statistics: {
-        min_value: Math.min(...nitrogenValues),
-        max_value: Math.max(...nitrogenValues),
-        mean_value: nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length,
+        min_value: nitrogenValues.length > 0 ? Math.min(...nitrogenValues) : 0,
+        max_value: nitrogenValues.length > 0 ? Math.max(...nitrogenValues) : 0,
+        mean_value: nitrogenValues.length > 0 ? nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length : 0,
         std_value: 0.35,
         deficient_count: deficientCount,
         subnormal_count: subnormalCount,
         normal_count: normalCount,
         high_count: highCount,
+        no_data_count: noDataCount,
         total_points: gridPoints.length,
+        data_points: gridPoints.length - noDataCount,
       },
       variogram_params: {
         model: 'spherical',
         nugget: 0.05,
         sill: 0.25,
         range: 0.002,
+        influence_radius: DEFAULT_INFLUENCE_RADIUS_KM,
       },
       thresholds: {
         deficient: NITROGEN_THRESHOLDS.deficient.max,

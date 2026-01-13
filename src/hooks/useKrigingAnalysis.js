@@ -8,13 +8,21 @@ import api from '@/services/api';
  * @param {number} options.gridResolution - Grid resolution (default: 20)
  * @param {string} options.variogramModel - Variogram model (default: 'spherical')
  * @param {Object} options.thresholds - Classification thresholds
+ * @param {number} options.influenceRadius - Influence radius in km (default: 0.05 = 50m)
  * @returns {Object} Analysis state and control functions
  */
 export function useKrigingAnalysis(options = {}) {
   const {
     gridResolution = 20,
     variogramModel = 'spherical',
-    thresholds = { low: 1.5, high: 2.5 },
+    thresholds = { 
+      low: 1.80, 
+      high: 3.31,
+      deficient: 1.80,
+      subnormal: 2.71,
+      normal: 3.31 
+    },
+    influenceRadius = 0.05, // 50 meters default
   } = options;
 
   const [result, setResult] = useState(null);
@@ -84,6 +92,10 @@ export function useKrigingAnalysis(options = {}) {
         variogram_model: analysisOptions.variogramModel || variogramModel,
         low_threshold: analysisOptions.lowThreshold || thresholds.low,
         high_threshold: analysisOptions.highThreshold || thresholds.high,
+        influence_radius: analysisOptions.influenceRadius || influenceRadius,
+        deficient_threshold: analysisOptions.deficientThreshold || thresholds.deficient,
+        subnormal_threshold: analysisOptions.subnormalThreshold || thresholds.subnormal,
+        normal_threshold: analysisOptions.normalThreshold || thresholds.normal,
         area_id: analysisOptions.areaId,
         area_name: analysisOptions.areaName,
         ...bounds,
