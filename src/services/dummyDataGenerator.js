@@ -17,10 +17,10 @@
  * No Data = Gray (abu-abu netral) - #9ca3af
  */
 export const NITROGEN_THRESHOLDS = {
-  deficient: { max: 1.80, color: '#ef4444', label: 'Deficient' },
-  subnormal: { min: 1.80, max: 2.71, color: '#ff8c00', label: 'Subnormal' },
-  normal: { min: 2.71, max: 3.31, color: '#ffa500', label: 'Normal' },
-  high: { min: 3.31, color: '#ffd700', label: 'High' },
+  deficient: { max: 1.80, color: '#E53935', label: 'Deficient' },
+  subnormal: { min: 1.80, max: 2.71, color: '#FB8C00', label: 'Subnormal' },
+  normal: { min: 2.71, max: 3.31, color: '#FDD835', label: 'Normal' },
+  high: { min: 3.31, color: '#43A047', label: 'High' },
   no_data: { color: '#9ca3af', label: 'No Data' },
 };
 

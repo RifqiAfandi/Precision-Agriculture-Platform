@@ -306,15 +306,19 @@ export function KrigingDashboard() {
                       {devices.map((device) => {
                         const classification = device.classification || 'unknown';
                         const statusColors = {
-                          low: 'bg-red-100 text-red-700',
-                          normal: 'bg-blue-100 text-blue-700',
+                          deficient: 'bg-red-100 text-red-700',
+                          subnormal: 'bg-orange-100 text-orange-700',
+                          normal: 'bg-yellow-100 text-yellow-700',
                           high: 'bg-green-100 text-green-700',
+                          low: 'bg-red-100 text-red-700',
                           unknown: 'bg-gray-100 text-gray-700',
                         };
                         const statusLabels = {
-                          low: 'Rendah',
+                          deficient: 'Defisien',
+                          subnormal: 'Subnormal',
                           normal: 'Normal',
                           high: 'Tinggi',
+                          low: 'Rendah',
                           unknown: 'Unknown',
                         };
                         

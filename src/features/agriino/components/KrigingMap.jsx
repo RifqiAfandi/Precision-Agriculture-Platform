@@ -26,17 +26,19 @@ import {
 import { toast } from 'sonner';
 import api from '@/services/api';
 import { realTimeDataStore, classifyNitrogen, getClassificationColor, NITROGEN_THRESHOLDS } from '@/services/dummyDataGenerator';
+import * as turf from '@turf/turf';
+import { contours } from 'd3-contour';
 
 // MapTiler API Key
 const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY || 'bedLj81C0j3GdguncpGN';
 
 // Map marker colors based on nitrogen classification
-// Deficient = Red (merah), Subnormal = Dark Orange (orange tua), Normal = Light Orange (orange muda), High = Yellow (kuning), No Data = Gray
+// Deficient = Red (merah), Subnormal = Orange (oranye), Normal = Yellow (kuning), High = Green (hijau), No Data = Gray
 const MARKER_COLORS = {
-  deficient: { fill: '#ef4444', border: '#dc2626', label: 'Deficient' },
-  subnormal: { fill: '#ff8c00', border: '#e67e00', label: 'Subnormal' },
-  normal: { fill: '#ffa500', border: '#e69500', label: 'Normal' },
-  high: { fill: '#ffd700', border: '#e6c200', label: 'High' },
+  deficient: { fill: '#E53935', border: '#C62828', label: 'Deficient' },
+  subnormal: { fill: '#FB8C00', border: '#EF6C00', label: 'Subnormal' },
+  normal: { fill: '#FDD835', border: '#F9A825', label: 'Normal' },
+  high: { fill: '#43A047', border: '#2E7D32', label: 'High' },
   no_data: { fill: '#9ca3af', border: '#6b7280', label: 'No Data' },
   unknown: { fill: '#6b7280', border: '#4b5563', label: 'Unknown' },
 };
@@ -215,21 +217,21 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
       <div className="space-y-2">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Distribusi Klasifikasi</p>
         <div className="grid grid-cols-5 gap-1">
-          <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-2 text-center">
-            <p className="text-lg font-bold text-red-600 dark:text-red-400">{statistics.deficient_count || 0}</p>
-            <p className="text-xs text-red-600 dark:text-red-400">Defisien</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(229, 57, 53, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#E53935' }}>{statistics.deficient_count || 0}</p>
+            <p className="text-xs" style={{ color: '#E53935' }}>Defisien</p>
           </div>
-          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 140, 0, 0.2)' }}>
-            <p className="text-lg font-bold" style={{ color: '#ff8c00' }}>{statistics.subnormal_count || 0}</p>
-            <p className="text-xs" style={{ color: '#ff8c00' }}>Subnormal</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(251, 140, 0, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#FB8C00' }}>{statistics.subnormal_count || 0}</p>
+            <p className="text-xs" style={{ color: '#FB8C00' }}>Subnormal</p>
           </div>
-          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 165, 0, 0.2)' }}>
-            <p className="text-lg font-bold" style={{ color: '#ffa500' }}>{statistics.normal_count || 0}</p>
-            <p className="text-xs" style={{ color: '#ffa500' }}>Normal</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(253, 216, 53, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#F9A825' }}>{statistics.normal_count || 0}</p>
+            <p className="text-xs" style={{ color: '#F9A825' }}>Normal</p>
           </div>
-          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)' }}>
-            <p className="text-lg font-bold" style={{ color: '#d4a500' }}>{statistics.high_count || 0}</p>
-            <p className="text-xs" style={{ color: '#d4a500' }}>Tinggi</p>
+          <div className="rounded-lg p-2 text-center" style={{ backgroundColor: 'rgba(67, 160, 71, 0.2)' }}>
+            <p className="text-lg font-bold" style={{ color: '#43A047' }}>{statistics.high_count || 0}</p>
+            <p className="text-xs" style={{ color: '#43A047' }}>Tinggi</p>
           </div>
           <div className="bg-gray-100 dark:bg-gray-700/30 rounded-lg p-2 text-center">
             <p className="text-lg font-bold text-gray-500 dark:text-gray-400">{statistics.no_data_count || 0}</p>
@@ -679,56 +681,186 @@ export function KrigingMap({ areaId, areaName }) {
     }
   }, [devices, bounds, areaId, areaName, selectedArea]);
 
-  // Create grid polygons from grid points for area visualization
+  // Create smooth contour polygons from grid points using d3-contour
   const createGridPolygons = (gridPoints, boundsData) => {
     if (!gridPoints || gridPoints.length === 0) return [];
     
-    // Calculate cell size based on bounds
-    const resolution = Math.sqrt(gridPoints.length) || 12;
-    let cellLat, cellLng;
+    // Get bounds
+    let minLat, maxLat, minLng, maxLng;
+    let clipPolygon = null;
     
     if (boundsData) {
       if (Array.isArray(boundsData)) {
-        // selectedArea is array of points
         const lngs = boundsData.map((p) => p[0]);
         const lats = boundsData.map((p) => p[1]);
-        cellLat = (Math.max(...lats) - Math.min(...lats)) / resolution;
-        cellLng = (Math.max(...lngs) - Math.min(...lngs)) / resolution;
+        minLat = Math.min(...lats);
+        maxLat = Math.max(...lats);
+        minLng = Math.min(...lngs);
+        maxLng = Math.max(...lngs);
+        // Close the polygon for clipping
+        clipPolygon = turf.polygon([[...boundsData, boundsData[0]]]);
       } else {
-        // bounds object
-        cellLat = (boundsData.max_lat - boundsData.min_lat) / resolution;
-        cellLng = (boundsData.max_lng - boundsData.min_lng) / resolution;
+        minLat = boundsData.min_lat;
+        maxLat = boundsData.max_lat;
+        minLng = boundsData.min_lng;
+        maxLng = boundsData.max_lng;
       }
     } else {
-      cellLat = 0.0001;
-      cellLng = 0.0001;
+      const lats = gridPoints.map(p => p.latitude);
+      const lngs = gridPoints.map(p => p.longitude);
+      minLat = Math.min(...lats);
+      maxLat = Math.max(...lats);
+      minLng = Math.min(...lngs);
+      maxLng = Math.max(...lngs);
     }
+
+    const width = maxLng - minLng;
+    const height = maxLat - minLat;
     
-    return gridPoints.map((point) => {
-      const lat = point.latitude;
-      const lng = point.longitude;
-      const halfLat = cellLat / 2;
-      const halfLng = cellLng / 2;
-      
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Polygon',
-          coordinates: [[
-            [lng - halfLng, lat - halfLat],
-            [lng + halfLng, lat - halfLat],
-            [lng + halfLng, lat + halfLat],
-            [lng - halfLng, lat + halfLat],
-            [lng - halfLng, lat - halfLat],
-          ]],
-        },
-        properties: {
-          value: point.predicted_value,
-          color: getClassificationColor(point.classification),
-          classification: point.classification,
-        },
-      };
+    // Filter only valid points with nitrogen data
+    const validPoints = gridPoints.filter(p => p.classification !== 'no_data' && p.predicted_value > 0);
+    if (validPoints.length === 0) return [];
+
+    // Create a higher resolution grid for smoother contours
+    const gridSize = 50;
+    const values = new Array(gridSize * gridSize).fill(0);
+    const counts = new Array(gridSize * gridSize).fill(0);
+
+    // Create grid values using IDW interpolation from grid points
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const lng = minLng + (x / (gridSize - 1)) * width;
+        const lat = minLat + (y / (gridSize - 1)) * height;
+        
+        // IDW interpolation
+        let weightSum = 0;
+        let valueSum = 0;
+        
+        validPoints.forEach(point => {
+          const dx = lng - point.longitude;
+          const dy = lat - point.latitude;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const weight = 1 / Math.max(dist, 0.00001);
+          weightSum += weight;
+          valueSum += weight * point.predicted_value;
+        });
+        
+        if (weightSum > 0) {
+          values[y * gridSize + x] = valueSum / weightSum;
+          counts[y * gridSize + x] = 1;
+        }
+      }
+    }
+
+    // Define thresholds for contour bands
+    const thresholds = [
+      { min: 0, max: 1.80, classification: 'deficient', color: '#E53935' },
+      { min: 1.80, max: 2.71, classification: 'subnormal', color: '#FB8C00' },
+      { min: 2.71, max: 3.31, classification: 'normal', color: '#FDD835' },
+      { min: 3.31, max: 5.0, classification: 'high', color: '#43A047' },
+    ];
+
+    const features = [];
+
+    // Generate isobands (filled contours) for each threshold range
+    thresholds.forEach(threshold => {
+      try {
+        // Generate contours for this threshold
+        const contourGenerator = contours()
+          .size([gridSize, gridSize])
+          .thresholds([threshold.min, threshold.max]);
+        
+        const contourData = contourGenerator(values);
+        
+        // Find the contour band between min and max
+        contourData.forEach((contour, idx) => {
+          if (contour.value >= threshold.min && contour.value < threshold.max) {
+            // Convert contour coordinates from grid space to geo coordinates
+            contour.coordinates.forEach(ring => {
+              if (ring.length > 0) {
+                const geoCoords = ring.map(subring => 
+                  subring.map(point => [
+                    minLng + (point[0] / (gridSize - 1)) * width,
+                    minLat + (point[1] / (gridSize - 1)) * height
+                  ])
+                );
+
+                // Create polygon feature
+                let polygon = {
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Polygon',
+                    coordinates: geoCoords,
+                  },
+                  properties: {
+                    value: contour.value,
+                    color: threshold.color,
+                    classification: threshold.classification,
+                  },
+                };
+
+                // Clip to boundary if exists
+                if (clipPolygon) {
+                  try {
+                    const clipped = turf.intersect(
+                      turf.featureCollection([polygon, clipPolygon])
+                    );
+                    if (clipped) {
+                      clipped.properties = polygon.properties;
+                      features.push(clipped);
+                    }
+                  } catch (e) {
+                    // If clipping fails, use original
+                    features.push(polygon);
+                  }
+                } else {
+                  features.push(polygon);
+                }
+              }
+            });
+          }
+        });
+      } catch (e) {
+        console.warn('Contour generation error:', e);
+      }
     });
+
+    // If contour generation failed or produced no results, fall back to simplified rendering
+    if (features.length === 0) {
+      // Create smooth blobs around each device using Turf buffers
+      return validPoints.map(point => {
+        const center = turf.point([point.longitude, point.latitude]);
+        const radius = 0.03; // 30 meters
+        const buffered = turf.buffer(center, radius, { units: 'kilometers' });
+        
+        if (buffered) {
+          buffered.properties = {
+            value: point.predicted_value,
+            color: getClassificationColor(point.classification),
+            classification: point.classification,
+          };
+          
+          // Clip to boundary if exists
+          if (clipPolygon) {
+            try {
+              const clipped = turf.intersect(
+                turf.featureCollection([buffered, clipPolygon])
+              );
+              if (clipped) {
+                clipped.properties = buffered.properties;
+                return clipped;
+              }
+            } catch (e) {
+              return buffered;
+            }
+          }
+          return buffered;
+        }
+        return null;
+      }).filter(Boolean);
+    }
+
+    return features;
   };
 
   // Generate mock analysis result for demo
