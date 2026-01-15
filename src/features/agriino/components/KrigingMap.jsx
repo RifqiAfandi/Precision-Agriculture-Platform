@@ -635,7 +635,7 @@ export function KrigingMap({ areaId, areaName }) {
         device_data: deviceData,
         area_id: areaId,
         area_name: areaName,
-        grid_resolution: 15,
+        grid_resolution: 50,
         variogram_model: 'spherical',
         low_threshold: NITROGEN_THRESHOLDS.deficient.max,
         high_threshold: NITROGEN_THRESHOLDS.normal.max,
@@ -938,7 +938,7 @@ export function KrigingMap({ areaId, areaName }) {
         maxLng = boundsData.max_lng;
       }
 
-      const resolution = 15;
+      const resolution = 50;
       for (let i = 0; i < resolution; i++) {
         for (let j = 0; j < resolution; j++) {
           const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
@@ -958,15 +958,17 @@ export function KrigingMap({ areaId, areaName }) {
           
           if (withinInfluence && deviceList.length > 0) {
             // Simple IDW interpolation for more realistic values
+            // Use squared distance for smoother decay
             let weightSum = 0;
             let valueSum = 0;
             deviceList.forEach(device => {
               const dist = haversineDistance(lat, lng, device.lat, device.lng);
-              const weight = 1 / Math.max(dist, 0.0001);
+              // Use squared inverse distance for smoother interpolation
+              const weight = 1 / Math.max(dist * dist, 0.0000001);
               weightSum += weight;
               valueSum += weight * device.nitrogen;
             });
-            value = valueSum / weightSum + (Math.random() - 0.5) * 0.3;
+            value = valueSum / weightSum;
             classification = classifyNitrogen(value);
           }
           

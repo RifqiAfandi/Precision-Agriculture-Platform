@@ -141,7 +141,7 @@ export function KrigingDashboard() {
     analyze,
     statistics: analysisStats,
   } = useKrigingAnalysis({
-    gridResolution: 15,
+    gridResolution: 50,
     variogramModel: 'spherical',
     thresholds: { 
       low: 1.80, 
