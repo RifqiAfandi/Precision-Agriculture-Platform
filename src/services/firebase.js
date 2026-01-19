@@ -187,16 +187,21 @@ class FirebaseService {
 
   /**
    * Classify nitrogen level
+   * Based on thresholds from features_update.txt:
+   * deficient: < 1.80%
+   * subnormal: 1.80 - 2.71
+   * normal: 2.71 - 3.31
+   * high: > 3.31
+   * 
    * @param {number} nitrogen - Nitrogen value
-   * @param {number} lowThreshold - Low threshold (default: 1.5)
-   * @param {number} highThreshold - High threshold (default: 2.5)
-   * @returns {string} Classification: 'low', 'normal', or 'high'
+   * @returns {string} Classification: 'deficient', 'subnormal', 'normal', or 'high'
    */
-  classifyNitrogen(nitrogen, lowThreshold = 1.5, highThreshold = 2.5) {
-    if (nitrogen === undefined || nitrogen === null) return 'unknown';
-    if (nitrogen < lowThreshold) return 'low';
-    if (nitrogen > highThreshold) return 'high';
-    return 'normal';
+  classifyNitrogen(nitrogen) {
+    if (nitrogen === undefined || nitrogen === null || isNaN(nitrogen)) return 'unknown';
+    if (nitrogen < 1.80) return 'deficient';
+    if (nitrogen < 2.71) return 'subnormal';
+    if (nitrogen < 3.31) return 'normal';
+    return 'high';
   }
 
   /**

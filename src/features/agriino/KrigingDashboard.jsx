@@ -131,7 +131,11 @@ export function KrigingDashboard() {
     refresh: refreshDevices 
   } = useFirebaseDevices('devices', {
     realtime: true,
-    thresholds: { low: 1.80, high: 3.31 },
+    thresholds: { 
+      deficient: 1.80, 
+      subnormal: 2.71, 
+      normal: 3.31 
+    },
   });
 
   // Kriging analysis hook
@@ -193,19 +197,19 @@ export function KrigingDashboard() {
           icon={Target}
           iconColor="text-green-600"
           label="Avg Nitrogen"
-          value={deviceStats.avgNitrogen.toFixed(3)}
+          value={deviceStats.avgNitrogen?.toFixed(3) || '0.000'}
         />
         <StatCard
           icon={TrendingDown}
           iconColor="text-red-600"
-          label="Level Rendah"
-          value={deviceStats.lowCount}
+          label="Defisien"
+          value={deviceStats.deficientCount || 0}
         />
         <StatCard
           icon={TrendingUp}
           iconColor="text-emerald-600"
           label="Level Tinggi"
-          value={deviceStats.highCount}
+          value={deviceStats.highCount || 0}
         />
       </div>
 
@@ -263,7 +267,7 @@ export function KrigingDashboard() {
 
         {/* Map Tab */}
         <TabsContent value="map" className="mt-4">
-          <KrigingMap />
+          <KrigingMap devices={devices} onRefresh={refreshDevices} />
         </TabsContent>
 
         {/* Devices Tab */}

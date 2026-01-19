@@ -13,7 +13,11 @@ import firebaseService from '@/services/firebase';
 export function useFirebaseDevices(path = 'devices', options = {}) {
   const {
     realtime = true,
-    thresholds = { low: 1.5, high: 2.5 },
+    thresholds = { 
+      deficient: 1.80, 
+      subnormal: 2.71, 
+      normal: 3.31 
+    },
   } = options;
 
   const [devices, setDevices] = useState([]);
@@ -22,12 +26,17 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   const [connected, setConnected] = useState(false);
   const unsubscribeRef = useRef(null);
 
-  // Classify nitrogen level
+  // Classify nitrogen level based on thresholds
+  // deficient: < 1.80
+  // subnormal: 1.80 - 2.71
+  // normal: 2.71 - 3.31
+  // high: > 3.31
   const classifyNitrogen = useCallback((value) => {
-    if (value === undefined || value === null) return 'unknown';
-    if (value < thresholds.low) return 'low';
-    if (value > thresholds.high) return 'high';
-    return 'normal';
+    if (value === undefined || value === null || isNaN(value)) return 'unknown';
+    if (value < thresholds.deficient) return 'deficient';
+    if (value < thresholds.subnormal) return 'subnormal';
+    if (value < thresholds.normal) return 'normal';
+    return 'high';
   }, [thresholds]);
 
   // Process devices with classification
@@ -111,7 +120,8 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
         avgNitrogen: 0,
         minNitrogen: 0,
         maxNitrogen: 0,
-        lowCount: 0,
+        deficientCount: 0,
+        subnormalCount: 0,
         normalCount: 0,
         highCount: 0,
       };
@@ -119,7 +129,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
 
     const nitrogenValues = devices
       .map(d => d.nitrogen)
-      .filter(v => typeof v === 'number');
+      .filter(v => typeof v === 'number' && !isNaN(v));
 
     return {
       count: devices.length,
@@ -128,7 +138,8 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
         : 0,
       minNitrogen: nitrogenValues.length > 0 ? Math.min(...nitrogenValues) : 0,
       maxNitrogen: nitrogenValues.length > 0 ? Math.max(...nitrogenValues) : 0,
-      lowCount: devices.filter(d => d.classification === 'low').length,
+      deficientCount: devices.filter(d => d.classification === 'deficient').length,
+      subnormalCount: devices.filter(d => d.classification === 'subnormal').length,
       normalCount: devices.filter(d => d.classification === 'normal').length,
       highCount: devices.filter(d => d.classification === 'high').length,
     };

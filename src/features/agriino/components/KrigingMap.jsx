@@ -280,7 +280,7 @@ AnalysisResultsPanel.propTypes = {
 /**
  * Main KrigingMap Component with MapTiler
  */
-export function KrigingMap({ areaId, areaName }) {
+export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }) {
   // Refs
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -289,8 +289,9 @@ export function KrigingMap({ areaId, areaName }) {
   const drawPointsRef = useRef([]);
   const isDrawingRef = useRef(false);
 
-  // State
-  const [devices, setDevices] = useState([]);
+  // State - use propDevices if provided, otherwise fall back to internal state
+  const [internalDevices, setInternalDevices] = useState([]);
+  const devices = propDevices && propDevices.length > 0 ? propDevices : internalDevices;
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -437,14 +438,20 @@ export function KrigingMap({ areaId, areaName }) {
     };
   }, []);
 
-  // Load device data from dummy generator
+  // Load device data from dummy generator only if no propDevices provided
   useEffect(() => {
+    // If propDevices are provided, use them instead of dummy data
+    if (propDevices && propDevices.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     const loadData = () => {
       setIsLoading(true);
       // Start the data store
       realTimeDataStore.start(60000);
       const data = realTimeDataStore.getCurrentData();
-      setDevices(data);
+      setInternalDevices(data);
       setIsLoading(false);
     };
 
@@ -452,13 +459,13 @@ export function KrigingMap({ areaId, areaName }) {
 
     // Subscribe to updates
     const unsubscribe = realTimeDataStore.subscribe((data) => {
-      setDevices(data);
+      setInternalDevices(data);
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [propDevices]);
 
   // Update markers when devices change
   useEffect(() => {
@@ -541,12 +548,19 @@ export function KrigingMap({ areaId, areaName }) {
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
-    setIsLoading(true);
-    const data = realTimeDataStore.getCurrentData();
-    setDevices(data);
-    setIsLoading(false);
-    toast.success('Data berhasil diperbarui');
-  }, []);
+    if (onRefresh) {
+      // Use prop callback if provided
+      onRefresh();
+      toast.success('Data berhasil diperbarui');
+    } else {
+      // Fall back to internal data
+      setIsLoading(true);
+      const data = realTimeDataStore.getCurrentData();
+      setInternalDevices(data);
+      setIsLoading(false);
+      toast.success('Data berhasil diperbarui');
+    }
+  }, [onRefresh]);
 
   // Toggle drawing mode
   const handleToggleDrawing = useCallback(() => {
@@ -717,9 +731,22 @@ export function KrigingMap({ areaId, areaName }) {
     const width = maxLng - minLng;
     const height = maxLat - minLat;
     
-    // Filter only valid points with nitrogen data
-    const validPoints = gridPoints.filter(p => p.classification !== 'no_data' && p.predicted_value > 0);
-    if (validPoints.length === 0) return [];
+    // Filter only valid points with nitrogen data (relaxed condition for better coverage)
+    const validPoints = gridPoints.filter(p => 
+      p.classification !== 'no_data' && 
+      typeof p.predicted_value === 'number' && 
+      !isNaN(p.predicted_value) && 
+      p.predicted_value > 0
+    );
+    
+    // If no valid points, try to show all points with predicted values
+    const pointsToUse = validPoints.length > 0 ? validPoints : gridPoints.filter(p => 
+      typeof p.predicted_value === 'number' && 
+      !isNaN(p.predicted_value) && 
+      p.predicted_value > 0
+    );
+    
+    if (pointsToUse.length === 0) return [];
 
     // Create a higher resolution grid for smoother contours
     const gridSize = 50;
@@ -736,7 +763,7 @@ export function KrigingMap({ areaId, areaName }) {
         let weightSum = 0;
         let valueSum = 0;
         
-        validPoints.forEach(point => {
+        pointsToUse.forEach(point => {
           const dx = lng - point.longitude;
           const dy = lat - point.latitude;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -828,7 +855,7 @@ export function KrigingMap({ areaId, areaName }) {
     // If contour generation failed or produced no results, fall back to simplified rendering
     if (features.length === 0) {
       // Create smooth blobs around each device using Turf buffers
-      return validPoints.map(point => {
+      return pointsToUse.map(point => {
         const center = turf.point([point.longitude, point.latitude]);
         const radius = 0.03; // 30 meters
         const buffered = turf.buffer(center, radius, { units: 'kilometers' });
@@ -865,7 +892,7 @@ export function KrigingMap({ areaId, areaName }) {
 
   // Generate mock analysis result for demo
   const generateMockAnalysisResult = (deviceList, boundsData) => {
-    const nitrogenValues = deviceList.map((d) => d.nitrogen);
+    const nitrogenValues = deviceList.map((d) => d.nitrogen).filter(v => typeof v === 'number' && !isNaN(v));
     const gridPoints = [];
 
     // Helper function to check if point is inside polygon
@@ -894,9 +921,10 @@ export function KrigingMap({ areaId, areaName }) {
       return R * c;
     };
 
-    // Check if point is within influence radius of any device
-    const isWithinInfluenceRadius = (lat, lng, devices, radiusKm = DEFAULT_INFLUENCE_RADIUS_KM) => {
+    // Check if point is within influence radius of any device (increased for better coverage)
+    const isWithinInfluenceRadius = (lat, lng, devices, radiusKm = DEFAULT_INFLUENCE_RADIUS_KM * 2) => {
       for (const device of devices) {
+        if (!device.lat || !device.lng) continue;
         const dist = haversineDistance(lat, lng, device.lat, device.lng);
         if (dist <= radiusKm) {
           return true;
@@ -920,6 +948,7 @@ export function KrigingMap({ areaId, areaName }) {
     let minLat, maxLat, minLng, maxLng;
     let polygonPoints = null;
 
+    // Calculate bounds from boundsData or from devices
     if (boundsData) {
       if (Array.isArray(boundsData)) {
         // selectedArea is array of points
@@ -937,49 +966,98 @@ export function KrigingMap({ areaId, areaName }) {
         minLng = boundsData.min_lng;
         maxLng = boundsData.max_lng;
       }
+    } else {
+      // Calculate bounds from devices if no boundsData provided
+      const validDevices = deviceList.filter(d => d.lat && d.lng);
+      if (validDevices.length === 0) {
+        // Return empty result if no valid devices
+        return {
+          success: true,
+          grid_points: [],
+          input_points: [],
+          statistics: {
+            min_value: 0,
+            max_value: 0,
+            mean_value: 0,
+            std_value: 0,
+            deficient_count: 0,
+            subnormal_count: 0,
+            normal_count: 0,
+            high_count: 0,
+            no_data_count: 0,
+            total_points: 0,
+            data_points: 0,
+          },
+          variogram_params: {
+            model: 'spherical',
+            nugget: 0,
+            sill: 0,
+            range: 0,
+            influence_radius: DEFAULT_INFLUENCE_RADIUS_KM,
+          },
+          thresholds: {
+            deficient: NITROGEN_THRESHOLDS.deficient.max,
+            subnormal: NITROGEN_THRESHOLDS.subnormal.max,
+            normal: NITROGEN_THRESHOLDS.normal.max,
+          },
+          bounds: null,
+        };
+      }
+      
+      const lats = validDevices.map(d => d.lat);
+      const lngs = validDevices.map(d => d.lng);
+      const padding = 0.002; // Add padding around devices
+      minLat = Math.min(...lats) - padding;
+      maxLat = Math.max(...lats) + padding;
+      minLng = Math.min(...lngs) - padding;
+      maxLng = Math.max(...lngs) + padding;
+    }
 
-      const resolution = 50;
-      for (let i = 0; i < resolution; i++) {
-        for (let j = 0; j < resolution; j++) {
-          const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
-          const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
-          
-          // Only include points inside the polygon if polygon is defined
-          if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
-            continue;
-          }
-          
-          // Check if point is within influence radius of any device
-          const withinInfluence = isWithinInfluenceRadius(lat, lng, deviceList);
-          
-          // Generate nitrogen value based on proximity to devices with interpolation
-          let value = 0;
-          let classification = 'no_data';
-          
-          if (withinInfluence && deviceList.length > 0) {
-            // Simple IDW interpolation for more realistic values
-            // Use squared distance for smoother decay
-            let weightSum = 0;
-            let valueSum = 0;
-            deviceList.forEach(device => {
-              const dist = haversineDistance(lat, lng, device.lat, device.lng);
-              // Use squared inverse distance for smoother interpolation
-              const weight = 1 / Math.max(dist * dist, 0.0000001);
-              weightSum += weight;
-              valueSum += weight * device.nitrogen;
-            });
+    // Generate grid points
+    const resolution = 50;
+    for (let i = 0; i < resolution; i++) {
+      for (let j = 0; j < resolution; j++) {
+        const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
+        const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
+        
+        // Only include points inside the polygon if polygon is defined
+        if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
+          continue;
+        }
+        
+        // Check if point is within influence radius of any device
+        const withinInfluence = isWithinInfluenceRadius(lat, lng, deviceList);
+        
+        // Generate nitrogen value based on proximity to devices with interpolation
+        let value = 0;
+        let classification = 'no_data';
+        
+        if (withinInfluence && deviceList.length > 0) {
+          // Simple IDW interpolation for more realistic values
+          // Use squared distance for smoother decay
+          let weightSum = 0;
+          let valueSum = 0;
+          deviceList.forEach(device => {
+            if (!device.lat || !device.lng || !device.nitrogen) return;
+            const dist = haversineDistance(lat, lng, device.lat, device.lng);
+            // Use squared inverse distance for smoother interpolation
+            const weight = 1 / Math.max(dist * dist, 0.0000001);
+            weightSum += weight;
+            valueSum += weight * device.nitrogen;
+          });
+          if (weightSum > 0) {
             value = valueSum / weightSum;
             classification = classifyNitrogen(value);
           }
-          
-          gridPoints.push({
-            latitude: lat,
-            longitude: lng,
-            predicted_value: value,
-            variance: 0.1,
-            classification: classification,
-          });
         }
+        
+        gridPoints.push({
+          latitude: lat,
+          longitude: lng,
+          predicted_value: value,
+          variance: 0.1,
+          classification: classification,
+        });
       }
     }
 
@@ -988,6 +1066,12 @@ export function KrigingMap({ areaId, areaName }) {
     const normalCount = gridPoints.filter((p) => p.classification === 'normal').length;
     const highCount = gridPoints.filter((p) => p.classification === 'high').length;
     const noDataCount = gridPoints.filter((p) => p.classification === 'no_data').length;
+
+    // Calculate standard deviation
+    const meanValue = nitrogenValues.length > 0 ? nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length : 0;
+    const stdValue = nitrogenValues.length > 1 
+      ? Math.sqrt(nitrogenValues.reduce((sum, val) => sum + Math.pow(val - meanValue, 2), 0) / nitrogenValues.length)
+      : 0;
 
     return {
       success: true,
@@ -1001,8 +1085,8 @@ export function KrigingMap({ areaId, areaName }) {
       statistics: {
         min_value: nitrogenValues.length > 0 ? Math.min(...nitrogenValues) : 0,
         max_value: nitrogenValues.length > 0 ? Math.max(...nitrogenValues) : 0,
-        mean_value: nitrogenValues.length > 0 ? nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length : 0,
-        std_value: 0.35,
+        mean_value: meanValue,
+        std_value: stdValue,
         deficient_count: deficientCount,
         subnormal_count: subnormalCount,
         normal_count: normalCount,
@@ -1013,9 +1097,9 @@ export function KrigingMap({ areaId, areaName }) {
       },
       variogram_params: {
         model: 'spherical',
-        nugget: 0.05,
-        sill: 0.25,
-        range: 0.002,
+        nugget: stdValue * 0.1,
+        sill: stdValue * 0.9,
+        range: 0.1014,
         influence_radius: DEFAULT_INFLUENCE_RADIUS_KM,
       },
       thresholds: {
@@ -1206,6 +1290,8 @@ export function KrigingMap({ areaId, areaName }) {
 KrigingMap.propTypes = {
   areaId: PropTypes.number,
   areaName: PropTypes.string,
+  devices: PropTypes.array,
+  onRefresh: PropTypes.func,
 };
 
 export default KrigingMap;
