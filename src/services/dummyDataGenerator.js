@@ -68,6 +68,10 @@ const withVariance = (base, variance) => base + randomInRange(-variance, varianc
  * @returns {string} Classification
  */
 export const classifyNitrogen = (nitrogen) => {
+  // Handle invalid values
+  if (nitrogen === undefined || nitrogen === null || isNaN(nitrogen) || typeof nitrogen !== 'number') {
+    return 'unknown';
+  }
   if (nitrogen < NITROGEN_THRESHOLDS.deficient.max) return 'deficient';
   if (nitrogen < NITROGEN_THRESHOLDS.subnormal.max) return 'subnormal';
   if (nitrogen < NITROGEN_THRESHOLDS.normal.max) return 'normal';

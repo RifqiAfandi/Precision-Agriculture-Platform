@@ -1015,6 +1015,28 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
 
     // Generate grid points
     const resolution = 50;
+    const validDevicesForInterpolation = deviceList.filter(d => 
+      d.lat && d.lng && typeof d.nitrogen === 'number' && !isNaN(d.nitrogen)
+    );
+
+    // Calculate max distance from devices to determine dynamic influence
+    let maxDeviceSpread = 0;
+    if (validDevicesForInterpolation.length > 1) {
+      for (let i = 0; i < validDevicesForInterpolation.length; i++) {
+        for (let j = i + 1; j < validDevicesForInterpolation.length; j++) {
+          const dist = haversineDistance(
+            validDevicesForInterpolation[i].lat, 
+            validDevicesForInterpolation[i].lng,
+            validDevicesForInterpolation[j].lat, 
+            validDevicesForInterpolation[j].lng
+          );
+          if (dist > maxDeviceSpread) maxDeviceSpread = dist;
+        }
+      }
+    }
+    // Use dynamic influence radius based on device spread (at least 200m or 2x device spread)
+    const dynamicInfluenceRadius = Math.max(0.2, maxDeviceSpread * 2, DEFAULT_INFLUENCE_RADIUS_KM * 4);
+
     for (let i = 0; i < resolution; i++) {
       for (let j = 0; j < resolution; j++) {
         const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
@@ -1025,29 +1047,35 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
           continue;
         }
         
-        // Check if point is within influence radius of any device
-        const withinInfluence = isWithinInfluenceRadius(lat, lng, deviceList);
-        
-        // Generate nitrogen value based on proximity to devices with interpolation
+        // Generate nitrogen value using IDW interpolation from ALL devices
         let value = 0;
         let classification = 'no_data';
+        let minDistToDevice = Infinity;
         
-        if (withinInfluence && deviceList.length > 0) {
-          // Simple IDW interpolation for more realistic values
-          // Use squared distance for smoother decay
+        if (validDevicesForInterpolation.length > 0) {
+          // IDW interpolation with power parameter p=2 for smoother results
           let weightSum = 0;
           let valueSum = 0;
-          deviceList.forEach(device => {
-            if (!device.lat || !device.lng || !device.nitrogen) return;
+          
+          validDevicesForInterpolation.forEach(device => {
             const dist = haversineDistance(lat, lng, device.lat, device.lng);
-            // Use squared inverse distance for smoother interpolation
+            if (dist < minDistToDevice) minDistToDevice = dist;
+            
+            // Use inverse distance weighting with power 2
             const weight = 1 / Math.max(dist * dist, 0.0000001);
             weightSum += weight;
             valueSum += weight * device.nitrogen;
           });
+          
           if (weightSum > 0) {
             value = valueSum / weightSum;
-            classification = classifyNitrogen(value);
+            // Only mark as no_data if too far from any device (beyond dynamic influence radius)
+            if (minDistToDevice <= dynamicInfluenceRadius) {
+              classification = classifyNitrogen(value);
+            } else {
+              classification = 'no_data';
+              value = 0;
+            }
           }
         }
         
@@ -1055,7 +1083,7 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
           latitude: lat,
           longitude: lng,
           predicted_value: value,
-          variance: 0.1,
+          variance: minDistToDevice < Infinity ? minDistToDevice * 0.1 : 0.1,
           classification: classification,
         });
       }
@@ -1067,11 +1095,23 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     const highCount = gridPoints.filter((p) => p.classification === 'high').length;
     const noDataCount = gridPoints.filter((p) => p.classification === 'no_data').length;
 
-    // Calculate standard deviation
-    const meanValue = nitrogenValues.length > 0 ? nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length : 0;
-    const stdValue = nitrogenValues.length > 1 
-      ? Math.sqrt(nitrogenValues.reduce((sum, val) => sum + Math.pow(val - meanValue, 2), 0) / nitrogenValues.length)
+    // Calculate statistics from grid points with data (not no_data)
+    const gridValuesWithData = gridPoints
+      .filter(p => p.classification !== 'no_data' && p.predicted_value > 0)
+      .map(p => p.predicted_value);
+    
+    // Use device nitrogen values for statistics if no grid data, otherwise use grid values
+    const statsValues = gridValuesWithData.length > 0 ? gridValuesWithData : nitrogenValues;
+    
+    // Calculate mean and standard deviation
+    const meanValue = statsValues.length > 0 
+      ? statsValues.reduce((a, b) => a + b, 0) / statsValues.length 
       : 0;
+    const stdValue = statsValues.length > 1 
+      ? Math.sqrt(statsValues.reduce((sum, val) => sum + Math.pow(val - meanValue, 2), 0) / statsValues.length)
+      : 0;
+    const minValue = statsValues.length > 0 ? Math.min(...statsValues) : 0;
+    const maxValue = statsValues.length > 0 ? Math.max(...statsValues) : 0;
 
     return {
       success: true,
@@ -1083,8 +1123,8 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
         classification: classifyNitrogen(d.nitrogen),
       })),
       statistics: {
-        min_value: nitrogenValues.length > 0 ? Math.min(...nitrogenValues) : 0,
-        max_value: nitrogenValues.length > 0 ? Math.max(...nitrogenValues) : 0,
+        min_value: minValue,
+        max_value: maxValue,
         mean_value: meanValue,
         std_value: stdValue,
         deficient_count: deficientCount,
@@ -1097,8 +1137,8 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       },
       variogram_params: {
         model: 'spherical',
-        nugget: stdValue * 0.1,
-        sill: stdValue * 0.9,
+        nugget: stdValue > 0 ? stdValue * 0.2 : 0.1,
+        sill: stdValue > 0 ? stdValue * 0.8 : 0.5,
         range: 0.1014,
         influence_radius: DEFAULT_INFLUENCE_RADIUS_KM,
       },
