@@ -30,9 +30,18 @@ export const AuthProvider = ({ children }) => {
             setUser(user);
             setIsAuthenticated(true);
           } catch (error) {
-            apiService.clearTokens();
-            setUser(null);
-            setIsAuthenticated(false);
+            console.error('Profile fetch error:', error);
+            // Don't clear tokens on profile fetch error if it's a server error
+            // Only clear if it's an auth error (401)
+            if (error.status === 401) {
+              apiService.clearTokens();
+              setUser(null);
+              setIsAuthenticated(false);
+            } else {
+              // Use stored user data for other errors (e.g., network, server issues)
+              setUser(storedUser);
+              setIsAuthenticated(true);
+            }
           }
         }
       } catch (error) {

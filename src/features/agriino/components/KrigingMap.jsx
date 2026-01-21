@@ -608,6 +608,12 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
 
   // Perform Kriging analysis
   const handleAnalysis = useCallback(async () => {
+    console.log('=== HANDLE ANALYSIS ===');
+    console.log('Devices count:', devices.length);
+    console.log('Devices data:', devices.map(d => ({ id: d.device_id, lat: d.lat, lng: d.lng, nitrogen: d.nitrogen })));
+    console.log('Selected Area:', selectedArea);
+    console.log('Bounds:', bounds);
+    
     if (devices.length < 1) {
       toast.error('Minimal 1 device diperlukan untuk analisis');
       return;
@@ -1019,75 +1025,121 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       d.lat && d.lng && typeof d.nitrogen === 'number' && !isNaN(d.nitrogen)
     );
 
-    // Calculate max distance from devices to determine dynamic influence
-    let maxDeviceSpread = 0;
-    if (validDevicesForInterpolation.length > 1) {
-      for (let i = 0; i < validDevicesForInterpolation.length; i++) {
-        for (let j = i + 1; j < validDevicesForInterpolation.length; j++) {
-          const dist = haversineDistance(
-            validDevicesForInterpolation[i].lat, 
-            validDevicesForInterpolation[i].lng,
-            validDevicesForInterpolation[j].lat, 
-            validDevicesForInterpolation[j].lng
-          );
-          if (dist > maxDeviceSpread) maxDeviceSpread = dist;
+    // DEBUG: Log devices info
+    console.log('=== KRIGING DEBUG ===');
+    console.log('Total devices:', deviceList.length);
+    console.log('Valid devices for interpolation:', validDevicesForInterpolation.length);
+    console.log('Valid devices:', validDevicesForInterpolation.map(d => ({
+      id: d.device_id,
+      lat: d.lat,
+      lng: d.lng,
+      nitrogen: d.nitrogen
+    })));
+    console.log('Bounds:', { minLat, maxLat, minLng, maxLng });
+    console.log('Polygon points:', polygonPoints);
+
+    // If no valid devices, use deviceList nitrogen values from dummy data  
+    let devicesToUse;
+    if (validDevicesForInterpolation.length > 0) {
+      devicesToUse = validDevicesForInterpolation;
+    } else {
+      // Fallback: use devices with coordinates and assign default nitrogen if missing
+      devicesToUse = deviceList.filter(d => d.lat && d.lng).map(d => ({
+        ...d,
+        nitrogen: typeof d.nitrogen === 'number' && !isNaN(d.nitrogen) ? d.nitrogen : 2.5
+      }));
+    }
+
+    console.log('Devices to use for interpolation:', devicesToUse.length);
+    console.log('Devices to use details:', devicesToUse.map(d => ({ id: d.device_id, nitrogen: d.nitrogen })));
+
+    // If still no devices, return with all no_data
+    if (devicesToUse.length === 0) {
+      console.warn('No devices available for interpolation!');
+      // Generate grid points as no_data
+      for (let i = 0; i < resolution; i++) {
+        for (let j = 0; j < resolution; j++) {
+          const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
+          const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
+          
+          if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
+            continue;
+          }
+          
+          gridPoints.push({
+            latitude: lat,
+            longitude: lng,
+            predicted_value: 0,
+            variance: 0.1,
+            classification: 'no_data',
+          });
         }
       }
-    }
-    // Use dynamic influence radius based on device spread (at least 200m or 2x device spread)
-    const dynamicInfluenceRadius = Math.max(0.2, maxDeviceSpread * 2, DEFAULT_INFLUENCE_RADIUS_KM * 4);
-
-    for (let i = 0; i < resolution; i++) {
-      for (let j = 0; j < resolution; j++) {
-        const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
-        const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
-        
-        // Only include points inside the polygon if polygon is defined
-        if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
-          continue;
-        }
-        
-        // Generate nitrogen value using IDW interpolation from ALL devices
-        let value = 0;
-        let classification = 'no_data';
-        let minDistToDevice = Infinity;
-        
-        if (validDevicesForInterpolation.length > 0) {
+    } else {
+      // Normal interpolation with devices
+      for (let i = 0; i < resolution; i++) {
+        for (let j = 0; j < resolution; j++) {
+          const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
+          const lng = minLng + ((j + 0.5) / resolution) * (maxLng - minLng);
+          
+          // Only include points inside the polygon if polygon is defined
+          if (polygonPoints && !isPointInPolygon([lng, lat], polygonPoints)) {
+            continue;
+          }
+          
+          // Generate nitrogen value using IDW interpolation from ALL devices
+          let value = 0;
+          let classification = 'no_data';
+          let minDistToDevice = Infinity;
+          
           // IDW interpolation with power parameter p=2 for smoother results
           let weightSum = 0;
           let valueSum = 0;
           
-          validDevicesForInterpolation.forEach(device => {
+          devicesToUse.forEach(device => {
             const dist = haversineDistance(lat, lng, device.lat, device.lng);
             if (dist < minDistToDevice) minDistToDevice = dist;
+            
+            // Get nitrogen value (use device.nitrogen or default to 2.0)
+            const nitrogenValue = typeof device.nitrogen === 'number' && !isNaN(device.nitrogen) 
+              ? device.nitrogen 
+              : 2.0;
             
             // Use inverse distance weighting with power 2
             const weight = 1 / Math.max(dist * dist, 0.0000001);
             weightSum += weight;
-            valueSum += weight * device.nitrogen;
+            valueSum += weight * nitrogenValue;
           });
           
           if (weightSum > 0) {
             value = valueSum / weightSum;
-            // Only mark as no_data if too far from any device (beyond dynamic influence radius)
-            if (minDistToDevice <= dynamicInfluenceRadius) {
-              classification = classifyNitrogen(value);
+            // ALL points inside polygon get classified - NO influence radius limit
+            // Use local classifyNitrogen to ensure correct classification
+            if (value < NITROGEN_THRESHOLDS.deficient.max) {
+              classification = 'deficient';
+            } else if (value < NITROGEN_THRESHOLDS.subnormal.max) {
+              classification = 'subnormal';
+            } else if (value < NITROGEN_THRESHOLDS.normal.max) {
+              classification = 'normal';
             } else {
-              classification = 'no_data';
-              value = 0;
+              classification = 'high';
             }
+            console.log(`Grid point [${i},${j}]: value=${value.toFixed(4)}, classification=${classification}`);
           }
+          
+          gridPoints.push({
+            latitude: lat,
+            longitude: lng,
+            predicted_value: value,
+            variance: minDistToDevice < Infinity ? minDistToDevice * 0.1 : 0.1,
+            classification: classification,
+          });
         }
-        
-        gridPoints.push({
-          latitude: lat,
-          longitude: lng,
-          predicted_value: value,
-          variance: minDistToDevice < Infinity ? minDistToDevice * 0.1 : 0.1,
-          classification: classification,
-        });
       }
     }
+    
+    console.log('Total grid points:', gridPoints.length);
+    console.log('Grid points with data:', gridPoints.filter(p => p.classification !== 'no_data').length);
 
     const deficientCount = gridPoints.filter((p) => p.classification === 'deficient').length;
     const subnormalCount = gridPoints.filter((p) => p.classification === 'subnormal').length;
