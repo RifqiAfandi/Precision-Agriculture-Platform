@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import firebaseService from '@/services/firebase';
+import { realTimeDataStore } from '@/services/dummyDataGenerator';
 
 /**
  * Custom hook for managing Firebase device data
@@ -25,6 +26,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
   const unsubscribeRef = useRef(null);
+  const dummyUnsubscribeRef = useRef(null);
 
   // Classify nitrogen level based on thresholds
   // deficient: < 1.80
@@ -47,6 +49,21 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
     }));
   }, [classifyNitrogen]);
 
+  // Fallback to dummy data
+  const useDummyData = useCallback(() => {
+    console.log('Using dummy data for devices');
+    realTimeDataStore.start(60000);
+    const data = realTimeDataStore.getCurrentData();
+    setDevices(processDevices(data));
+    setConnected(false);
+    setLoading(false);
+    
+    // Subscribe to dummy data updates
+    dummyUnsubscribeRef.current = realTimeDataStore.subscribe((data) => {
+      setDevices(processDevices(data));
+    });
+  }, [processDevices]);
+
   // Initialize Firebase and subscribe
   useEffect(() => {
     let isMounted = true;
@@ -64,8 +81,13 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
           // Subscribe to real-time updates
           unsubscribeRef.current = firebaseService.subscribeToDevices(path, (data) => {
             if (isMounted) {
-              setDevices(processDevices(data));
-              setConnected(true);
+              if (data && data.length > 0) {
+                setDevices(processDevices(data));
+                setConnected(true);
+              } else {
+                // No data from Firebase, use dummy data
+                useDummyData();
+              }
               setLoading(false);
             }
           });
@@ -73,8 +95,12 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
           // One-time fetch
           const data = await firebaseService.getDevicesOnce(path);
           if (isMounted) {
-            setDevices(processDevices(data));
-            setConnected(true);
+            if (data && data.length > 0) {
+              setDevices(processDevices(data));
+              setConnected(true);
+            } else {
+              useDummyData();
+            }
             setLoading(false);
           }
         }
@@ -82,8 +108,8 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
         console.error('Firebase hook error:', err);
         if (isMounted) {
           setError(err.message || 'Failed to connect to Firebase');
-          setConnected(false);
-          setLoading(false);
+          // Fallback to dummy data on error
+          useDummyData();
         }
       }
     };
@@ -95,8 +121,11 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
       }
+      if (dummyUnsubscribeRef.current) {
+        dummyUnsubscribeRef.current();
+      }
     };
-  }, [path, realtime, processDevices]);
+  }, [path, realtime, processDevices, useDummyData]);
 
   // Manual refresh
   const refresh = useCallback(async () => {

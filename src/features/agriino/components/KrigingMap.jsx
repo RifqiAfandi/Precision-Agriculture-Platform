@@ -608,14 +608,23 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
 
   // Perform Kriging analysis
   const handleAnalysis = useCallback(async () => {
-    console.log('=== HANDLE ANALYSIS ===');
+    console.log('=== HANDLE ANALYSIS START ===');
     console.log('Devices count:', devices.length);
-    console.log('Devices data:', devices.map(d => ({ id: d.device_id, lat: d.lat, lng: d.lng, nitrogen: d.nitrogen })));
+    console.log('Devices data:', JSON.stringify(devices.map(d => ({ 
+      id: d.device_id, 
+      lat: d.lat, 
+      lng: d.lng, 
+      nitrogen: d.nitrogen,
+      classification: d.classification 
+    })), null, 2));
     console.log('Selected Area:', selectedArea);
     console.log('Bounds:', bounds);
+    console.log('propDevices:', propDevices);
+    console.log('internalDevices:', internalDevices);
     
     if (devices.length < 1) {
       toast.error('Minimal 1 device diperlukan untuk analisis');
+      console.log('=== HANDLE ANALYSIS ABORTED: No devices ===');
       return;
     }
 
@@ -684,7 +693,17 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       toast.error(`Gagal melakukan analisis: ${error.message || 'Unknown error'}`);
 
       // Generate mock analysis result for demo
+      console.log('=== GENERATING MOCK RESULT ===');
+      console.log('Devices passed to generateMockAnalysisResult:', devices.length);
+      console.log('Bounds passed:', selectedArea || bounds);
+      
       const mockResult = generateMockAnalysisResult(devices, selectedArea || bounds);
+      
+      console.log('=== MOCK RESULT ===');
+      console.log('Success:', mockResult.success);
+      console.log('Grid points count:', mockResult.grid_points?.length);
+      console.log('Statistics:', JSON.stringify(mockResult.statistics, null, 2));
+      
       setAnalysisResult(mockResult);
       
       // Update map with mock grid as filled polygons
@@ -698,8 +717,9 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       }
     } finally {
       setIsAnalyzing(false);
+      console.log('=== HANDLE ANALYSIS END ===');
     }
-  }, [devices, bounds, areaId, areaName, selectedArea]);
+  }, [devices, bounds, areaId, areaName, selectedArea, propDevices, internalDevices]);
 
   // Create smooth contour polygons from grid points using d3-contour
   const createGridPolygons = (gridPoints, boundsData) => {
