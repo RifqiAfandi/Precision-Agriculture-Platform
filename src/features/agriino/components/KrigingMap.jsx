@@ -240,6 +240,77 @@ const AnalysisResultsPanel = ({ analysisResult, isAnalyzing }) => {
         </div>
       </div>
 
+      {/* Zoning Statistics Table - like the mobile app */}
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Zoning Statistic</p>
+        <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+          <table className="w-full text-xs">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-2 py-1.5 text-left font-medium text-gray-600 dark:text-gray-400">Header</th>
+                <th className="px-2 py-1.5 text-right font-medium text-gray-600 dark:text-gray-400">Amount</th>
+                <th className="px-2 py-1.5 text-right font-medium text-gray-600 dark:text-gray-400">AVG N (%)</th>
+                <th className="px-2 py-1.5 text-right font-medium text-gray-600 dark:text-gray-400">Rate</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {statistics.deficient_count > 0 && (
+                <tr className="bg-red-50 dark:bg-red-900/20">
+                  <td className="px-2 py-1.5 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#E53935' }}></span>
+                    <span style={{ color: '#E53935' }}>Defisien</span>
+                  </td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{statistics.deficient_count}</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">&lt; 1.80</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{((statistics.deficient_count / statistics.total_points) * 100).toFixed(1)}%</td>
+                </tr>
+              )}
+              {statistics.subnormal_count > 0 && (
+                <tr className="bg-orange-50 dark:bg-orange-900/20">
+                  <td className="px-2 py-1.5 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FB8C00' }}></span>
+                    <span style={{ color: '#FB8C00' }}>Subnormal</span>
+                  </td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{statistics.subnormal_count}</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">1.80-2.71</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{((statistics.subnormal_count / statistics.total_points) * 100).toFixed(1)}%</td>
+                </tr>
+              )}
+              {statistics.normal_count > 0 && (
+                <tr className="bg-yellow-50 dark:bg-yellow-900/20">
+                  <td className="px-2 py-1.5 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDD835' }}></span>
+                    <span style={{ color: '#F9A825' }}>Normal</span>
+                  </td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{statistics.normal_count}</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">2.71-3.31</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{((statistics.normal_count / statistics.total_points) * 100).toFixed(1)}%</td>
+                </tr>
+              )}
+              {statistics.high_count > 0 && (
+                <tr className="bg-green-50 dark:bg-green-900/20">
+                  <td className="px-2 py-1.5 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#43A047' }}></span>
+                    <span style={{ color: '#43A047' }}>Tinggi</span>
+                  </td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{statistics.high_count}</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">&gt; 3.31</td>
+                  <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{((statistics.high_count / statistics.total_points) * 100).toFixed(1)}%</td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot className="bg-gray-100 dark:bg-gray-800">
+              <tr>
+                <td className="px-2 py-1.5 font-medium text-gray-700 dark:text-gray-300">TOTAL</td>
+                <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">{statistics.data_points || statistics.total_points}</td>
+                <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">{statistics.mean_value?.toFixed(2)}</td>
+                <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">100%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
       {/* Variogram Info */}
       {variogram_params && (
         <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3 text-sm">
@@ -708,12 +779,22 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       
       // Update map with mock grid as filled polygons
       if (map.current && map.current.getSource('kriging-grid') && mockResult.grid_points) {
+        console.log('=== CREATING GRID FEATURES ===');
         const gridFeatures = createGridPolygons(mockResult.grid_points, selectedArea || bounds);
+        console.log('Grid features created:', gridFeatures.length);
+        
+        if (gridFeatures.length > 0) {
+          console.log('Sample feature:', JSON.stringify(gridFeatures[0]?.properties));
+        }
 
         map.current.getSource('kriging-grid').setData({
           type: 'FeatureCollection',
           features: gridFeatures,
         });
+        
+        console.log('Map source updated with', gridFeatures.length, 'features');
+      } else {
+        console.warn('Cannot update map: source not ready or no grid points');
       }
     } finally {
       setIsAnalyzing(false);
@@ -721,11 +802,17 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     }
   }, [devices, bounds, areaId, areaName, selectedArea, propDevices, internalDevices]);
 
-  // Create smooth contour polygons from grid points using d3-contour
+  // Create smooth Kriging visualization - optimized for performance and visual quality
   const createGridPolygons = (gridPoints, boundsData) => {
-    if (!gridPoints || gridPoints.length === 0) return [];
+    if (!gridPoints || gridPoints.length === 0) {
+      console.log('createGridPolygons: No grid points');
+      return [];
+    }
     
-    // Get bounds
+    console.log('=== CREATE GRID POLYGONS ===');
+    console.log('Grid points received:', gridPoints.length);
+    
+    // Get bounds and clip polygon
     let minLat, maxLat, minLng, maxLng;
     let clipPolygon = null;
     
@@ -738,7 +825,11 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
         minLng = Math.min(...lngs);
         maxLng = Math.max(...lngs);
         // Close the polygon for clipping
-        clipPolygon = turf.polygon([[...boundsData, boundsData[0]]]);
+        try {
+          clipPolygon = turf.polygon([[...boundsData, boundsData[0]]]);
+        } catch (e) {
+          console.warn('Failed to create clip polygon:', e);
+        }
       } else {
         minLat = boundsData.min_lat;
         maxLat = boundsData.max_lat;
@@ -754,10 +845,7 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       maxLng = Math.max(...lngs);
     }
 
-    const width = maxLng - minLng;
-    const height = maxLat - minLat;
-    
-    // Filter only valid points with nitrogen data (relaxed condition for better coverage)
+    // Filter valid points
     const validPoints = gridPoints.filter(p => 
       p.classification !== 'no_data' && 
       typeof p.predicted_value === 'number' && 
@@ -765,154 +853,218 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       p.predicted_value > 0
     );
     
-    // If no valid points, try to show all points with predicted values
-    const pointsToUse = validPoints.length > 0 ? validPoints : gridPoints.filter(p => 
-      typeof p.predicted_value === 'number' && 
-      !isNaN(p.predicted_value) && 
-      p.predicted_value > 0
-    );
+    console.log('Valid points for rendering:', validPoints.length);
     
-    if (pointsToUse.length === 0) return [];
-
-    // Create a higher resolution grid for smoother contours
-    const gridSize = 50;
-    const values = new Array(gridSize * gridSize).fill(0);
-    const counts = new Array(gridSize * gridSize).fill(0);
-
-    // Create grid values using IDW interpolation from grid points
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        const lng = minLng + (x / (gridSize - 1)) * width;
-        const lat = minLat + (y / (gridSize - 1)) * height;
-        
-        // IDW interpolation
-        let weightSum = 0;
-        let valueSum = 0;
-        
-        pointsToUse.forEach(point => {
-          const dx = lng - point.longitude;
-          const dy = lat - point.latitude;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const weight = 1 / Math.max(dist, 0.00001);
-          weightSum += weight;
-          valueSum += weight * point.predicted_value;
-        });
-        
-        if (weightSum > 0) {
-          values[y * gridSize + x] = valueSum / weightSum;
-          counts[y * gridSize + x] = 1;
-        }
-      }
+    if (validPoints.length === 0) {
+      console.warn('No valid points for Kriging visualization');
+      return [];
     }
-
-    // Define thresholds for contour bands
-    const thresholds = [
-      { min: 0, max: 1.80, classification: 'deficient', color: '#E53935' },
-      { min: 1.80, max: 2.71, classification: 'subnormal', color: '#FB8C00' },
-      { min: 2.71, max: 3.31, classification: 'normal', color: '#FDD835' },
-      { min: 3.31, max: 5.0, classification: 'high', color: '#43A047' },
-    ];
 
     const features = [];
-
-    // Generate isobands (filled contours) for each threshold range
-    thresholds.forEach(threshold => {
-      try {
-        // Generate contours for this threshold
-        const contourGenerator = contours()
-          .size([gridSize, gridSize])
-          .thresholds([threshold.min, threshold.max]);
-        
-        const contourData = contourGenerator(values);
-        
-        // Find the contour band between min and max
-        contourData.forEach((contour, idx) => {
-          if (contour.value >= threshold.min && contour.value < threshold.max) {
-            // Convert contour coordinates from grid space to geo coordinates
-            contour.coordinates.forEach(ring => {
-              if (ring.length > 0) {
-                const geoCoords = ring.map(subring => 
-                  subring.map(point => [
-                    minLng + (point[0] / (gridSize - 1)) * width,
-                    minLat + (point[1] / (gridSize - 1)) * height
-                  ])
-                );
-
-                // Create polygon feature
-                let polygon = {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Polygon',
-                    coordinates: geoCoords,
-                  },
-                  properties: {
-                    value: contour.value,
-                    color: threshold.color,
-                    classification: threshold.classification,
-                  },
-                };
-
-                // Clip to boundary if exists
-                if (clipPolygon) {
-                  try {
-                    const clipped = turf.intersect(
-                      turf.featureCollection([polygon, clipPolygon])
-                    );
-                    if (clipped) {
-                      clipped.properties = polygon.properties;
-                      features.push(clipped);
-                    }
-                  } catch (e) {
-                    // If clipping fails, use original
-                    features.push(polygon);
-                  }
-                } else {
-                  features.push(polygon);
-                }
-              }
-            });
-          }
-        });
-      } catch (e) {
-        console.warn('Contour generation error:', e);
+    
+    // Group points by classification to create smooth zones
+    const classificationGroups = {
+      deficient: [],
+      subnormal: [],
+      normal: [],
+      high: [],
+    };
+    
+    validPoints.forEach(p => {
+      if (classificationGroups[p.classification]) {
+        classificationGroups[p.classification].push(
+          turf.point([p.longitude, p.latitude], { value: p.predicted_value })
+        );
       }
     });
-
-    // If contour generation failed or produced no results, fall back to simplified rendering
-    if (features.length === 0) {
-      // Create smooth blobs around each device using Turf buffers
-      return pointsToUse.map(point => {
-        const center = turf.point([point.longitude, point.latitude]);
-        const radius = 0.03; // 30 meters
-        const buffered = turf.buffer(center, radius, { units: 'kilometers' });
-        
-        if (buffered) {
-          buffered.properties = {
-            value: point.predicted_value,
-            color: getClassificationColor(point.classification),
-            classification: point.classification,
-          };
-          
-          // Clip to boundary if exists
-          if (clipPolygon) {
-            try {
-              const clipped = turf.intersect(
-                turf.featureCollection([buffered, clipPolygon])
-              );
-              if (clipped) {
-                clipped.properties = buffered.properties;
-                return clipped;
+    
+    console.log('Classification groups:', {
+      deficient: classificationGroups.deficient.length,
+      subnormal: classificationGroups.subnormal.length,
+      normal: classificationGroups.normal.length,
+      high: classificationGroups.high.length,
+    });
+    
+    const colors = {
+      deficient: '#E53935',
+      subnormal: '#FB8C00',
+      normal: '#FDD835',
+      high: '#43A047',
+    };
+    
+    // Create smooth polygons for each classification using concave hull
+    Object.entries(classificationGroups).forEach(([classification, points]) => {
+      if (points.length < 3) {
+        // Not enough points for hull, use buffer circles
+        points.forEach(pt => {
+          try {
+            const buffered = turf.buffer(pt, 0.015, { units: 'kilometers', steps: 16 });
+            if (buffered) {
+              buffered.properties = {
+                value: pt.properties.value,
+                color: colors[classification],
+                classification: classification,
+              };
+              
+              if (clipPolygon) {
+                try {
+                  const clipped = turf.intersect(turf.featureCollection([buffered, clipPolygon]));
+                  if (clipped) {
+                    clipped.properties = buffered.properties;
+                    features.push(clipped);
+                  }
+                } catch (e) {
+                  features.push(buffered);
+                }
+              } else {
+                features.push(buffered);
               }
-            } catch (e) {
-              return buffered;
+            }
+          } catch (e) {
+            console.warn('Buffer failed:', e);
+          }
+        });
+        return;
+      }
+      
+      // Try to create concave hull for smooth boundary
+      try {
+        const pointCollection = turf.featureCollection(points);
+        
+        // Use concave hull with high maxEdge for smoother results
+        let hull;
+        try {
+          hull = turf.concave(pointCollection, { maxEdge: 0.5, units: 'kilometers' });
+        } catch (concaveErr) {
+          // Fallback to convex hull
+          hull = turf.convex(pointCollection);
+        }
+        
+        if (hull) {
+          // Buffer the hull slightly for smoother edges
+          const bufferedHull = turf.buffer(hull, 0.005, { units: 'kilometers', steps: 8 });
+          
+          if (bufferedHull) {
+            bufferedHull.properties = {
+              color: colors[classification],
+              classification: classification,
+              pointCount: points.length,
+            };
+            
+            // Clip to boundary
+            if (clipPolygon) {
+              try {
+                const clipped = turf.intersect(turf.featureCollection([bufferedHull, clipPolygon]));
+                if (clipped) {
+                  clipped.properties = bufferedHull.properties;
+                  features.push(clipped);
+                } else {
+                  features.push(bufferedHull);
+                }
+              } catch (e) {
+                features.push(bufferedHull);
+              }
+            } else {
+              features.push(bufferedHull);
             }
           }
-          return buffered;
         }
-        return null;
-      }).filter(Boolean);
+      } catch (hullErr) {
+        console.warn('Hull creation failed for', classification, ':', hullErr);
+        
+        // Fallback: create buffers around each point and union them
+        try {
+          const buffers = points.map(pt => 
+            turf.buffer(pt, 0.012, { units: 'kilometers', steps: 8 })
+          ).filter(Boolean);
+          
+          if (buffers.length > 0) {
+            // Union all buffers together
+            let combined = buffers[0];
+            for (let i = 1; i < buffers.length; i++) {
+              try {
+                combined = turf.union(turf.featureCollection([combined, buffers[i]]));
+              } catch (e) {
+                // If union fails, add individually
+                buffers[i].properties = {
+                  color: colors[classification],
+                  classification: classification,
+                };
+                features.push(buffers[i]);
+              }
+            }
+            
+            if (combined) {
+              combined.properties = {
+                color: colors[classification],
+                classification: classification,
+                pointCount: points.length,
+              };
+              
+              if (clipPolygon) {
+                try {
+                  const clipped = turf.intersect(turf.featureCollection([combined, clipPolygon]));
+                  if (clipped) {
+                    clipped.properties = combined.properties;
+                    features.push(clipped);
+                  } else {
+                    features.push(combined);
+                  }
+                } catch (e) {
+                  features.push(combined);
+                }
+              } else {
+                features.push(combined);
+              }
+            }
+          }
+        } catch (bufferErr) {
+          console.warn('Buffer union failed:', bufferErr);
+        }
+      }
+    });
+    
+    console.log('Final features count:', features.length);
+    
+    // If no features created, fall back to simple grid rendering
+    if (features.length === 0) {
+      console.log('Falling back to simple grid rendering');
+      
+      // Create small polygons for each valid point
+      const cellWidth = (maxLng - minLng) / 50;
+      const cellHeight = (maxLat - minLat) / 50;
+      
+      validPoints.forEach(point => {
+        const cell = turf.polygon([[
+          [point.longitude - cellWidth/2, point.latitude - cellHeight/2],
+          [point.longitude + cellWidth/2, point.latitude - cellHeight/2],
+          [point.longitude + cellWidth/2, point.latitude + cellHeight/2],
+          [point.longitude - cellWidth/2, point.latitude + cellHeight/2],
+          [point.longitude - cellWidth/2, point.latitude - cellHeight/2],
+        ]]);
+        
+        cell.properties = {
+          value: point.predicted_value,
+          color: getClassificationColor(point.classification),
+          classification: point.classification,
+        };
+        
+        if (clipPolygon) {
+          try {
+            const clipped = turf.intersect(turf.featureCollection([cell, clipPolygon]));
+            if (clipped) {
+              clipped.properties = cell.properties;
+              features.push(clipped);
+            }
+          } catch (e) {
+            features.push(cell);
+          }
+        } else {
+          features.push(cell);
+        }
+      });
     }
-
+    
     return features;
   };
 
@@ -1320,17 +1472,27 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
               className="w-full h-96 rounded-lg border-2 border-gray-200 dark:border-slate-700"
               style={{ minHeight: '400px' }}
             />
-            {/* Map Legend */}
-            <div className="mt-3 flex flex-wrap gap-3 text-sm">
-              {Object.entries(NITROGEN_THRESHOLDS).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-1">
-                  <div
-                    className="w-4 h-4 rounded-full border-2 border-white shadow"
-                    style={{ backgroundColor: value.color }}
-                  />
-                  <span className="capitalize">{value.label}</span>
+            {/* Map Legend - Leaf Nitrogen Status */}
+            <div className="mt-3 p-3 bg-white/90 dark:bg-slate-800/90 rounded-lg border border-gray-200 dark:border-slate-700">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Leaf Nitrogen Status</p>
+              <div className="flex flex-wrap gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E53935' }} />
+                  <span className="text-gray-600 dark:text-gray-400">Deficient (&lt;1.80 %)</span>
                 </div>
-              ))}
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#FB8C00' }} />
+                  <span className="text-gray-600 dark:text-gray-400">Subnormal (1.80-2.71 %)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#FDD835' }} />
+                  <span className="text-gray-600 dark:text-gray-400">Normal (2.71-3.31 %)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#43A047' }} />
+                  <span className="text-gray-600 dark:text-gray-400">High (&gt;3.31 %)</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
