@@ -845,13 +845,18 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
       maxLng = Math.max(...lngs);
     }
 
-    // Filter valid points
+    // Filter valid points - include all points since no_data is now treated as normal
     const validPoints = gridPoints.filter(p => 
-      p.classification !== 'no_data' && 
       typeof p.predicted_value === 'number' && 
-      !isNaN(p.predicted_value) && 
-      p.predicted_value > 0
+      !isNaN(p.predicted_value)
     );
+    
+    // Convert any remaining no_data to normal classification
+    validPoints.forEach(p => {
+      if (p.classification === 'no_data') {
+        p.classification = 'normal';
+      }
+    });
     
     console.log('Valid points for rendering:', validPoints.length);
     
@@ -863,6 +868,7 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     const features = [];
     
     // Group points by classification to create smooth zones
+    // Convert no_data to normal
     const classificationGroups = {
       deficient: [],
       subnormal: [],
@@ -871,8 +877,10 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     };
     
     validPoints.forEach(p => {
-      if (classificationGroups[p.classification]) {
-        classificationGroups[p.classification].push(
+      // Convert no_data to normal
+      const classification = p.classification === 'no_data' ? 'normal' : p.classification;
+      if (classificationGroups[classification]) {
+        classificationGroups[classification].push(
           turf.point([p.longitude, p.latitude], { value: p.predicted_value })
         );
       }
@@ -1026,15 +1034,18 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     
     console.log('Final features count:', features.length);
     
-    // If no features created, fall back to simple grid rendering
+    // If no features created, fall back to textured grid rendering that follows boundary
     if (features.length === 0) {
-      console.log('Falling back to simple grid rendering');
+      console.log('Falling back to textured grid rendering');
       
-      // Create small polygons for each valid point
+      // Create textured grid cells that follow the field boundary (like the mobile app)
       const cellWidth = (maxLng - minLng) / 50;
       const cellHeight = (maxLat - minLat) / 50;
       
       validPoints.forEach(point => {
+        // Convert no_data to normal
+        const classification = point.classification === 'no_data' ? 'normal' : point.classification;
+        
         const cell = turf.polygon([[
           [point.longitude - cellWidth/2, point.latitude - cellHeight/2],
           [point.longitude + cellWidth/2, point.latitude - cellHeight/2],
@@ -1045,8 +1056,8 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
         
         cell.properties = {
           value: point.predicted_value,
-          color: getClassificationColor(point.classification),
-          classification: point.classification,
+          color: colors[classification] || colors.normal,
+          classification: classification,
         };
         
         if (clipPolygon) {
@@ -1225,10 +1236,10 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
     console.log('Devices to use for interpolation:', devicesToUse.length);
     console.log('Devices to use details:', devicesToUse.map(d => ({ id: d.device_id, nitrogen: d.nitrogen })));
 
-    // If still no devices, return with all no_data
+    // If still no devices, return with all normal (orange) classification
     if (devicesToUse.length === 0) {
       console.warn('No devices available for interpolation!');
-      // Generate grid points as no_data
+      // Generate grid points as normal (default) - no more no_data
       for (let i = 0; i < resolution; i++) {
         for (let j = 0; j < resolution; j++) {
           const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
@@ -1241,9 +1252,9 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
           gridPoints.push({
             latitude: lat,
             longitude: lng,
-            predicted_value: 0,
+            predicted_value: 2.9, // Default to normal range value
             variance: 0.1,
-            classification: 'no_data',
+            classification: 'normal', // Default to normal instead of no_data
           });
         }
       }
@@ -1285,7 +1296,7 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
           
           if (weightSum > 0) {
             value = valueSum / weightSum;
-            // ALL points inside polygon get classified - NO influence radius limit
+            // ALL points inside polygon get classified
             // Use local classifyNitrogen to ensure correct classification
             if (value < NITROGEN_THRESHOLDS.deficient.max) {
               classification = 'deficient';
@@ -1297,6 +1308,10 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
               classification = 'high';
             }
             console.log(`Grid point [${i},${j}]: value=${value.toFixed(4)}, classification=${classification}`);
+          } else {
+            // If no weight sum, default to normal classification
+            value = 2.5; // Default nitrogen value in normal range
+            classification = 'normal';
           }
           
           gridPoints.push({
@@ -1315,13 +1330,14 @@ export function KrigingMap({ areaId, areaName, devices: propDevices, onRefresh }
 
     const deficientCount = gridPoints.filter((p) => p.classification === 'deficient').length;
     const subnormalCount = gridPoints.filter((p) => p.classification === 'subnormal').length;
-    const normalCount = gridPoints.filter((p) => p.classification === 'normal').length;
+    // Include no_data points in normal count since they are now treated as normal
+    const normalCount = gridPoints.filter((p) => p.classification === 'normal' || p.classification === 'no_data').length;
     const highCount = gridPoints.filter((p) => p.classification === 'high').length;
-    const noDataCount = gridPoints.filter((p) => p.classification === 'no_data').length;
+    const noDataCount = 0; // No more no_data - all are classified
 
-    // Calculate statistics from grid points with data (not no_data)
+    // Calculate statistics from all grid points
     const gridValuesWithData = gridPoints
-      .filter(p => p.classification !== 'no_data' && p.predicted_value > 0)
+      .filter(p => p.predicted_value > 0)
       .map(p => p.predicted_value);
     
     // Use device nitrogen values for statistics if no grid data, otherwise use grid values
