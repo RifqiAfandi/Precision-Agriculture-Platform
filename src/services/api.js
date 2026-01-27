@@ -1,10 +1,13 @@
 // API Service - Precision Agriculture Platform
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+import { API_CONFIG } from '@/constants/config';
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
+    this.timeout = API_CONFIG.TIMEOUT;
   }
 
   // Token management

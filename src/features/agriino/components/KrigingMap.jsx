@@ -29,22 +29,16 @@ import { realTimeDataStore, classifyNitrogen, getClassificationColor, NITROGEN_T
 import * as turf from '@turf/turf';
 import { contours } from 'd3-contour';
 
-// MapTiler API Key
-const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY || 'bedLj81C0j3GdguncpGN';
+// Import constants from centralized location
+import {
+  MAP_CONFIG,
+  DEFAULT_INFLUENCE_RADIUS_KM,
+  MARKER_COLORS,
+  getClassificationLabel as getClassificationLabelFromConstants,
+} from '@/constants';
 
-// Map marker colors based on nitrogen classification
-// Deficient = Red (merah), Subnormal = Orange (oranye), Normal = Yellow (kuning), High = Green (hijau), No Data = Gray
-const MARKER_COLORS = {
-  deficient: { fill: '#E53935', border: '#C62828', label: 'Deficient' },
-  subnormal: { fill: '#FB8C00', border: '#EF6C00', label: 'Subnormal' },
-  normal: { fill: '#FDD835', border: '#F9A825', label: 'Normal' },
-  high: { fill: '#43A047', border: '#2E7D32', label: 'High' },
-  no_data: { fill: '#9ca3af', border: '#6b7280', label: 'No Data' },
-  unknown: { fill: '#6b7280', border: '#4b5563', label: 'Unknown' },
-};
-
-// Default influence radius in kilometers (50 meters)
-const DEFAULT_INFLUENCE_RADIUS_KM = 0.05;
+// MapTiler API Key from config
+const MAPTILER_API_KEY = MAP_CONFIG.MAPTILER_API_KEY;
 
 /**
  * Get classification label in Indonesian

@@ -1,31 +1,33 @@
 // Dummy Data Generator Service for Agriino
 // Generates real-time and weekly dummy data based on database.txt specifications
 
+import {
+  NITROGEN_THRESHOLDS as THRESHOLDS,
+  DEFAULT_INFLUENCE_RADIUS_KM,
+  classifyNitrogenValue,
+} from '@/constants';
+import { MARKER_COLORS, getClassificationFillColor } from '@/constants/colors';
+
 /**
- * Nitrogen classification thresholds based on features_update.txt
+ * Nitrogen classification thresholds
+ * Re-export from constants for backward compatibility
+ * 
  * deficient: <1.80%
  * subnormal: 1.80 - 2.71
  * normal: 2.71 - 3.31
  * high: >3.31
  * no_data: outside sensor influence radius (neutral/gray)
- * 
- * Colors based on features_update.txt:
- * Deficient = Red (merah) - #ef4444
- * Subnormal = Dark Orange (orange tua) - #ff8c00
- * Normal = Light Orange (orange muda) - #ffa500
- * High = Yellow (kuning) - #ffd700
- * No Data = Gray (abu-abu netral) - #9ca3af
  */
 export const NITROGEN_THRESHOLDS = {
-  deficient: { max: 1.80, color: '#E53935', label: 'Deficient' },
-  subnormal: { min: 1.80, max: 2.71, color: '#FB8C00', label: 'Subnormal' },
-  normal: { min: 2.71, max: 3.31, color: '#FDD835', label: 'Normal' },
-  high: { min: 3.31, color: '#43A047', label: 'High' },
-  no_data: { color: '#9ca3af', label: 'No Data' },
+  deficient: { max: THRESHOLDS.deficient.max, color: MARKER_COLORS.deficient.fill, label: 'Deficient' },
+  subnormal: { min: THRESHOLDS.subnormal.min, max: THRESHOLDS.subnormal.max, color: MARKER_COLORS.subnormal.fill, label: 'Subnormal' },
+  normal: { min: THRESHOLDS.normal.min, max: THRESHOLDS.normal.max, color: MARKER_COLORS.normal.fill, label: 'Normal' },
+  high: { min: THRESHOLDS.high.min, color: MARKER_COLORS.high.fill, label: 'High' },
+  no_data: { color: MARKER_COLORS.no_data.fill, label: 'No Data' },
 };
 
 // Default influence radius in kilometers (0.05 km = 50 meters)
-export const DEFAULT_INFLUENCE_RADIUS = 0.05;
+export const DEFAULT_INFLUENCE_RADIUS = DEFAULT_INFLUENCE_RADIUS_KM;
 
 /**
  * Base location for devices (based on database.txt)
@@ -68,14 +70,8 @@ const withVariance = (base, variance) => base + randomInRange(-variance, varianc
  * @returns {string} Classification
  */
 export const classifyNitrogen = (nitrogen) => {
-  // Handle invalid values
-  if (nitrogen === undefined || nitrogen === null || isNaN(nitrogen) || typeof nitrogen !== 'number') {
-    return 'unknown';
-  }
-  if (nitrogen < NITROGEN_THRESHOLDS.deficient.max) return 'deficient';
-  if (nitrogen < NITROGEN_THRESHOLDS.subnormal.max) return 'subnormal';
-  if (nitrogen < NITROGEN_THRESHOLDS.normal.max) return 'normal';
-  return 'high';
+  // Use the centralized classification function
+  return classifyNitrogenValue(nitrogen);
 };
 
 /**
@@ -84,7 +80,8 @@ export const classifyNitrogen = (nitrogen) => {
  * @returns {string} Hex color
  */
 export const getClassificationColor = (classification) => {
-  return NITROGEN_THRESHOLDS[classification]?.color || '#6b7280';
+  // Use the centralized color function
+  return getClassificationFillColor(classification);
 };
 
 /**

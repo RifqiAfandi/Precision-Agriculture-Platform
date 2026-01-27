@@ -1,5 +1,14 @@
 import { useState, useCallback } from 'react';
 import api from '@/services/api';
+import {
+  DEFAULT_DEFICIENT_THRESHOLD,
+  DEFAULT_SUBNORMAL_THRESHOLD,
+  DEFAULT_NORMAL_THRESHOLD,
+  DEFAULT_LOW_THRESHOLD,
+  DEFAULT_HIGH_THRESHOLD,
+  DEFAULT_INFLUENCE_RADIUS_KM,
+  DEFAULT_GRID_RESOLUTION,
+} from '@/constants';
 
 /**
  * Custom hook for Kriging analysis
@@ -13,16 +22,16 @@ import api from '@/services/api';
  */
 export function useKrigingAnalysis(options = {}) {
   const {
-    gridResolution = 20,
+    gridResolution = DEFAULT_GRID_RESOLUTION,
     variogramModel = 'spherical',
     thresholds = { 
-      low: 1.80, 
-      high: 3.31,
-      deficient: 1.80,
-      subnormal: 2.71,
-      normal: 3.31 
+      low: DEFAULT_LOW_THRESHOLD, 
+      high: DEFAULT_HIGH_THRESHOLD,
+      deficient: DEFAULT_DEFICIENT_THRESHOLD,
+      subnormal: DEFAULT_SUBNORMAL_THRESHOLD,
+      normal: DEFAULT_NORMAL_THRESHOLD 
     },
-    influenceRadius = 0.05, // 50 meters default
+    influenceRadius = DEFAULT_INFLUENCE_RADIUS_KM,
   } = options;
 
   const [result, setResult] = useState(null);
