@@ -1,576 +1,279 @@
-// API Service - Precision Agriculture Platform
+/**
+ * API Service - Precision Agriculture Platform
+ * 
+ * This file serves as a backward-compatible facade for the refactored API modules.
+ * The original 577 line file has been split into modular domain-specific APIs.
+ * 
+ * Refactored structure:
+ * - api/apiClient.js (~210 lines) - Core HTTP client with auth
+ * - api/authApi.js (~110 lines) - Authentication endpoints
+ * - api/deviceApi.js (~90 lines) - Device management
+ * - api/plantApi.js (~110 lines) - Plant and readings management
+ * - api/areaApi.js (~100 lines) - Area management
+ * - api/analysisApi.js (~100 lines) - Kriging analysis and stats
+ * 
+ * For new code, prefer importing from '@/services/api':
+ * @example
+ * import { authApi, deviceApi, analysisApi } from '@/services/api';
+ * 
+ * @deprecated Direct import of this file is deprecated for new code.
+ * Use modular imports from '@/services/api' instead.
+ */
 
-import { API_CONFIG } from '@/constants/config';
+import { apiClient } from './api/apiClient';
+import { authApi } from './api/authApi';
+import { deviceApi } from './api/deviceApi';
+import { plantApi, readingsApi } from './api/plantApi';
+import { areaApi } from './api/areaApi';
+import { analysisApi, statsApi } from './api/analysisApi';
 
-const API_BASE_URL = API_CONFIG.BASE_URL;
-
+/**
+ * Backward-compatible API Service class
+ * Wraps all modular APIs into a single interface
+ */
 class ApiService {
   constructor() {
-    this.baseURL = API_BASE_URL;
-    this.timeout = API_CONFIG.TIMEOUT;
+    this.baseURL = apiClient.baseURL;
+    this.timeout = apiClient.timeout;
   }
 
-  // Token management
+  // ==========================================
+  // TOKEN MANAGEMENT (delegated to apiClient)
+  // ==========================================
+
   getAccessToken() {
-    return localStorage.getItem('access_token');
+    return apiClient.getAccessToken();
   }
 
   getRefreshToken() {
-    return localStorage.getItem('refresh_token');
+    return apiClient.getRefreshToken();
   }
 
   setTokens(accessToken, refreshToken) {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
+    apiClient.setTokens(accessToken, refreshToken);
   }
 
   clearTokens() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('agri-user');
-  }
-
-  // Core request method
-  async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const accessToken = this.getAccessToken();
-
-    const headers = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
-
-    if (accessToken && !options.skipAuth) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw {
-          status: response.status,
-          data,
-        };
-      }
-
-      return data;
-    } catch (error) {
-      if (error.status === 401 && !options.skipAuth) {
-        const refreshed = await this.refreshAccessToken();
-        if (refreshed) {
-          return this.request(endpoint, options);
-        }
-      }
-      throw error;
-    }
-  }
-
-  // Token refresh
-  async refreshAccessToken() {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) return false;
-
-    try {
-      const response = await fetch(`${this.baseURL}/token/refresh/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('access_token', data.access);
-        return true;
-      }
-      
-      this.clearTokens();
-      return false;
-    } catch (error) {
-      this.clearTokens();
-      return false;
-    }
-  }
-
-  /**
-   * Register new user
-   */
-  async register(userData) {
-    const data = await this.request('/auth/register/', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      skipAuth: true,
-    });
-
-    this.setTokens(data.tokens.access, data.tokens.refresh);
-    localStorage.setItem('agri-user', JSON.stringify(data.user));
-
-    return data;
-  }
-
-  /**
-   * Login user
-   */
-  async login(email, password) {
-    const data = await this.request('/auth/login/', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      skipAuth: true,
-    });
-
-    this.setTokens(data.tokens.access, data.tokens.refresh);
-    localStorage.setItem('agri-user', JSON.stringify(data.user));
-
-    return data;
-  }
-
-  /**
-   * Logout user
-   */
-  async logout() {
-    const refreshToken = this.getRefreshToken();
-    
-    try {
-      await this.request('/auth/logout/', {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      this.clearTokens();
-    }
-  }
-
-  /**
-   * Get current user profile
-   */
-  async getProfile() {
-    const data = await this.request('/auth/profile/', {
-      method: 'GET',
-    });
-
-    localStorage.setItem('agri-user', JSON.stringify(data.user));
-
-    return data.user;
-  }
-
-  /**
-   * Update user profile
-   */
-  async updateProfile(profileData) {
-    const data = await this.request('/auth/profile/update/', {
-      method: 'PATCH',
-      body: JSON.stringify(profileData),
-    });
-
-    localStorage.setItem('agri-user', JSON.stringify(data.user));
-
-    return data;
-  }
-
-  /**
-   * Change password
-   */
-  async changePassword(passwordData) {
-    const data = await this.request('/auth/change-password/', {
-      method: 'POST',
-      body: JSON.stringify(passwordData),
-    });
-
-    return data;
+    apiClient.clearTokens();
   }
 
   isAuthenticated() {
-    return !!this.getAccessToken();
+    return apiClient.isAuthenticated();
   }
 
   getStoredUser() {
-    const userStr = localStorage.getItem('agri-user');
-    return userStr ? JSON.parse(userStr) : null;
+    return apiClient.getStoredUser();
+  }
+
+  // Core request (for custom endpoints)
+  async request(endpoint, options = {}) {
+    return apiClient.request(endpoint, options);
+  }
+
+  async refreshAccessToken() {
+    return apiClient.refreshAccessToken();
   }
 
   // ==========================================
-  // AGRIINO API METHODS
+  // AUTH METHODS (delegated to authApi)
   // ==========================================
 
-  /**
-   * Get dashboard statistics
-   */
+  async register(userData) {
+    return authApi.register(userData);
+  }
+
+  async login(email, password) {
+    return authApi.login(email, password);
+  }
+
+  async logout() {
+    return authApi.logout();
+  }
+
+  async getProfile() {
+    return authApi.getProfile();
+  }
+
+  async updateProfile(profileData) {
+    return authApi.updateProfile(profileData);
+  }
+
+  async changePassword(passwordData) {
+    return authApi.changePassword(passwordData);
+  }
+
+  // ==========================================
+  // AGRIINO STATS (delegated to statsApi)
+  // ==========================================
+
   async getAgriinoStats() {
-    return await this.request('/agriino/stats/', {
-      method: 'GET',
-    });
+    return statsApi.getDashboardStats();
   }
 
-  /**
-   * Get recent alerts (plants needing attention)
-   */
   async getAgriinoAlerts() {
-    return await this.request('/agriino/alerts/', {
-      method: 'GET',
-    });
+    return statsApi.getAlerts();
   }
 
-  // ========== DEVICES ==========
+  // ==========================================
+  // DEVICE METHODS (delegated to deviceApi)
+  // ==========================================
 
-  /**
-   * Get all user's devices
-   */
   async getDevices() {
-    const data = await this.request('/agriino/devices/', {
-      method: 'GET',
-    });
-    // Handle pagination - return results array or data itself
-    return Array.isArray(data) ? data : (data.results || []);
+    return deviceApi.getAll();
   }
 
-  /**
-   * Get device details
-   */
   async getDevice(deviceId) {
-    return await this.request(`/agriino/devices/${deviceId}/`, {
-      method: 'GET',
-    });
+    return deviceApi.getById(deviceId);
   }
 
-  /**
-   * Create new device
-   */
   async createDevice(deviceData) {
-    return await this.request('/agriino/devices/', {
-      method: 'POST',
-      body: JSON.stringify(deviceData),
-    });
+    return deviceApi.create(deviceData);
   }
 
-  /**
-   * Update device
-   */
   async updateDevice(deviceId, deviceData) {
-    return await this.request(`/agriino/devices/${deviceId}/`, {
-      method: 'PATCH',
-      body: JSON.stringify(deviceData),
-    });
+    return deviceApi.update(deviceId, deviceData);
   }
 
-  /**
-   * Delete device
-   */
   async deleteDevice(deviceId) {
-    return await this.request(`/agriino/devices/${deviceId}/`, {
-      method: 'DELETE',
-    });
+    return deviceApi.delete(deviceId);
   }
 
-  /**
-   * Regenerate device API key
-   */
   async regenerateDeviceApiKey(deviceId) {
-    return await this.request(`/agriino/devices/${deviceId}/regenerate_api_key/`, {
-      method: 'POST',
-    });
+    return deviceApi.regenerateApiKey(deviceId);
   }
 
-  /**
-   * Get device's plants
-   */
   async getDevicePlants(deviceId) {
-    return await this.request(`/agriino/devices/${deviceId}/plants/`, {
-      method: 'GET',
-    });
+    return deviceApi.getPlants(deviceId);
   }
 
-  // ========== PLANTS ==========
+  // ==========================================
+  // PLANT METHODS (delegated to plantApi)
+  // ==========================================
 
-  /**
-   * Get all plants
-   */
   async getPlants() {
-    const data = await this.request('/agriino/plants/', {
-      method: 'GET',
-    });
-    // Handle pagination - return results array or data itself
-    return Array.isArray(data) ? data : (data.results || []);
+    return plantApi.getAll();
   }
 
-  /**
-   * Get plant details with history
-   */
   async getPlant(plantId) {
-    return await this.request(`/agriino/plants/${plantId}/`, {
-      method: 'GET',
-    });
+    return plantApi.getById(plantId);
   }
 
-  /**
-   * Create new plant
-   */
   async createPlant(plantData) {
-    return await this.request('/agriino/plants/', {
-      method: 'POST',
-      body: JSON.stringify(plantData),
-    });
+    return plantApi.create(plantData);
   }
 
-  /**
-   * Update plant
-   */
   async updatePlant(plantId, plantData) {
-    return await this.request(`/agriino/plants/${plantId}/`, {
-      method: 'PATCH',
-      body: JSON.stringify(plantData),
-    });
+    return plantApi.update(plantId, plantData);
   }
 
-  /**
-   * Delete plant
-   */
   async deletePlant(plantId) {
-    return await this.request(`/agriino/plants/${plantId}/`, {
-      method: 'DELETE',
-    });
+    return plantApi.delete(plantId);
   }
 
-  /**
-   * Get plant history
-   * @param {string} plantId 
-   * @param {number} days - Number of days (default: 7)
-   * @param {number} limit - Max records (default: 100)
-   */
   async getPlantHistory(plantId, days = 7, limit = 100) {
-    return await this.request(`/agriino/plants/${plantId}/history/?days=${days}&limit=${limit}`, {
-      method: 'GET',
-    });
+    return plantApi.getHistory(plantId, days, limit);
   }
 
-  /**
-   * Get plant latest reading
-   */
   async getPlantLatestReading(plantId) {
-    return await this.request(`/agriino/plants/${plantId}/latest_reading/`, {
-      method: 'GET',
-    });
+    return plantApi.getLatestReading(plantId);
   }
 
-  // ========== READINGS ==========
+  // ==========================================
+  // READINGS METHODS (delegated to readingsApi)
+  // ==========================================
 
-  /**
-   * Get all readings
-   */
   async getReadings() {
-    return await this.request('/agriino/readings/', {
-      method: 'GET',
-    });
+    return readingsApi.getAll();
   }
 
-  /**
-   * Create manual reading
-   */
   async createReading(readingData) {
-    return await this.request('/agriino/readings/', {
-      method: 'POST',
-      body: JSON.stringify(readingData),
-    });
+    return readingsApi.create(readingData);
   }
 
-  /**
-   * Get reading details
-   */
   async getReading(readingId) {
-    return await this.request(`/agriino/readings/${readingId}/`, {
-      method: 'GET',
-    });
+    return readingsApi.getById(readingId);
   }
 
   // ==========================================
-  // KRIGING ANALYSIS API METHODS
+  // KRIGING ANALYSIS (delegated to analysisApi)
   // ==========================================
 
-  /**
-   * Perform Kriging analysis on nitrogen data from Firebase
-   * @param {Object} analysisData - Analysis request data
-   * @param {Array} analysisData.device_data - Array of device readings with lat, lng, nitrogen
-   * @param {number} analysisData.grid_resolution - Grid resolution (default: 20)
-   * @param {string} analysisData.variogram_model - Variogram model (default: 'spherical')
-   * @param {number} analysisData.low_threshold - Low nitrogen threshold (default: 1.5)
-   * @param {number} analysisData.high_threshold - High nitrogen threshold (default: 2.5)
-   */
   async performKrigingAnalysis(analysisData) {
-    return await this.request('/agriino/analyze/', {
-      method: 'POST',
-      body: JSON.stringify(analysisData),
-      skipAuth: true,
-    });
+    return analysisApi.performKriging(analysisData);
   }
 
-  /**
-   * Quick Kriging analysis with simplified request format
-   * @param {Array} points - Array of {lat, lng, nitrogen} objects
-   * @param {Object} options - Optional parameters (resolution, model, thresholds)
-   */
   async quickKrigingAnalysis(points, options = {}) {
-    return await this.request('/agriino/quick-analyze/', {
-      method: 'POST',
-      body: JSON.stringify({
-        points,
-        resolution: options.resolution || 20,
-        model: options.model || 'spherical',
-        low_threshold: options.lowThreshold || 1.5,
-        high_threshold: options.highThreshold || 2.5,
-      }),
-      skipAuth: true,
-    });
+    return analysisApi.quickKriging(points, options);
   }
 
-  /**
-   * Sync device data from Firebase to backend database
-   * @param {Array} devices - Array of device data from Firebase
-   * @param {boolean} saveToDb - Whether to persist data (default: false)
-   */
   async syncFirebaseDevices(devices, saveToDb = false) {
-    return await this.request('/agriino/sync/', {
-      method: 'POST',
-      body: JSON.stringify({
-        devices,
-        save_to_db: saveToDb,
-      }),
-      skipAuth: true,
-    });
+    return deviceApi.syncFromFirebase(devices, saveToDb);
   }
 
-  /**
-   * Get API health status
-   */
   async getApiHealth() {
-    return await this.request('/agriino/health/', {
-      method: 'GET',
-      skipAuth: true,
-    });
+    return statsApi.getHealth();
   }
 
   // ==========================================
-  // AREA MANAGEMENT API METHODS
+  // AREA METHODS (delegated to areaApi)
   // ==========================================
 
-  /**
-   * Get all areas
-   */
   async getAreas() {
-    const data = await this.request('/agriino/areas/', {
-      method: 'GET',
-    });
-    return Array.isArray(data) ? data : (data.results || []);
+    return areaApi.getAll();
   }
 
-  /**
-   * Get area details
-   */
   async getArea(areaId) {
-    return await this.request(`/agriino/areas/${areaId}/`, {
-      method: 'GET',
-    });
+    return areaApi.getById(areaId);
   }
 
-  /**
-   * Create new area
-   * @param {Object} areaData - Area data
-   * @param {string} areaData.name - Area name
-   * @param {string} areaData.description - Area description
-   * @param {Array} areaData.polygon_coordinates - Array of [lat, lng] pairs
-   * @param {number} areaData.center_latitude - Center latitude
-   * @param {number} areaData.center_longitude - Center longitude
-   * @param {Array} areaData.device_ids - Array of device IDs to add
-   */
   async createArea(areaData) {
-    return await this.request('/agriino/areas/', {
-      method: 'POST',
-      body: JSON.stringify(areaData),
-    });
+    return areaApi.create(areaData);
   }
 
-  /**
-   * Update area
-   */
   async updateArea(areaId, areaData) {
-    return await this.request(`/agriino/areas/${areaId}/`, {
-      method: 'PATCH',
-      body: JSON.stringify(areaData),
-    });
+    return areaApi.update(areaId, areaData);
   }
 
-  /**
-   * Delete area
-   */
   async deleteArea(areaId) {
-    return await this.request(`/agriino/areas/${areaId}/`, {
-      method: 'DELETE',
-    });
+    return areaApi.delete(areaId);
   }
 
-  /**
-   * Add device to area
-   */
   async addDeviceToArea(areaId, deviceId) {
-    return await this.request(`/agriino/areas/${areaId}/add_device/`, {
-      method: 'POST',
-      body: JSON.stringify({ device_id: deviceId }),
-    });
+    return areaApi.addDevice(areaId, deviceId);
   }
 
-  /**
-   * Remove device from area
-   */
   async removeDeviceFromArea(areaId, deviceId) {
-    return await this.request(`/agriino/areas/${areaId}/remove_device/`, {
-      method: 'DELETE',
-      body: JSON.stringify({ device_id: deviceId }),
-    });
+    return areaApi.removeDevice(areaId, deviceId);
   }
 
-  /**
-   * Get devices in an area
-   */
   async getAreaDevices(areaId) {
-    return await this.request(`/agriino/areas/${areaId}/devices/`, {
-      method: 'GET',
-    });
+    return areaApi.getDevices(areaId);
   }
 
-  /**
-   * Get analysis history for an area
-   */
   async getAreaAnalysisHistory(areaId) {
-    return await this.request(`/agriino/areas/${areaId}/analysis_history/`, {
-      method: 'GET',
-    });
+    return areaApi.getAnalysisHistory(areaId);
   }
 
-  /**
-   * Get analysis result details
-   */
   async getAnalysisResult(analysisId) {
-    return await this.request(`/agriino/analysis-results/${analysisId}/`, {
-      method: 'GET',
-    });
+    return analysisApi.getResultById(analysisId);
   }
 
-  /**
-   * Get all analysis results
-   */
   async getAnalysisResults() {
-    const data = await this.request('/agriino/analysis-results/', {
-      method: 'GET',
-    });
-    return Array.isArray(data) ? data : (data.results || []);
+    return analysisApi.getResults();
   }
 }
 
+// Export singleton instance for backward compatibility
 export default new ApiService();
+
+// Also export modular APIs for new code
+export { 
+  apiClient, 
+  authApi, 
+  deviceApi, 
+  plantApi, 
+  readingsApi, 
+  areaApi, 
+  analysisApi, 
+  statsApi 
+};
