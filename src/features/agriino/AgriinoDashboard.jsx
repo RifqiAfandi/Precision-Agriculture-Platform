@@ -25,6 +25,62 @@ import {
   NITROGEN_THRESHOLDS 
 } from "@/services/dummyDataGenerator";
 
+/**
+ * Calculate and update statistics from device data
+ * 
+ * @param {Array<Object>} deviceData - Array of device objects with nitrogen and spad values
+ * @param {Function} setStats - State setter function for stats
+ * @returns {void}
+ */
+const updateStatsFromDevices = (deviceData, setStats) => {
+  if (!deviceData || deviceData.length === 0) {
+    setStats({
+      totalDevices: 0,
+      avgNitrogen: '0',
+      avgSpad: '0',
+      needsAttention: 0,
+    });
+    return;
+  }
+
+  const nitrogenValues = deviceData.map(d => d.nitrogen);
+  const spadValues = deviceData.map(d => d.spad);
+  
+  const avgNitrogen = nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length;
+  const avgSpad = spadValues.reduce((a, b) => a + b, 0) / spadValues.length;
+  
+  // Count devices that need attention (deficient nitrogen)
+  const needsAttention = deviceData.filter(
+    d => classifyNitrogen(d.nitrogen) === 'deficient'
+  ).length;
+
+  setStats({
+    totalDevices: deviceData.length,
+    avgNitrogen: avgNitrogen.toFixed(3),
+    avgSpad: avgSpad.toFixed(2),
+    needsAttention,
+  });
+};
+
+/**
+ * AgriinoDashboard Component
+ * 
+ * Main dashboard for Agriino nitrogen monitoring system.
+ * Displays real-time device data, kriging analysis, and historical data.
+ * 
+ * Features:
+ * - Real-time monitoring tab with live device data
+ * - Kriging analysis tab for spatial interpolation
+ * - History tab for weekly data trends
+ * - Statistics cards showing key metrics
+ * - Nitrogen classification legend
+ * 
+ * @component
+ * @returns {React.ReactElement} Rendered AgriinoDashboard component
+ * 
+ * @example
+ * <AgriinoDashboard />
+ */
 export function AgriinoDashboard() {
   const [activeTab, setActiveTab] = useState("monitoring");
   const [loading, setLoading] = useState(true);
@@ -46,7 +102,7 @@ export function AgriinoDashboard() {
       
       // Get initial data
       const currentData = realTimeDataStore.getCurrentData();
-      updateStatsFromDevices(currentData);
+      updateStatsFromDevices(currentData, setStats);
       setDevices(currentData);
       setLoading(false);
     };
@@ -55,7 +111,7 @@ export function AgriinoDashboard() {
 
     // Subscribe to data updates
     const unsubscribe = realTimeDataStore.subscribe((data) => {
-      updateStatsFromDevices(data);
+      updateStatsFromDevices(data, setStats);
       setDevices(data);
     });
 
@@ -63,37 +119,6 @@ export function AgriinoDashboard() {
       unsubscribe();
     };
   }, []);
-
-  // Calculate statistics from device data
-  const updateStatsFromDevices = (deviceData) => {
-    if (!deviceData || deviceData.length === 0) {
-      setStats({
-        totalDevices: 0,
-        avgNitrogen: '0',
-        avgSpad: '0',
-        needsAttention: 0,
-      });
-      return;
-    }
-
-    const nitrogenValues = deviceData.map(d => d.nitrogen);
-    const spadValues = deviceData.map(d => d.spad);
-    
-    const avgNitrogen = nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length;
-    const avgSpad = spadValues.reduce((a, b) => a + b, 0) / spadValues.length;
-    
-    // Count devices that need attention (deficient nitrogen)
-    const needsAttention = deviceData.filter(
-      d => classifyNitrogen(d.nitrogen) === 'deficient'
-    ).length;
-
-    setStats({
-      totalDevices: deviceData.length,
-      avgNitrogen: avgNitrogen.toFixed(3),
-      avgSpad: avgSpad.toFixed(2),
-      needsAttention,
-    });
-  };
 
   if (loading) {
     return (

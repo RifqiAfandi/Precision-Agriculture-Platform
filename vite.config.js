@@ -16,24 +16,55 @@ export default defineConfig({
     // Enable code splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks - split large libraries
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-charts': ['recharts'],
-          'vendor-map': ['maplibre-gl'],
-          'vendor-ui': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-label',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-tabs',
-          ],
+        manualChunks(id) {
+          // Node modules chunking strategy
+          if (id.includes('node_modules')) {
+            // MapLibre GL - large map library (separate chunk)
+            if (id.includes('maplibre-gl')) {
+              return 'vendor-map';
+            }
+            // Recharts and D3 dependencies
+            if (id.includes('recharts') || id.includes('d3-')) {
+              return 'vendor-charts';
+            }
+            // React core
+            if (id.includes('react-dom') || id.includes('/react/')) {
+              return 'vendor-react';
+            }
+            // Radix UI components
+            if (id.includes('@radix-ui')) {
+              return 'vendor-ui';
+            }
+            // Turf.js geospatial library
+            if (id.includes('@turf')) {
+              return 'vendor-turf';
+            }
+            // Firebase - lazy loaded
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            // Other smaller vendor libs
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            // Remaining node_modules
+            return 'vendor-common';
+          }
+          // Feature-based code splitting for app code
+          if (id.includes('/features/agriino/components/kriging')) {
+            return 'feature-kriging';
+          }
+          if (id.includes('/features/agriino/')) {
+            return 'feature-agriino';
+          }
+          if (id.includes('/features/')) {
+            return 'features';
+          }
         },
       },
     },
-    // Increase chunk size warning limit
-    chunkSizeWarningLimit: 500,
+    // Increase chunk size warning limit for map library
+    chunkSizeWarningLimit: 600,
     // Disable source maps for production
     sourcemap: false,
     // Target modern browsers for smaller bundle

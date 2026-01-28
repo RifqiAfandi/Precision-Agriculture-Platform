@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
@@ -27,6 +28,13 @@ import useKrigingAnalysis from '@/hooks/useKrigingAnalysis';
 
 /**
  * Analysis History Component
+ * 
+ * Displays a list of previous Kriging analysis results with selection capability.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.onSelectAnalysis - Callback when an analysis is selected
+ * @returns {React.ReactElement} Rendered AnalysisHistory component
  */
 const AnalysisHistory = ({ onSelectAnalysis }) => {
   const [history, setHistory] = useState([]);
@@ -36,6 +44,11 @@ const AnalysisHistory = ({ onSelectAnalysis }) => {
     fetchHistory();
   }, []);
 
+  /**
+   * Fetch analysis history from API
+   * Falls back to demo data on error
+   * @returns {Promise<void>}
+   */
   const fetchHistory = async () => {
     try {
       const data = await api.getAnalysisResults();
@@ -116,8 +129,28 @@ const AnalysisHistory = ({ onSelectAnalysis }) => {
   );
 };
 
+AnalysisHistory.propTypes = {
+  onSelectAnalysis: PropTypes.func,
+};
+
 /**
- * Main Kriging Dashboard Page
+ * KrigingDashboard Component
+ * 
+ * Main dashboard for Kriging spatial analysis of nitrogen data.
+ * Integrates Firebase real-time device data with Kriging interpolation analysis.
+ * 
+ * Features:
+ * - Real-time device statistics from Firebase
+ * - Interactive Kriging map visualization
+ * - Device data table with classification
+ * - Analysis history with result viewing
+ * - Automatic device refresh
+ * 
+ * @component
+ * @returns {React.ReactElement} Rendered KrigingDashboard component
+ * 
+ * @example
+ * <KrigingDashboard />
  */
 export function KrigingDashboard() {
   const [activeTab, setActiveTab] = useState('map');
@@ -157,7 +190,11 @@ export function KrigingDashboard() {
     influenceRadius: 0.05, // 50 meters
   });
 
-  // Handle analysis
+  /**
+   * Handle Kriging analysis execution
+   * Validates device count and triggers analysis
+   * @returns {Promise<void>}
+   */
   const handleAnalyze = async () => {
     if (devices.length < 1) {
       toast.error('Minimal 1 device diperlukan untuk analisis');
@@ -172,7 +209,11 @@ export function KrigingDashboard() {
     }
   };
 
-  // Handle view analysis history
+  /**
+   * Handle selection of historical analysis result
+   * @param {number} analysisId - ID of the analysis to load
+   * @returns {Promise<void>}
+   */
   const handleSelectAnalysis = async (analysisId) => {
     try {
       const result = await api.getAnalysisResult(analysisId);

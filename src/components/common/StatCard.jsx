@@ -2,6 +2,41 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent } from "../ui/Card";
 
+/**
+ * StatCard Component
+ * 
+ * A reusable statistics card component that displays an icon, label, and value.
+ * Used throughout dashboards for displaying key metrics.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ElementType} props.icon - Lucide icon component to display
+ * @param {string} [props.iconColor='bg-gray-100 text-gray-600'] - Tailwind classes for icon background and text color
+ * @param {string} props.label - Label text describing the statistic
+ * @param {string|number} props.value - The statistic value to display
+ * @param {string} [props.unit] - Optional unit suffix (e.g., '%', 'kg')
+ * @param {string} [props.className] - Additional CSS classes for the card
+ * @returns {React.ReactElement} Rendered StatCard component
+ * 
+ * @example
+ * // Basic usage
+ * <StatCard
+ *   icon={Leaf}
+ *   iconColor="text-green-600"
+ *   label="Total Devices"
+ *   value={10}
+ * />
+ * 
+ * @example
+ * // With unit
+ * <StatCard
+ *   icon={BarChart3}
+ *   iconColor="text-blue-600"
+ *   label="Average Nitrogen"
+ *   value="0.123"
+ *   unit="%"
+ * />
+ */
 export function StatCard({
   icon: IconComponent,
   iconColor = "bg-gray-100 text-gray-600",
