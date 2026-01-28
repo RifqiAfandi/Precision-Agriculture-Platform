@@ -40,7 +40,7 @@ function AppContent() {
     }
   }, []);
 
-  const handleLogin = (userData) => {
+  const handleLogin = () => {
     setCurrentPage("dashboard");
   };
 

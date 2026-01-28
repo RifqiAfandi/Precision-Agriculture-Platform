@@ -18,7 +18,6 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
-import { toast } from "sonner";
 import { 
   realTimeDataStore, 
   classifyNitrogen, 
@@ -90,7 +89,8 @@ export function AgriinoDashboard() {
     avgSpad: '0',
     needsAttention: 0,
   });
-  const [devices, setDevices] = useState([]);
+  // Store devices for potential future use (e.g., passing to child components)
+  const [_devices, setDevices] = useState([]);
 
   // Initialize and subscribe to real-time data
   useEffect(() => {
