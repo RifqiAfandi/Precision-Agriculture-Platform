@@ -18,6 +18,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
+import { REFRESH_INTERVALS } from "@/constants/config";
 import { 
   realTimeDataStore, 
   classifyNitrogen, 
@@ -98,7 +99,7 @@ export function AgriinoDashboard() {
       setLoading(true);
       
       // Start the real-time data store
-      realTimeDataStore.start(60000); // Update every minute
+      realTimeDataStore.start(REFRESH_INTERVALS.SLOW); // Update every minute
       
       // Get initial data
       const currentData = realTimeDataStore.getCurrentData();

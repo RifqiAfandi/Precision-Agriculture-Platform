@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import firebaseService from '@/services/firebase';
 import { realTimeDataStore } from '@/services/dummyDataGenerator';
+import { REFRESH_INTERVALS } from '@/constants/config';
 
 /**
  * Custom hook for managing Firebase device data
@@ -52,7 +53,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   // Fallback to dummy data
   const useDummyData = useCallback(() => {
     console.log('Using dummy data for devices');
-    realTimeDataStore.start(60000);
+    realTimeDataStore.start(REFRESH_INTERVALS.SLOW);
     const data = realTimeDataStore.getCurrentData();
     setDevices(processDevices(data));
     setConnected(false);

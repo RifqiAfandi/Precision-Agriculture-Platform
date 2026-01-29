@@ -2,31 +2,28 @@
 // Generates real-time and weekly dummy data based on database.txt specifications
 
 import {
-  NITROGEN_THRESHOLDS as THRESHOLDS,
+  NITROGEN_THRESHOLDS,
   DEFAULT_INFLUENCE_RADIUS_KM,
   classifyNitrogenValue,
 } from '@/constants';
 import { MARKER_COLORS, getClassificationFillColor } from '@/constants/colors';
 
 /**
- * Nitrogen classification thresholds
- * Re-export from constants for backward compatibility
+ * Re-export NITROGEN_THRESHOLDS from constants for backward compatibility
+ * @deprecated Import directly from '@/constants' instead
  * 
  * deficient: <1.80%
- * subnormal: 1.80 - 2.71
- * normal: 2.71 - 3.31
- * high: >3.31
+ * subnormal: 1.80 - 2.71%
+ * normal: 2.71 - 3.31%
+ * high: >3.31%
  * no_data: outside sensor influence radius (neutral/gray)
  */
-export const NITROGEN_THRESHOLDS = {
-  deficient: { max: THRESHOLDS.deficient.max, color: MARKER_COLORS.deficient.fill, label: 'Deficient' },
-  subnormal: { min: THRESHOLDS.subnormal.min, max: THRESHOLDS.subnormal.max, color: MARKER_COLORS.subnormal.fill, label: 'Subnormal' },
-  normal: { min: THRESHOLDS.normal.min, max: THRESHOLDS.normal.max, color: MARKER_COLORS.normal.fill, label: 'Normal' },
-  high: { min: THRESHOLDS.high.min, color: MARKER_COLORS.high.fill, label: 'High' },
-  no_data: { color: MARKER_COLORS.no_data.fill, label: 'No Data' },
-};
+export { NITROGEN_THRESHOLDS };
 
-// Default influence radius in kilometers (0.05 km = 50 meters)
+/**
+ * Default influence radius in kilometers (0.05 km = 50 meters)
+ * @deprecated Import DEFAULT_INFLUENCE_RADIUS_KM from '@/constants' instead
+ */
 export const DEFAULT_INFLUENCE_RADIUS = DEFAULT_INFLUENCE_RADIUS_KM;
 
 /**

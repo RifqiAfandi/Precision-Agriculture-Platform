@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Activity } from 'lucide-react';
+import { REFRESH_INTERVALS } from '@/constants/config';
 
 // Import shared dashboard components
 import {
@@ -115,7 +116,7 @@ function useRealTimeData() {
 
   useEffect(() => {
     // Start the data store if not already running
-    realTimeDataStore.start(60000); // 1 minute interval
+    realTimeDataStore.start(REFRESH_INTERVALS.SLOW); // 1 minute interval
     setIsConnected(true);
 
     // Subscribe to updates
@@ -136,7 +137,7 @@ function useRealTimeData() {
   useEffect(() => {
     const interval = setInterval(() => {
       setHistoricalData(realTimeDataStore.getHistoricalData(60));
-    }, 60000);
+    }, REFRESH_INTERVALS.SLOW);
 
     return () => clearInterval(interval);
   }, []);

@@ -12,18 +12,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { CHART_COLORS } from '@/constants/colors';
 
 /**
- * Chart Colors Configuration
- * Centralized color palette for consistent chart styling
+ * Extended Chart Colors for Nitrogen-specific charts
+ * Combines centralized CHART_COLORS with nitrogen-specific mapping
  */
-export const CHART_COLORS = {
-  nitrogen: '#22c55e', // green-500
-  spad: '#3b82f6',     // blue-500
-  primary: '#16a34a',  // green-600
-  secondary: '#2563eb', // blue-600
-  warning: '#f59e0b',  // amber-500
-  danger: '#ef4444',   // red-500
+const NITROGEN_CHART_COLORS = {
+  nitrogen: CHART_COLORS.primary,  // green for nitrogen
+  spad: CHART_COLORS.secondary,    // blue for SPAD
 };
 
 /**
@@ -57,7 +54,7 @@ export function NitrogenLineChart({
   showLegend = true,
   className = '',
 }) {
-  const color = dataKey === 'nitrogen' ? CHART_COLORS.nitrogen : CHART_COLORS.spad;
+  const color = NITROGEN_CHART_COLORS[dataKey] || CHART_COLORS.primary;
   const label = dataKey === 'nitrogen' ? 'Nitrogen (%)' : 'SPAD';
 
   return (
@@ -121,7 +118,7 @@ export function NitrogenBarChart({
   showLegend = true,
   className = '',
 }) {
-  const color = dataKey === 'nitrogen' ? CHART_COLORS.nitrogen : CHART_COLORS.spad;
+  const color = NITROGEN_CHART_COLORS[dataKey] || CHART_COLORS.primary;
   const label = dataKey === 'nitrogen' ? 'Nitrogen (%)' : 'SPAD';
 
   return (

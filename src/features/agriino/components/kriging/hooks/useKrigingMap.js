@@ -10,6 +10,7 @@ import maplibregl from 'maplibre-gl';
 import { toast } from 'sonner';
 import api from '@/services/api';
 import { realTimeDataStore, NITROGEN_THRESHOLDS } from '@/services/dummyDataGenerator';
+import { REFRESH_INTERVALS } from '@/constants/config';
 import {
   createMarkerElement,
   createDevicePopup,
@@ -111,7 +112,7 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
 
     const loadData = () => {
       setIsLoading(true);
-      realTimeDataStore.start(60000);
+      realTimeDataStore.start(REFRESH_INTERVALS.SLOW);
       const data = realTimeDataStore.getCurrentData();
       setInternalDevices(data);
       setIsLoading(false);

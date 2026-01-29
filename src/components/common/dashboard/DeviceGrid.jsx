@@ -29,7 +29,10 @@ export function DeviceCard({
   showSpad = true,
   className = '',
 }) {
-  const classification = classifyNitrogen(device.nitrogen);
+  // Handle null/undefined nitrogen values gracefully
+  const classification = device.nitrogen != null 
+    ? classifyNitrogen(device.nitrogen) 
+    : 'no_data';
   const color = getClassificationColor(classification);
 
   return (
