@@ -48,5 +48,6 @@ export {
   TOAST_DURATIONS,
   DATA_LIMITS,
   FEATURE_FLAGS,
+  STORAGE_KEYS,
   getMapStyleUrl,
 } from './config';

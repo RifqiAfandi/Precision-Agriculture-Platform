@@ -14,6 +14,8 @@ export { NitrogenLegend } from './NitrogenLegend';
 export { 
   NitrogenLineChart, 
   NitrogenBarChart,
-  CHART_COLORS,
   DEFAULT_TOOLTIP_STYLE 
 } from './NitrogenCharts';
+
+// Re-export CHART_COLORS from constants for backward compatibility
+export { CHART_COLORS } from '@/constants/colors';

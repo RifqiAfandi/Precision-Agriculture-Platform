@@ -27,7 +27,46 @@ import {
   createGridPolygons,
   generateMockAnalysisResult,
 } from '../utils/krigingUtils';
-import { MAP_CONFIG } from '@/constants';
+import { MAP_CONFIG, STORAGE_KEYS } from '@/constants';
+
+// =============================================================================
+// HELPER FUNCTIONS FOR PERSISTENCE
+// =============================================================================
+
+/**
+ * Save selected area to localStorage
+ * @param {Array|null} area - Array of [lng, lat] coordinates
+ */
+function saveSelectedArea(area) {
+  try {
+    if (area && area.length >= 3) {
+      localStorage.setItem(STORAGE_KEYS.KRIGING_SELECTED_AREA, JSON.stringify(area));
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.KRIGING_SELECTED_AREA);
+    }
+  } catch (error) {
+    console.warn('Failed to save selected area to localStorage:', error);
+  }
+}
+
+/**
+ * Load selected area from localStorage
+ * @returns {Array|null} Saved area coordinates or null
+ */
+function loadSelectedArea() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.KRIGING_SELECTED_AREA);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length >= 3) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load selected area from localStorage:', error);
+  }
+  return null;
+}
 
 /**
  * Custom hook for managing the Kriging map state and operations
@@ -57,10 +96,28 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
   const [activeTab, setActiveTab] = useState('devices');
   const [mapLoaded, setMapLoaded] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
+  // Initialize selectedArea from localStorage
+  const [selectedArea, setSelectedArea] = useState(() => loadSelectedArea());
 
   // Calculate bounds from devices
   const bounds = useMemo(() => calculateBoundsFromDevices(devices), [devices]);
+
+  // Persist selectedArea to localStorage when it changes
+  useEffect(() => {
+    saveSelectedArea(selectedArea);
+  }, [selectedArea]);
+
+  // Restore saved polygon on map when map loads
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    
+    const savedArea = loadSelectedArea();
+    if (savedArea && savedArea.length >= 3) {
+      // Restore the polygon drawing on the map
+      drawPointsRef.current = [...savedArea];
+      updateDrawPolygon(map.current, savedArea);
+    }
+  }, [mapLoaded]);
 
   // Initialize Map
   useEffect(() => {
@@ -188,22 +245,27 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
   // Toggle drawing mode
   const handleToggleDrawing = useCallback(() => {
     if (isDrawing) {
+      // Finishing drawing mode
       isDrawingRef.current = false;
       setIsDrawing(false);
+      // Save the drawn area if valid
+      if (drawPointsRef.current.length >= 3) {
+        setSelectedArea([...drawPointsRef.current]);
+      }
     } else {
+      // Starting new drawing - clear existing for new selection
       drawPointsRef.current = [];
-      setSelectedArea(null);
       clearDrawPolygon(map.current);
       isDrawingRef.current = true;
       setIsDrawing(true);
-      toast.info('Klik pada peta untuk menggambar area analisis');
+      toast.info('Klik pada peta untuk menggambar area analisis. Klik "Selesai Gambar" untuk menyimpan.');
     }
   }, [isDrawing]);
 
-  // Clear polygon
+  // Clear polygon (explicit user action to delete saved area)
   const handleClearPolygon = useCallback(() => {
     drawPointsRef.current = [];
-    setSelectedArea(null);
+    setSelectedArea(null); // This will trigger useEffect to clear localStorage
     setAnalysisResult(null);
     isDrawingRef.current = false;
     setIsDrawing(false);

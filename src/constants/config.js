@@ -158,3 +158,26 @@ export const FEATURE_FLAGS = {
   // Enable analytics
   ENABLE_ANALYTICS: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
 };
+
+
+// =============================================================================
+// LOCAL STORAGE KEYS
+// =============================================================================
+
+/**
+ * Keys for localStorage persistence
+ * Centralized to avoid key collisions and typos
+ */
+export const STORAGE_KEYS = {
+  // Kriging area selection persistence
+  KRIGING_SELECTED_AREA: 'precision-agriculture:kriging-selected-area',
+  KRIGING_ANALYSIS_RESULT: 'precision-agriculture:kriging-analysis-result',
+  
+  // User preferences
+  USER_PREFERENCES: 'precision-agriculture:user-preferences',
+  THEME: 'precision-agriculture:theme',
+  
+  // Auth tokens (if needed)
+  AUTH_TOKEN: 'precision-agriculture:auth-token',
+  REFRESH_TOKEN: 'precision-agriculture:refresh-token',
+};
