@@ -6,7 +6,7 @@ import {
   TrendingDown,
   Minus,
 } from 'lucide-react';
-import { NITROGEN_THRESHOLDS } from '@/constants';
+import { NITROGEN_THRESHOLDS, classifyNitrogenValue } from '@/constants';
 
 /**
  * Classification colors for the analysis results
@@ -20,13 +20,14 @@ const CLASSIFICATION_COLORS = {
 
 /**
  * Zoning Statistics Table Component
+ * Shows device counts by classification
  */
-function ZoningStatisticsTable({ statistics }) {
+function ZoningStatisticsTable({ deviceStats, totalDevices, meanValue }) {
   const rows = [
-    { key: 'deficient', label: 'Defisien', count: statistics.deficient_count, range: '< 1.80', bgClass: 'bg-red-50 dark:bg-red-900/20' },
-    { key: 'subnormal', label: 'Subnormal', count: statistics.subnormal_count, range: '1.80-2.71', bgClass: 'bg-orange-50 dark:bg-orange-900/20' },
-    { key: 'normal', label: 'Normal', count: statistics.normal_count, range: '2.71-3.31', bgClass: 'bg-yellow-50 dark:bg-yellow-900/20' },
-    { key: 'high', label: 'Tinggi', count: statistics.high_count, range: '> 3.31', bgClass: 'bg-green-50 dark:bg-green-900/20' },
+    { key: 'deficient', label: 'Defisien', count: deviceStats?.deficient || 0, range: '< 1.80', bgClass: 'bg-red-50 dark:bg-red-900/20' },
+    { key: 'subnormal', label: 'Subnormal', count: deviceStats?.subnormal || 0, range: '1.80-2.71', bgClass: 'bg-orange-50 dark:bg-orange-900/20' },
+    { key: 'normal', label: 'Normal', count: deviceStats?.normal || 0, range: '2.71-3.31', bgClass: 'bg-yellow-50 dark:bg-yellow-900/20' },
+    { key: 'high', label: 'Tinggi', count: deviceStats?.high || 0, range: '> 3.31', bgClass: 'bg-green-50 dark:bg-green-900/20' },
   ];
 
   return (
@@ -55,7 +56,7 @@ function ZoningStatisticsTable({ statistics }) {
                 <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{count}</td>
                 <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">{range}</td>
                 <td className="px-2 py-1.5 text-right text-gray-700 dark:text-gray-300">
-                  {((count / statistics.total_points) * 100).toFixed(1)}%
+                  {totalDevices > 0 ? ((count / totalDevices) * 100).toFixed(1) : 0}%
                 </td>
               </tr>
             ))}
@@ -64,10 +65,10 @@ function ZoningStatisticsTable({ statistics }) {
             <tr>
               <td className="px-2 py-1.5 font-medium text-gray-700 dark:text-gray-300">TOTAL</td>
               <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">
-                {statistics.data_points || statistics.total_points}
+                {totalDevices}
               </td>
               <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">
-                {statistics.mean_value?.toFixed(2)}
+                {meanValue?.toFixed(2)}
               </td>
               <td className="px-2 py-1.5 text-right font-medium text-gray-700 dark:text-gray-300">100%</td>
             </tr>
@@ -79,18 +80,21 @@ function ZoningStatisticsTable({ statistics }) {
 }
 
 ZoningStatisticsTable.propTypes = {
-  statistics: PropTypes.object.isRequired,
+  deviceStats: PropTypes.object,
+  totalDevices: PropTypes.number,
+  meanValue: PropTypes.number,
 };
 
 /**
  * Classification Distribution Component
+ * Shows actual device counts by classification
  */
-function ClassificationDistribution({ statistics }) {
+function ClassificationDistribution({ deviceStats }) {
   const items = [
-    { key: 'deficient', label: 'Defisien', count: statistics.deficient_count },
-    { key: 'subnormal', label: 'Subnormal', count: statistics.subnormal_count },
-    { key: 'normal', label: 'Normal', count: statistics.normal_count },
-    { key: 'high', label: 'Tinggi', count: statistics.high_count },
+    { key: 'deficient', label: 'Defisien', count: deviceStats?.deficient || 0 },
+    { key: 'subnormal', label: 'Subnormal', count: deviceStats?.subnormal || 0 },
+    { key: 'normal', label: 'Normal', count: deviceStats?.normal || 0 },
+    { key: 'high', label: 'Tinggi', count: deviceStats?.high || 0 },
   ];
 
   return (
@@ -104,13 +108,13 @@ function ClassificationDistribution({ statistics }) {
             style={{ backgroundColor: CLASSIFICATION_COLORS[key]?.bg }}
           >
             <p className="text-lg font-bold" style={{ color: CLASSIFICATION_COLORS[key]?.text }}>
-              {count || 0}
+              {count}
             </p>
             <p className="text-xs" style={{ color: CLASSIFICATION_COLORS[key]?.text }}>{label}</p>
           </div>
         ))}
         <div className="bg-gray-100 dark:bg-gray-700/30 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-gray-500 dark:text-gray-400">{statistics.no_data_count || 0}</p>
+          <p className="text-lg font-bold text-gray-500 dark:text-gray-400">{deviceStats?.no_data || 0}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">No Data</p>
         </div>
       </div>
@@ -119,7 +123,7 @@ function ClassificationDistribution({ statistics }) {
 }
 
 ClassificationDistribution.propTypes = {
-  statistics: PropTypes.object.isRequired,
+  deviceStats: PropTypes.object,
 };
 
 /**
@@ -182,7 +186,23 @@ export function AnalysisResultsPanel({ analysisResult, isAnalyzing }) {
     );
   }
 
-  const { statistics, thresholds, variogram_params } = analysisResult;
+  const { statistics, thresholds, variogram_params, input_points } = analysisResult;
+  
+  // Always calculate device stats from input_points nitrogen values for accuracy
+  // We recalculate classification here to ensure consistency with displayed thresholds
+  const deviceStats = (() => {
+    if (!input_points || input_points.length === 0) return { deficient: 0, subnormal: 0, normal: 0, high: 0, no_data: 0 };
+    const stats = { deficient: 0, subnormal: 0, normal: 0, high: 0, no_data: 0 };
+    input_points.forEach(device => {
+      // Calculate classification directly from nitrogen value for accuracy
+      const cls = device.nitrogen != null ? classifyNitrogenValue(device.nitrogen) : 'no_data';
+      if (stats[cls] !== undefined) stats[cls]++;
+      else stats.no_data++;
+    });
+    return stats;
+  })();
+  
+  const totalDevices = input_points?.length || 0;
 
   return (
     <div className="space-y-4">
@@ -220,10 +240,10 @@ export function AnalysisResultsPanel({ analysisResult, isAnalyzing }) {
       </div>
 
       {/* Classification Distribution */}
-      <ClassificationDistribution statistics={statistics} />
+      <ClassificationDistribution deviceStats={deviceStats} />
 
       {/* Zoning Statistics Table */}
-      <ZoningStatisticsTable statistics={statistics} />
+      <ZoningStatisticsTable deviceStats={deviceStats} totalDevices={totalDevices} meanValue={statistics.mean_value} />
 
       {/* Variogram Parameters */}
       <VariogramParams params={variogram_params} />

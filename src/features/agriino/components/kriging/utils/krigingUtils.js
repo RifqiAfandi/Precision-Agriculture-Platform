@@ -7,7 +7,7 @@
 
 import * as turf from '@turf/turf';
 import { classifyNitrogen, NITROGEN_THRESHOLDS } from '@/services/dummyDataGenerator';
-import { DEFAULT_INFLUENCE_RADIUS_KM, KRIGING_GRID_COLORS } from '@/constants';
+import { DEFAULT_INFLUENCE_RADIUS_KM, KRIGING_GRID_COLORS, classifyNitrogenValue } from '@/constants';
 
 /**
  * Grid colors for Kriging visualization
@@ -87,23 +87,6 @@ export const getMinDistanceToDevice = (lat, lng, devices) => {
     }
   }
   return minDist;
-};
-
-/**
- * Classify nitrogen value into category
- * @param {number} value - Nitrogen value
- * @returns {string} Classification string
- */
-export const classifyNitrogenValue = (value) => {
-  if (value < NITROGEN_THRESHOLDS.deficient.max) {
-    return 'deficient';
-  } else if (value < NITROGEN_THRESHOLDS.subnormal.max) {
-    return 'subnormal';
-  } else if (value < NITROGEN_THRESHOLDS.normal.max) {
-    return 'normal';
-  } else {
-    return 'high';
-  }
 };
 
 /**
@@ -502,12 +485,25 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
     }
   }
   
-  // Calculate statistics
+  // Calculate grid statistics (for zoning/area coverage)
   const deficientCount = gridPoints.filter((p) => p.classification === 'deficient').length;
   const subnormalCount = gridPoints.filter((p) => p.classification === 'subnormal').length;
   const normalCount = gridPoints.filter((p) => p.classification === 'normal' || p.classification === 'no_data').length;
   const highCount = gridPoints.filter((p) => p.classification === 'high').length;
   const noDataCount = 0;
+
+  // Calculate device statistics (actual device counts by classification)
+  const deviceStats = { deficient: 0, subnormal: 0, normal: 0, high: 0, no_data: 0 };
+  deviceList.forEach(device => {
+    if (device.nitrogen != null && !isNaN(device.nitrogen)) {
+      const classification = classifyNitrogenValue(device.nitrogen);
+      if (deviceStats[classification] !== undefined) {
+        deviceStats[classification]++;
+      }
+    } else {
+      deviceStats.no_data++;
+    }
+  });
 
   const gridValuesWithData = gridPoints
     .filter(p => p.predicted_value > 0)
@@ -546,6 +542,7 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
       total_points: gridPoints.length,
       data_points: gridPoints.length - noDataCount,
     },
+    device_statistics: deviceStats,
     variogram_params: {
       model: 'spherical',
       nugget: stdValue > 0 ? stdValue * 0.2 : 0.1,
