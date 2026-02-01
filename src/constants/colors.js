@@ -14,29 +14,30 @@
 /**
  * Marker colors for map markers and classification badges
  * Used in KrigingMap, DeviceCard, and other components
+ * Deficient: <1.8% | Subnormal: 1.8-2.71% | Normal: 2.71-3.31% | High: >3.31%
  */
 export const MARKER_COLORS = {
   deficient: {
-    fill: '#E53935',
-    border: '#C62828',
+    fill: '#FF0000',
+    border: '#CC0000',
     label: 'Deficient',
     labelId: 'Defisien',
   },
   subnormal: {
-    fill: '#FB8C00',
-    border: '#EF6C00',
+    fill: '#FF4500',
+    border: '#CC3700',
     label: 'Subnormal',
     labelId: 'Subnormal',
   },
   normal: {
-    fill: '#FDD835',
-    border: '#F9A825',
+    fill: '#FF8C00',
+    border: '#CC7000',
     label: 'Normal',
     labelId: 'Normal',
   },
   high: {
-    fill: '#43A047',
-    border: '#2E7D32',
+    fill: '#FFD700',
+    border: '#CCAC00',
     label: 'High',
     labelId: 'Tinggi',
   },
@@ -57,23 +58,25 @@ export const MARKER_COLORS = {
 /**
  * Background colors with transparency for classification zones
  * Used in statistics tables and zone indicators
+ * Deficient: <1.8% | Subnormal: 1.8-2.71% | Normal: 2.71-3.31% | High: >3.31%
  */
 export const CLASSIFICATION_BG_COLORS = {
-  deficient: 'rgba(229, 57, 53, 0.2)',
-  subnormal: 'rgba(251, 140, 0, 0.2)',
-  normal: 'rgba(253, 216, 53, 0.2)',
-  high: 'rgba(67, 160, 71, 0.2)',
+  deficient: 'rgba(255, 0, 0, 0.2)',
+  subnormal: 'rgba(255, 69, 0, 0.2)',
+  normal: 'rgba(255, 140, 0, 0.2)',
+  high: 'rgba(255, 215, 0, 0.2)',
   no_data: 'rgba(156, 163, 175, 0.2)',
 };
 
 /**
  * Kriging grid colors for map visualization
+ * Deficient: <1.8% | Subnormal: 1.8-2.71% | Normal: 2.71-3.31% | High: >3.31%
  */
 export const KRIGING_GRID_COLORS = {
-  deficient: '#E53935',
-  subnormal: '#FB8C00',
-  normal: '#FDD835',
-  high: '#43A047',
+  deficient: '#FF0000',
+  subnormal: '#FF4500',
+  normal: '#FF8C00',
+  high: '#FFD700',
 };
 
 

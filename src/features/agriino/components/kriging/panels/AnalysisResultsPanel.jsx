@@ -10,12 +10,13 @@ import { NITROGEN_THRESHOLDS, classifyNitrogenValue } from '@/constants';
 
 /**
  * Classification colors for the analysis results
+ * Deficient: <1.8% | Subnormal: 1.8-2.71% | Normal: 2.71-3.31% | High: >3.31%
  */
 const CLASSIFICATION_COLORS = {
-  deficient: { bg: 'rgba(229, 57, 53, 0.2)', text: '#E53935' },
-  subnormal: { bg: 'rgba(251, 140, 0, 0.2)', text: '#FB8C00' },
-  normal: { bg: 'rgba(253, 216, 53, 0.2)', text: '#F9A825', dot: '#FDD835' },
-  high: { bg: 'rgba(67, 160, 71, 0.2)', text: '#43A047' },
+  deficient: { bg: 'rgba(255, 0, 0, 0.2)', text: '#FF0000' },
+  subnormal: { bg: 'rgba(255, 69, 0, 0.2)', text: '#FF4500' },
+  normal: { bg: 'rgba(255, 140, 0, 0.2)', text: '#FF8C00', dot: '#FF8C00' },
+  high: { bg: 'rgba(255, 215, 0, 0.2)', text: '#FFD700' },
 };
 
 /**
