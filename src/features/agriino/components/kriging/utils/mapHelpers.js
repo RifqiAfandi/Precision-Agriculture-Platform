@@ -158,19 +158,19 @@ export const initializeMapSources = (map) => {
     source: 'kriging-grid',
     paint: {
       'fill-color': ['get', 'color'],
-      'fill-opacity': 0.75,
+      'fill-opacity': 0.8,
     },
   });
 
-  // Add kriging grid outline layer
+  // Add kriging grid outline layer - hidden by default for smooth look
   map.addLayer({
     id: 'kriging-grid-outline',
     type: 'line',
     source: 'kriging-grid',
     paint: {
       'line-color': ['get', 'color'],
-      'line-width': 0.5,
-      'line-opacity': 0.3,
+      'line-width': 0,
+      'line-opacity': 0,
     },
   });
 };

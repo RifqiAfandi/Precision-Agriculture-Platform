@@ -67,9 +67,10 @@ export const NITROGEN_THRESHOLDS = {
 // =============================================================================
 
 /**
- * Default influence radius in kilometers (0.05 km = 50 meters)
+ * Default influence radius in kilometers (0.015 km = 15 meters)
+ * Reduced for more localized device influence
  */
-export const DEFAULT_INFLUENCE_RADIUS_KM = 0.05;
+export const DEFAULT_INFLUENCE_RADIUS_KM = 0.015;
 
 /**
  * Default grid resolution for Kriging interpolation

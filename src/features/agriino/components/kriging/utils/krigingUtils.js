@@ -90,7 +90,18 @@ export const getMinDistanceToDevice = (lat, lng, devices) => {
 };
 
 /**
- * Create grid polygons for Kriging visualization
+ * Seeded pseudo-random number generator for consistent results
+ * @param {number} seed - Seed value
+ * @returns {number} Random value between 0 and 1
+ */
+const seededRandom = (seed) => {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+/**
+ * Create grid polygons for Kriging visualization with small grid cells
+ * Uses small square cells for smooth appearance
  * @param {Object[]} gridPoints - Array of grid point objects
  * @param {Object|number[][]} boundsData - Bounds object or polygon array
  * @returns {Object[]} Array of GeoJSON features
@@ -101,12 +112,12 @@ export const createGridPolygons = (gridPoints, boundsData) => {
     return [];
   }
   
-  console.log('=== CREATE GRID POLYGONS ===');
+  console.log('=== CREATE GRID POLYGONS (SMALL GRID) ===');
   console.log('Grid points received:', gridPoints.length);
   
   // Get bounds and clip polygon
   let minLat, maxLat, minLng, maxLng;
-  let clipPolygon = null;
+  let clipPolygonCoords = null;
   
   if (boundsData) {
     if (Array.isArray(boundsData)) {
@@ -116,12 +127,7 @@ export const createGridPolygons = (gridPoints, boundsData) => {
       maxLat = Math.max(...lats);
       minLng = Math.min(...lngs);
       maxLng = Math.max(...lngs);
-      // Close the polygon for clipping
-      try {
-        clipPolygon = turf.polygon([[...boundsData, boundsData[0]]]);
-      } catch (e) {
-        console.warn('Failed to create clip polygon:', e);
-      }
+      clipPolygonCoords = boundsData;
     } else {
       minLat = boundsData.min_lat;
       maxLat = boundsData.max_lat;
@@ -143,7 +149,6 @@ export const createGridPolygons = (gridPoints, boundsData) => {
     !isNaN(p.predicted_value)
   );
   
-  // Convert any remaining no_data to normal classification
   validPoints.forEach(p => {
     if (p.classification === 'no_data') {
       p.classification = 'normal';
@@ -159,197 +164,70 @@ export const createGridPolygons = (gridPoints, boundsData) => {
 
   const features = [];
   
-  // Group points by classification
-  const classificationGroups = {
-    deficient: [],
-    subnormal: [],
-    normal: [],
-    high: [],
-  };
+  // Calculate small cell size for smooth appearance
+  const gridWidth = maxLng - minLng;
+  const gridHeight = maxLat - minLat;
   
-  validPoints.forEach(p => {
-    const classification = p.classification === 'no_data' ? 'normal' : p.classification;
-    if (classificationGroups[classification]) {
-      classificationGroups[classification].push(
-        turf.point([p.longitude, p.latitude], { value: p.predicted_value })
-      );
-    }
-  });
+  // Determine grid resolution from points
+  const uniqueLngs = [...new Set(validPoints.map(p => p.longitude.toFixed(6)))].sort();
+  const uniqueLats = [...new Set(validPoints.map(p => p.latitude.toFixed(6)))].sort();
   
-  console.log('Classification groups:', {
-    deficient: classificationGroups.deficient.length,
-    subnormal: classificationGroups.subnormal.length,
-    normal: classificationGroups.normal.length,
-    high: classificationGroups.high.length,
-  });
+  // Calculate cell size - make it small
+  let cellWidth, cellHeight;
+  if (uniqueLngs.length > 1) {
+    cellWidth = Math.abs(parseFloat(uniqueLngs[1]) - parseFloat(uniqueLngs[0]));
+  } else {
+    cellWidth = gridWidth / 50;
+  }
+  if (uniqueLats.length > 1) {
+    cellHeight = Math.abs(parseFloat(uniqueLats[1]) - parseFloat(uniqueLats[0]));
+  } else {
+    cellHeight = gridHeight / 50;
+  }
   
-  // Create smooth polygons for each classification using concave hull
-  Object.entries(classificationGroups).forEach(([classification, points]) => {
-    if (points.length < 3) {
-      // Not enough points for hull, use buffer circles
-      points.forEach(pt => {
-        try {
-          const buffered = turf.buffer(pt, 0.015, { units: 'kilometers', steps: 16 });
-          if (buffered) {
-            buffered.properties = {
-              value: pt.properties.value,
-              color: GRID_COLORS[classification],
-              classification: classification,
-            };
-            
-            if (clipPolygon) {
-              try {
-                const clipped = turf.intersect(turf.featureCollection([buffered, clipPolygon]));
-                if (clipped) {
-                  clipped.properties = buffered.properties;
-                  features.push(clipped);
-                }
-              } catch (e) {
-                features.push(buffered);
-              }
-            } else {
-              features.push(buffered);
-            }
-          }
-        } catch (e) {
-          console.warn('Buffer failed:', e);
-        }
-      });
+  // Half cell for centering
+  const halfWidth = cellWidth / 2;
+  const halfHeight = cellHeight / 2;
+  
+  console.log('Cell size:', { cellWidth, cellHeight });
+  
+  // Create small square for each grid point
+  validPoints.forEach((point, idx) => {
+    const lng = point.longitude;
+    const lat = point.latitude;
+    const classification = point.classification === 'no_data' ? 'normal' : point.classification;
+    
+    // Check if point is inside clip polygon
+    if (clipPolygonCoords && !isPointInPolygon([lng, lat], clipPolygonCoords)) {
       return;
     }
     
-    // Try to create concave hull for smooth boundary
-    try {
-      const pointCollection = turf.featureCollection(points);
-      
-      let hull;
-      try {
-        hull = turf.concave(pointCollection, { maxEdge: 0.5, units: 'kilometers' });
-      } catch (concaveErr) {
-        hull = turf.convex(pointCollection);
-      }
-      
-      if (hull) {
-        const bufferedHull = turf.buffer(hull, 0.005, { units: 'kilometers', steps: 8 });
-        
-        if (bufferedHull) {
-          bufferedHull.properties = {
-            color: GRID_COLORS[classification],
-            classification: classification,
-            pointCount: points.length,
-          };
-          
-          if (clipPolygon) {
-            try {
-              const clipped = turf.intersect(turf.featureCollection([bufferedHull, clipPolygon]));
-              if (clipped) {
-                clipped.properties = bufferedHull.properties;
-                features.push(clipped);
-              } else {
-                features.push(bufferedHull);
-              }
-            } catch (e) {
-              features.push(bufferedHull);
-            }
-          } else {
-            features.push(bufferedHull);
-          }
-        }
-      }
-    } catch (hullErr) {
-      console.warn('Hull creation failed for', classification, ':', hullErr);
-      
-      // Fallback: create buffers around each point and union them
-      try {
-        const buffers = points.map(pt => 
-          turf.buffer(pt, 0.012, { units: 'kilometers', steps: 8 })
-        ).filter(Boolean);
-        
-        if (buffers.length > 0) {
-          let combined = buffers[0];
-          for (let i = 1; i < buffers.length; i++) {
-            try {
-              combined = turf.union(turf.featureCollection([combined, buffers[i]]));
-            } catch (e) {
-              buffers[i].properties = {
-                color: GRID_COLORS[classification],
-                classification: classification,
-              };
-              features.push(buffers[i]);
-            }
-          }
-          
-          if (combined) {
-            combined.properties = {
-              color: GRID_COLORS[classification],
-              classification: classification,
-              pointCount: points.length,
-            };
-            
-            if (clipPolygon) {
-              try {
-                const clipped = turf.intersect(turf.featureCollection([combined, clipPolygon]));
-                if (clipped) {
-                  clipped.properties = combined.properties;
-                  features.push(clipped);
-                } else {
-                  features.push(combined);
-                }
-              } catch (e) {
-                features.push(combined);
-              }
-            } else {
-              features.push(combined);
-            }
-          }
-        }
-      } catch (bufferErr) {
-        console.warn('Buffer union failed:', bufferErr);
-      }
-    }
-  });
-  
-  console.log('Final features count:', features.length);
-  
-  // Fallback to textured grid rendering if no features created
-  if (features.length === 0) {
-    console.log('Falling back to textured grid rendering');
+    // Create small square cell
+    const coords = [
+      [lng - halfWidth, lat - halfHeight],
+      [lng + halfWidth, lat - halfHeight],
+      [lng + halfWidth, lat + halfHeight],
+      [lng - halfWidth, lat + halfHeight],
+      [lng - halfWidth, lat - halfHeight], // Close polygon
+    ];
     
-    const cellWidth = (maxLng - minLng) / 50;
-    const cellHeight = (maxLat - minLat) / 50;
-    
-    validPoints.forEach(point => {
-      const classification = point.classification === 'no_data' ? 'normal' : point.classification;
-      
-      const cell = turf.polygon([[
-        [point.longitude - cellWidth/2, point.latitude - cellHeight/2],
-        [point.longitude + cellWidth/2, point.latitude - cellHeight/2],
-        [point.longitude + cellWidth/2, point.latitude + cellHeight/2],
-        [point.longitude - cellWidth/2, point.latitude + cellHeight/2],
-        [point.longitude - cellWidth/2, point.latitude - cellHeight/2],
-      ]]);
-      
-      cell.properties = {
+    const feature = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [coords],
+      },
+      properties: {
         value: point.predicted_value,
         color: GRID_COLORS[classification] || GRID_COLORS.normal,
         classification: classification,
-      };
-      
-      if (clipPolygon) {
-        try {
-          const clipped = turf.intersect(turf.featureCollection([cell, clipPolygon]));
-          if (clipped) {
-            clipped.properties = cell.properties;
-            features.push(clipped);
-          }
-        } catch (e) {
-          features.push(cell);
-        }
-      } else {
-        features.push(cell);
-      }
-    });
-  }
+      },
+    };
+    
+    features.push(feature);
+  });
+  
+  console.log('Final features count:', features.length);
   
   return features;
 };
@@ -435,7 +313,15 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
       }
     }
   } else {
-    // Normal interpolation with devices using IDW
+    // Normal interpolation with devices using IDW with influence radius
+    // Use direct radius without multiplier for smaller, more precise circles
+    const influenceRadius = DEFAULT_INFLUENCE_RADIUS_KM;
+    
+    console.log('=== IDW INTERPOLATION DEBUG ===');
+    console.log('Influence radius (km):', influenceRadius);
+    console.log('Influence radius (m):', influenceRadius * 1000);
+    console.log('Devices to use:', devicesToUse.length);
+    
     for (let i = 0; i < resolution; i++) {
       for (let j = 0; j < resolution; j++) {
         const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
@@ -446,32 +332,44 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
         }
         
         let value = 0;
-        let classification = 'no_data';
+        let classification = 'normal'; // Default to normal for areas outside influence
         let minDistToDevice = Infinity;
         
-        // IDW interpolation
+        // IDW interpolation with influence radius constraint
         let weightSum = 0;
         let valueSum = 0;
+        let isWithinInfluence = false;
         
         devicesToUse.forEach(device => {
           const dist = haversineDistance(lat, lng, device.lat, device.lng);
           if (dist < minDistToDevice) minDistToDevice = dist;
           
-          const nitrogenValue = typeof device.nitrogen === 'number' && !isNaN(device.nitrogen) 
-            ? device.nitrogen 
-            : 2.0;
-          
-          const weight = 1 / Math.max(dist * dist, 0.0000001);
-          weightSum += weight;
-          valueSum += weight * nitrogenValue;
+          // Only consider devices within influence radius
+          if (dist <= influenceRadius) {
+            isWithinInfluence = true;
+            const nitrogenValue = typeof device.nitrogen === 'number' && !isNaN(device.nitrogen) 
+              ? device.nitrogen 
+              : 2.0;
+            
+            // Weight decreases with distance squared
+            const weight = 1 / Math.max(dist * dist, 0.0000001);
+            weightSum += weight;
+            valueSum += weight * nitrogenValue;
+          }
         });
         
-        if (weightSum > 0) {
+        if (isWithinInfluence && weightSum > 0) {
           value = valueSum / weightSum;
           classification = classifyNitrogenValue(value);
         } else {
-          value = 2.5;
+          // Outside influence radius - default to normal (orange #FF8C00)
+          value = 2.9; // Normal range value
           classification = 'normal';
+        }
+        
+        // Log first few points for debugging
+        if (gridPoints.length < 5) {
+          console.log(`Grid point ${gridPoints.length}: lat=${lat.toFixed(6)}, lng=${lng.toFixed(6)}, withinInfluence=${isWithinInfluence}, class=${classification}`);
         }
         
         gridPoints.push({
