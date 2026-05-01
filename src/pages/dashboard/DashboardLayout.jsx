@@ -8,7 +8,6 @@ import {
   Leaf,
   Cloud,
   Home,
-  Bell,
   Moon,
   Sun,
   Activity,
@@ -351,13 +350,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Alat</span>
-              </Button>
-
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <Bell className="w-4 h-4 lg:w-5 lg:h-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center">
-                  <span className="text-[8px] text-white font-bold">3</span>
-                </span>
               </Button>
 
               <Button

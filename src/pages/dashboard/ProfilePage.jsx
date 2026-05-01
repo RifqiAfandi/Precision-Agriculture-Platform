@@ -14,8 +14,6 @@ import {
   User,
   Mail,
   Key,
-  Shield,
-  Bell,
   Eye,
   EyeOff,
   CheckCircle,
@@ -30,12 +28,6 @@ export function ProfilePage({ user }) {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-  });
-  const [notifications, setNotifications] = useState({
-    emailAlerts: true,
-    smsAlerts: false,
-    pushNotifications: true,
-    weeklyReports: true,
   });
 
   const handlePasswordChange = (field) => (e) => {
@@ -72,10 +64,6 @@ export function ProfilePage({ user }) {
     });
   };
 
-  const toggleNotification = (key) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
-    toast.success("Pengaturan notifikasi diperbarui");
-  };
 
   if (!user) {
     return (
@@ -261,77 +249,6 @@ export function ProfilePage({ user }) {
           </CardContent>
         </Card>
       </div>
-      <Card className="glass-card">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center space-x-2 text-lg">
-            <Bell className="w-5 h-5 text-green-600" />
-            <span>Pengaturan Notifikasi</span>
-          </CardTitle>
-          <CardDescription className="text-sm">
-            Kelola preferensi pemberitahuan Anda
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid lg:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              {Object.entries({
-                emailAlerts: "Email Alert",
-                smsAlerts: "SMS Alert",
-                pushNotifications: "Push Notification",
-                weeklyReports: "Laporan Mingguan",
-              }).map(([key, label]) => (
-                <div
-                  key={key}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
-                >
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{label}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {key === "emailAlerts" && "Notifikasi melalui email"}
-                      {key === "smsAlerts" && "Notifikasi melalui SMS"}
-                      {key === "pushNotifications" && "Notifikasi push browser"}
-                      {key === "weeklyReports" && "Ringkasan mingguan data"}
-                    </p>
-                  </div>
-                  <Button
-                    variant={notifications[key] ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleNotification(key)}
-                    className="flex-shrink-0 min-w-[80px]"
-                  >
-                    {notifications[key] ? "Aktif" : "Nonaktif"}
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-5 rounded-lg border border-blue-200 dark:border-blue-800">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center space-x-2">
-                <Shield className="w-5 h-5" />
-                <span>Informasi Keamanan</span>
-              </h4>
-              <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <span>Password terakhir diubah: 15 Juli 2024</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <span>Login terakhir: 02 Agustus 2024, 14:35</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <span>Device aktif: Browser Desktop</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  <span className="font-medium">Status keamanan: Aman</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
