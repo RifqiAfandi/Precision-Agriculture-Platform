@@ -22,6 +22,10 @@ import {
   getClassificationColor 
 } from '@/services/dummyDataGenerator';
 
+const NITROGEN_ONLY_OPTIONS = CHART_DATA_OPTIONS.filter(
+  (option) => option.value === 'nitrogen'
+);
+
 /**
  * Selected Device Detail Card Component
  * Shows detailed information for a selected device
@@ -294,7 +298,7 @@ export function RealTimeMonitoring({ onDeviceSelect }) {
               </CardDescription>
             </div>
             <ChartToggle
-              options={CHART_DATA_OPTIONS}
+              options={NITROGEN_ONLY_OPTIONS}
               value={chartDataType}
               onChange={setChartDataType}
             />

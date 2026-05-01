@@ -15,7 +15,6 @@ import { KrigingMap } from "./components/KrigingMap";
 import {
   Leaf,
   BarChart3,
-  TrendingUp,
   AlertCircle,
 } from "lucide-react";
 import { REFRESH_INTERVALS } from "@/constants/config";
@@ -28,7 +27,7 @@ import {
 /**
  * Calculate and update statistics from device data
  * 
- * @param {Array<Object>} deviceData - Array of device objects with nitrogen and spad values
+ * @param {Array<Object>} deviceData - Array of device objects with nitrogen values
  * @param {Function} setStats - State setter function for stats
  * @returns {void}
  */
@@ -37,17 +36,13 @@ const updateStatsFromDevices = (deviceData, setStats) => {
     setStats({
       totalDevices: 0,
       avgNitrogen: '0',
-      avgSpad: '0',
       needsAttention: 0,
     });
     return;
   }
 
   const nitrogenValues = deviceData.map(d => d.nitrogen);
-  const spadValues = deviceData.map(d => d.spad);
-  
   const avgNitrogen = nitrogenValues.reduce((a, b) => a + b, 0) / nitrogenValues.length;
-  const avgSpad = spadValues.reduce((a, b) => a + b, 0) / spadValues.length;
   
   // Count devices that need attention (deficient nitrogen)
   const needsAttention = deviceData.filter(
@@ -57,7 +52,6 @@ const updateStatsFromDevices = (deviceData, setStats) => {
   setStats({
     totalDevices: deviceData.length,
     avgNitrogen: avgNitrogen.toFixed(3),
-    avgSpad: avgSpad.toFixed(2),
     needsAttention,
   });
 };
@@ -87,7 +81,6 @@ export function AgriinoDashboard() {
   const [stats, setStats] = useState({
     totalDevices: 0,
     avgNitrogen: '0',
-    avgSpad: '0',
     needsAttention: 0,
   });
   // Store devices for potential future use (e.g., passing to child components)
@@ -132,7 +125,7 @@ export function AgriinoDashboard() {
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
         <StatCard
           icon={Leaf}
           iconColor="text-green-600"
@@ -145,13 +138,6 @@ export function AgriinoDashboard() {
           iconColor="text-blue-600"
           label="Rata-rata Nitrogen"
           value={stats.avgNitrogen}
-        />
-
-        <StatCard
-          icon={TrendingUp}
-          iconColor="text-purple-600"
-          label="Rata-rata SPAD"
-          value={stats.avgSpad}
         />
 
         <StatCard
@@ -199,7 +185,7 @@ export function AgriinoDashboard() {
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span className="hidden sm:inline">Riwayat Data</span>
+            <span className="hidden sm:inline">Riwayat Monitoring</span>
             <span className="sm:hidden">Riwayat</span>
           </TabsTrigger>
         </TabsList>
@@ -228,7 +214,7 @@ export function AgriinoDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Riwayat Data - Weekly averages */}
+        {/* Riwayat Monitoring - Weekly averages */}
         <TabsContent value="history">
           <WeeklyHistoryTable />
         </TabsContent>

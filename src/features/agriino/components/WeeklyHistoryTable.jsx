@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Calendar, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Calendar, Download } from 'lucide-react';
 
 // Import shared dashboard components
 import {
@@ -19,16 +19,19 @@ import {
   getClassificationColor 
 } from '@/services/dummyDataGenerator';
 
+const NITROGEN_ONLY_OPTIONS = CHART_DATA_OPTIONS.filter(
+  (option) => option.value === 'nitrogen'
+);
+
 /**
  * Export data to CSV file
  * @param {Array} weeklyData - Array of weekly data to export
  */
 function exportToCSV(weeklyData) {
-  const headers = ['Tanggal', 'Rata-rata Nitrogen', 'Rata-rata SPAD', 'Klasifikasi', 'Jumlah Data'];
+  const headers = ['Tanggal', 'Rata-rata Nitrogen', 'Klasifikasi', 'Jumlah Data'];
   const rows = weeklyData.map(day => [
     day.date,
     day.avgNitrogen.toFixed(4),
-    day.avgSpad.toFixed(2),
     day.classification,
     day.readingsCount,
   ]);
@@ -57,7 +60,6 @@ function WeeklyDataTable({ weeklyData, selectedDay, onSelectDay }) {
           <tr className="border-b border-gray-200 dark:border-gray-700">
             <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Tanggal</th>
             <th className="text-right py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Rata-rata Nitrogen</th>
-            <th className="text-right py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Rata-rata SPAD</th>
             <th className="text-center py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Klasifikasi</th>
             <th className="text-right py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Jumlah Data</th>
           </tr>
@@ -77,7 +79,6 @@ function WeeklyDataTable({ weeklyData, selectedDay, onSelectDay }) {
                 <td className="py-3 px-4 text-right font-mono">
                   <span style={{ color }}>{day.avgNitrogen.toFixed(4)}</span>
                 </td>
-                <td className="py-3 px-4 text-right font-mono">{day.avgSpad.toFixed(2)}</td>
                 <td className="py-3 px-4 text-center">
                   <Badge
                     style={{ backgroundColor: color, color: 'white' }}
@@ -175,7 +176,6 @@ export function WeeklyHistoryTable() {
     return weeklyData.map(day => ({
       name: day.dateLabel,
       nitrogen: parseFloat(day.avgNitrogen.toFixed(3)),
-      spad: parseFloat(day.avgSpad.toFixed(2)),
       date: day.date,
     }));
   }, [weeklyData]);
@@ -191,7 +191,7 @@ export function WeeklyHistoryTable() {
         <div>
           <CardTitle className="flex items-center space-x-2">
             <Calendar className="w-5 h-5 text-green-600" />
-            <span>Riwayat Data Mingguan</span>
+            <span>Riwayat Monitoring Mingguan</span>
           </CardTitle>
           <CardDescription>
             Data rata-rata harian dari {weeklyData.length} hari terakhir (masing-masing 1440 data/hari)
@@ -216,7 +216,7 @@ export function WeeklyHistoryTable() {
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium">Tren Harian</h4>
               <ChartToggle
-                options={CHART_DATA_OPTIONS}
+                options={NITROGEN_ONLY_OPTIONS}
                 value={chartDataType}
                 onChange={setChartDataType}
               />
