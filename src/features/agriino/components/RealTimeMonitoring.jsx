@@ -7,9 +7,7 @@ import { REFRESH_INTERVALS } from '@/constants/config';
 
 // Import shared dashboard components
 import {
-  ConnectionStatus,
   StatsOverview,
-  ClassificationDistribution,
   DeviceGrid,
   ChartToggle,
   NitrogenLineChart,
@@ -159,7 +157,7 @@ function useRealTimeData() {
  * Updates every minute with new data
  */
 export function RealTimeMonitoring({ onDeviceSelect }) {
-  const { currentData, historicalData, isConnected, lastUpdate, refresh } = useRealTimeData();
+  const { currentData, historicalData } = useRealTimeData();
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [chartDataType, setChartDataType] = useState('nitrogen');
 
@@ -243,13 +241,6 @@ export function RealTimeMonitoring({ onDeviceSelect }) {
   ] : [];
 
   // Classification counts for distribution component
-  const classificationCounts = stats ? {
-    deficient: stats.deficientCount,
-    subnormal: stats.subnormalCount,
-    normal: stats.normalCount,
-    high: stats.highCount,
-  } : { deficient: 0, subnormal: 0, normal: 0, high: 0 };
-
   const handleDeviceClick = (device) => {
     setSelectedDeviceId(selectedDeviceId === device.device_id ? null : device.device_id);
     if (onDeviceSelect) {
@@ -263,19 +254,8 @@ export function RealTimeMonitoring({ onDeviceSelect }) {
 
   return (
     <div className="space-y-4">
-      {/* Connection Status Header */}
-      <ConnectionStatus
-        connected={isConnected}
-        deviceCount={currentData.length}
-        onRefresh={refresh}
-        lastUpdate={lastUpdate}
-      />
-
       {/* Stats Overview */}
       {stats && <StatsOverview items={statsItems} />}
-
-      {/* Classification Distribution */}
-      {stats && <ClassificationDistribution counts={classificationCounts} />}
 
       {/* Real-time Chart */}
       <Card>
