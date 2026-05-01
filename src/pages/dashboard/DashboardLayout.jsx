@@ -6,21 +6,15 @@ import {
   User,
   LogOut,
   Leaf,
-  Cloud,
-  Home,
   Moon,
   Sun,
   Activity,
   Calendar,
-  Plus,
-  Gauge,
   Menu,
   X,
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
-import { WelcomePage } from "./WelcomePage";
-import AddDeviceDialog from "@/features/devices/components/AddDeviceDialog";
-import { loadInstalledDevices, addDevice } from "@/features/devices/utils/devicesHelpers";
+import { loadInstalledDevices } from "@/features/devices/utils/devicesHelpers";
 
 // Lazy load feature dashboards for better performance
 const AgriinoDashboard = lazy(() => import("@/features/agriino/AgriinoDashboard").then(m => ({ default: m.AgriinoDashboard })));
@@ -40,10 +34,9 @@ const FeatureLoader = () => (
 );
 
 export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
-  const [currentPage, setCurrentPage] = useState("welcome");
+  const [currentPage, setCurrentPage] = useState("agriino");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showAddDevice, setShowAddDevice] = useState(false);
   const [installedDevices, setInstalledDevices] = useState([]);
 
   useEffect(() => {
@@ -62,25 +55,7 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
     };
   }, [sidebarOpen]);
 
-  const handleDeviceAdded = (deviceId) => {
-    const updatedDevices = addDevice(deviceId, installedDevices);
-    setInstalledDevices(updatedDevices);
-
-    if (deviceId === "greenhouse") {
-      setCurrentPage("greenhouse");
-    } else if (deviceId === "skyvera") {
-      setCurrentPage("skyvera");
-    }
-  };
-
   const menuItems = [
-    {
-      id: "welcome",
-      label: "Dashboard",
-      icon: Activity,
-      description: "Ringkasan monitoring",
-      always: true,
-    },
     {
       id: "agriino",
       label: "Agriino",
@@ -125,14 +100,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const renderContent = () => {
     const content = (() => {
       switch (currentPage) {
-        case "welcome":
-          return (
-            <WelcomePage
-              user={user}
-              onNavigate={setCurrentPage}
-              installedDevices={installedDevices}
-            />
-          );
         case "agriino":
           return <AgriinoDashboard />;
         case "agriimeter":
@@ -144,21 +111,11 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
         case "profile":
           return <ProfilePage user={user} />;
         default:
-          return (
-            <WelcomePage
-              user={user}
-              onNavigate={setCurrentPage}
-              installedDevices={installedDevices}
-            />
-          );
+          return <AgriinoDashboard />;
       }
     })();
 
-    // Wrap lazy-loaded components with Suspense
-    if (currentPage !== "welcome") {
-      return <Suspense fallback={<FeatureLoader />}>{content}</Suspense>;
-    }
-    return content;
+    return <Suspense fallback={<FeatureLoader />}>{content}</Suspense>;
   };
 
   return (
@@ -248,19 +205,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
               </button>
             ))}
 
-            <button
-              onClick={() => {
-                setShowAddDevice(true);
-                setSidebarOpen(false);
-              }}
-              className={`w-full lg:hidden flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-left group border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 hover:text-green-700`}
-            >
-              <Plus className="w-5 h-5 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <span className="font-medium text-sm">Tambah Alat</span>
-                <p className="text-xs text-gray-500">Pasang perangkat baru</p>
-              </div>
-            </button>
           </div>
         </nav>
 
@@ -343,16 +287,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
 
             <div className="flex items-center space-x-2 lg:space-x-3">
               <Button
-                onClick={() => setShowAddDevice(true)}
-                variant="outline"
-                size="sm"
-                className="hidden lg:flex items-center space-x-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-slate-700"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Alat</span>
-              </Button>
-
-              <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleDarkMode}
@@ -386,12 +320,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">{renderContent()}</main>
       </div>
-
-      <AddDeviceDialog
-        open={showAddDevice}
-        onOpenChange={setShowAddDevice}
-        onDeviceAdded={handleDeviceAdded}
-      />
     </div>
   );
 }
