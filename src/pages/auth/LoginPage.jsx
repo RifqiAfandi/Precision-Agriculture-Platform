@@ -55,17 +55,11 @@ export function LoginPage({ onNavigate, onLogin }) {
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Masuk ke Akun Anda
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Akses dashboard monitoring IoT pertanian
-          </p>
         </div>
 
         <Card className="glass-card">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Masuk</CardTitle>
+            <CardTitle className="text-xl">Login</CardTitle>
             <CardDescription>
               Masukkan email dan password untuk mengakses dashboard
             </CardDescription>
@@ -116,17 +110,9 @@ export function LoginPage({ onNavigate, onLogin }) {
                 className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 disabled={isLoading}
               >
-                {isLoading ? "Memproses..." : "Masuk"}
+                {isLoading ? "Memproses..." : "Login"}
               </Button>
             </form>
-
-            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-800 dark:text-blue-300">
-              <p className="font-medium mb-1">Info:</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                Silakan login dengan email dan password yang telah terdaftar di database
-              </p>
-            </div>
-
             <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Belum punya akun?{" "}
@@ -134,7 +120,7 @@ export function LoginPage({ onNavigate, onLogin }) {
                   onClick={() => onNavigate("register")}
                   className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 font-medium"
                 >
-                  Daftar sekarang
+                  Registrasi Akun
                 </button>
               </p>
             </div>
@@ -148,7 +134,7 @@ export function LoginPage({ onNavigate, onLogin }) {
             className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Beranda
+            Kembali ke Halaman Utama
           </Button>
         </div>
       </div>

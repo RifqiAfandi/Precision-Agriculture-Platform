@@ -92,16 +92,10 @@ export function RegisterPage({ onNavigate, onLogin }) {
           <div className="flex justify-center mb-6">
             <Logo size="xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Daftar Akun Baru
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Bergabung dengan platform IoT pertanian terdepan
-          </p>
         </div>
         <Card className="glass-card">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Buat Akun</CardTitle>
+            <CardTitle className="text-xl">Registrasi Akun</CardTitle>
             <CardDescription>
               Isi informasi di bawah untuk membuat akun baru
             </CardDescription>
@@ -206,7 +200,7 @@ export function RegisterPage({ onNavigate, onLogin }) {
                 className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 disabled={isLoading}
               >
-                {isLoading ? "Memproses..." : "Daftar Sekarang"}
+                {isLoading ? "Memproses..." : "Registrasi Akun"}
               </Button>
             </form>
 
@@ -217,18 +211,8 @@ export function RegisterPage({ onNavigate, onLogin }) {
                   onClick={() => onNavigate("login")}
                   className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-500 font-medium"
                 >
-                  Masuk di sini
+                  Login
                 </button>
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Dengan mendaftar, Anda menyetujui{" "}
-                <span className="text-green-600 dark:text-green-400 underline cursor-pointer">
-                  Syarat & Ketentuan
-                </span>{" "}
-                dan{" "}
-                <span className="text-green-600 dark:text-green-400 underline cursor-pointer">
-                  Kebijakan Privasi
-                </span>
               </p>
             </div>
           </CardContent>
@@ -240,7 +224,7 @@ export function RegisterPage({ onNavigate, onLogin }) {
             className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Beranda
+            Kembali ke Halaman Utama
           </Button>
         </div>
       </div>

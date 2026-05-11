@@ -94,13 +94,13 @@ export function LandingPage({ onNavigate }) {
               variant="ghost"
               onClick={() => onNavigate("login")}
             >
-              Masuk
+              Login
             </Button>
             <Button
               className="px-5 py-4 text-md bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
               onClick={() => onNavigate("register")}
             >
-              Daftar
+              Register
             </Button>
           </div>
         </div>
