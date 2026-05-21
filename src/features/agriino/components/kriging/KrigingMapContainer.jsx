@@ -72,7 +72,7 @@ function HeaderControls({
         className={isDrawing ? 'bg-orange-500 hover:bg-orange-600' : ''}
       >
         <Square className="w-4 h-4 mr-1" />
-        {isDrawing ? 'Selesai Gambar' : 'Pilih Area'}
+        {isDrawing ? 'Selesai Memilih Area' : 'Pilih Area'}
       </Button>
       {selectedArea && (
         <Button variant="outline" size="sm" onClick={onClearPolygon}>

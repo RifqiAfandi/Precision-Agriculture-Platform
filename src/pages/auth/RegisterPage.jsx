@@ -21,7 +21,7 @@ import {
 import { Logo } from "@/components/common/Logo";
 import { useAuth } from "@/contexts/AuthContext";
 
-export function RegisterPage({ onNavigate, onLogin }) {
+export function RegisterPage({ onNavigate }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,14 +39,16 @@ export function RegisterPage({ onNavigate, onLogin }) {
     setIsLoading(true);
 
     // Validation
-    if (!formData.name || !formData.email || !formData.password) {
-      setError("Nama, email, dan password harus diisi");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Password dan konfirmasi password tidak cocok");
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.company ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError(
+        "Nama, email, perusahaan, password, dan konfirmasi password harus diisi"
+      );
       setIsLoading(false);
       return;
     }
@@ -57,11 +59,17 @@ export function RegisterPage({ onNavigate, onLogin }) {
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Password dan konfirmasi password tidak cocok");
+      setIsLoading(false);
+      return;
+    }
+
     // Prepare data
     const userData = {
       email: formData.email,
       name: formData.name,
-      company: formData.company || undefined,
+      company: formData.company,
       password: formData.password,
       confirm_password: formData.confirmPassword,
     };
@@ -70,12 +78,12 @@ export function RegisterPage({ onNavigate, onLogin }) {
       const result = await register(userData);
       
       if (result.success) {
-        onLogin(result.user);
-      } else {
+        onNavigate("login");
+      } else if (result.error) {
         setError(result.error);
       }
     } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga");
+      setError("");
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +143,7 @@ export function RegisterPage({ onNavigate, onLogin }) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">Nama Perusahaan (Opsional)</Label>
+                <Label htmlFor="company">Nama Perusahaan</Label>
                 <div className="relative">
                   <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input

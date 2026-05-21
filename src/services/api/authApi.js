@@ -27,9 +27,6 @@ export const authApi = {
       skipAuth: true,
     });
 
-    apiClient.setTokens(data.tokens.access, data.tokens.refresh);
-    apiClient.setStoredUser(data.user);
-
     return data;
   },
 

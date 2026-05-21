@@ -17,6 +17,24 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const getRegisterErrorMessage = (error) => {
+    const emailError = error.data?.email?.[0] || error.data?.email;
+    if (emailError) {
+      return 'Email sudah terdaftar';
+    }
+
+    const passwordError = error.data?.password?.[0] || error.data?.password;
+    if (passwordError) {
+      const normalizedMessage = String(passwordError).toLowerCase();
+      if (normalizedMessage.includes('konfirmasi')) {
+        return 'Password dan konfirmasi password tidak cocok';
+      }
+      return 'Password minimal 6 karakter';
+    }
+
+    return null;
+  };
+
   // Check auth on mount
   useEffect(() => {
     const checkAuth = async () => {
@@ -74,17 +92,13 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     try {
       const response = await apiService.register(formData);
-      setUser(response.user);
-      setIsAuthenticated(true);
-      toast.success('Registrasi berhasil!');
+      toast.success('Registrasi berhasil! Silakan login.');
       return { success: true, user: response.user };
     } catch (error) {
-      const errorMessage = 
-        error.data?.email?.[0] || 
-        error.data?.password?.[0] || 
-        error.data?.error ||
-        'Terjadi kesalahan saat registrasi';
-      toast.error(errorMessage);
+      const errorMessage = getRegisterErrorMessage(error);
+      if (errorMessage) {
+        toast.error(errorMessage);
+      }
       return { success: false, error: errorMessage };
     }
   };
