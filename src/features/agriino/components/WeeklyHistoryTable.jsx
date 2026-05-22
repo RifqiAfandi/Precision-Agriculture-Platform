@@ -239,11 +239,6 @@ export function WeeklyHistoryTable() {
 
         {/* Selected Day Details */}
         <SelectedDayDetails dayData={selectedDayData} />
-
-        {/* Legend */}
-        <div className="border-t dark:border-gray-700 pt-4">
-          <NitrogenLegend showRanges={true} />
-        </div>
       </CardContent>
     </Card>
   );
