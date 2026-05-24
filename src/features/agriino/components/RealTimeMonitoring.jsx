@@ -14,97 +14,15 @@ import {
   CHART_DATA_OPTIONS,
 } from '@/components/common/dashboard';
 
-import { 
-  realTimeDataStore, 
-  classifyNitrogen, 
-  getClassificationColor 
+import {
+  realTimeDataStore,
+  classifyNitrogen,
 } from '@/services/dummyDataGenerator';
 
 const NITROGEN_ONLY_OPTIONS = CHART_DATA_OPTIONS.filter(
   (option) => option.value === 'nitrogen'
 );
 
-/**
- * Selected Device Detail Card Component
- * Shows detailed information for a selected device
- */
-function SelectedDeviceDetail({ device }) {
-  if (!device) return null;
-
-  const classification = classifyNitrogen(device.nitrogen);
-  const color = getClassificationColor(classification);
-
-  return (
-    <Card className="border-blue-200 dark:border-blue-800">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          Detail Device: {device.device_id}
-          <Badge style={{ backgroundColor: color, color: 'white' }}>
-            {classification}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Lokasi</p>
-            <p className="text-sm font-medium">
-              {device.lat?.toFixed(6)}, {device.lng?.toFixed(6)}
-            </p>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Nitrogen</p>
-            <p className="text-lg font-bold text-green-600">
-              {device.nitrogen?.toFixed(4)}
-            </p>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">SPAD</p>
-            <p className="text-lg font-bold text-purple-600">
-              {device.spad?.toFixed(2)}
-            </p>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Class</p>
-            <p className="text-lg font-bold text-blue-600">
-              {device.class_eq1}
-            </p>
-          </div>
-        </div>
-        {device.R !== undefined && (
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
-            <div className="bg-red-50 dark:bg-red-900/30 rounded p-2">
-              <p className="font-medium text-red-500">R</p>
-              <p>{device.R?.toFixed(1)}</p>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900/30 rounded p-2">
-              <p className="font-medium text-green-500">G</p>
-              <p>{device.G?.toFixed(1)}</p>
-            </div>
-            <div className="bg-blue-50 dark:bg-blue-900/30 rounded p-2">
-              <p className="font-medium text-blue-500">B</p>
-              <p>{device.B?.toFixed(1)}</p>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-SelectedDeviceDetail.propTypes = {
-  device: PropTypes.shape({
-    device_id: PropTypes.string,
-    nitrogen: PropTypes.number,
-    spad: PropTypes.number,
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-    class_eq1: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    R: PropTypes.number,
-    G: PropTypes.number,
-    B: PropTypes.number,
-  }),
-};
 
 /**
  * Custom hook for real-time monitoring data
@@ -295,9 +213,8 @@ export function RealTimeMonitoring({ onDeviceSelect }) {
 
       {/* Device List */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <CardTitle className="text-base">Daftar Device</CardTitle>
-          <CardDescription>Klik untuk melihat data spesifik device</CardDescription>
         </CardHeader>
         <CardContent>
           <DeviceGrid
@@ -309,8 +226,6 @@ export function RealTimeMonitoring({ onDeviceSelect }) {
         </CardContent>
       </Card>
 
-      {/* Selected Device Details */}
-      <SelectedDeviceDetail device={selectedDevice} />
     </div>
   );
 }
