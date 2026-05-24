@@ -18,15 +18,12 @@ import {
   MapPin,
   Play,
   Loader2,
-  RefreshCw,
   Square,
   Trash2,
 } from 'lucide-react';
 
 // Import extracted components
 import { DeviceDetailsPanel, AnalysisResultsPanel } from './panels';
-import { MapLegend } from './MapLegend';
-import { DeviceListCard } from './DeviceListCard';
 import { useKrigingMap } from './hooks/useKrigingMap';
 
 /**
@@ -53,63 +50,67 @@ DrawingInstructions.propTypes = {
  * Header Controls Component
  */
 function HeaderControls({
+  hasAnalysis,
+  hasSelectedArea,
   isDrawing,
-  selectedArea,
-  isLoading,
   isAnalyzing,
-  devicesCount,
   onToggleDrawing,
   onClearPolygon,
-  onRefresh,
   onAnalysis,
 }) {
+  const isProcessing = isAnalyzing;
+  let label = 'Pilih Area';
+  let Icon = Square;
+  let onClick = onToggleDrawing;
+  let variant = 'outline';
+  let className = '';
+
+  if (hasAnalysis) {
+    label = 'Hapus Area';
+    Icon = Trash2;
+    onClick = onClearPolygon;
+    variant = 'outline';
+  } else if (isDrawing) {
+    label = 'Selesai Memilih Area';
+    Icon = Square;
+    onClick = onToggleDrawing;
+    variant = 'default';
+    className = 'bg-orange-500 hover:bg-orange-600';
+  } else if (hasSelectedArea) {
+    label = 'Mulai Analisis';
+    Icon = Play;
+    onClick = onAnalysis;
+    variant = 'default';
+    className = 'bg-green-600 hover:bg-green-700';
+  }
+
   return (
     <div className="flex items-center gap-2">
       <Button
-        variant={isDrawing ? 'default' : 'outline'}
+        variant={variant}
         size="sm"
-        onClick={onToggleDrawing}
-        className={isDrawing ? 'bg-orange-500 hover:bg-orange-600' : ''}
+        onClick={onClick}
+        disabled={isProcessing}
+        className={className}
       >
-        <Square className="w-4 h-4 mr-1" />
-        {isDrawing ? 'Selesai Memilih Area' : 'Pilih Area'}
-      </Button>
-      {selectedArea && (
-        <Button variant="outline" size="sm" onClick={onClearPolygon}>
-          <Trash2 className="w-4 h-4 mr-1" />
-          Hapus Area
-        </Button>
-      )}
-      <Button variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
-        <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-        Refresh
-      </Button>
-      <Button
-        size="sm"
-        onClick={onAnalysis}
-        disabled={isAnalyzing || devicesCount < 1}
-        className="bg-green-600 hover:bg-green-700"
-      >
-        {isAnalyzing ? (
+        {isProcessing ? (
           <Loader2 className="w-4 h-4 mr-1 animate-spin" />
         ) : (
-          <Play className="w-4 h-4 mr-1" />
+          <Icon className="w-4 h-4 mr-1" />
         )}
-        Mulai Analisis
+        {isProcessing ? 'Memproses...' : label}
       </Button>
     </div>
   );
 }
 
 HeaderControls.propTypes = {
+  hasAnalysis: PropTypes.bool,
+  hasSelectedArea: PropTypes.bool,
   isDrawing: PropTypes.bool,
-  selectedArea: PropTypes.array,
-  isLoading: PropTypes.bool,
   isAnalyzing: PropTypes.bool,
-  devicesCount: PropTypes.number,
   onToggleDrawing: PropTypes.func,
   onClearPolygon: PropTypes.func,
-  onRefresh: PropTypes.func,
   onAnalysis: PropTypes.func,
 };
 
@@ -124,7 +125,6 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
     // State
     devices,
     selectedDevice,
-    isLoading,
     isAnalyzing,
     analysisResult,
     showGrid,
@@ -137,35 +137,34 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
     setActiveTab,
     
     // Handlers
-    handleRefresh,
     handleToggleDrawing,
     handleClearPolygon,
     handleAnalysis,
     handleToggleGrid,
   } = useKrigingMap({ areaId, areaName, propDevices, onRefresh });
+  const hasAnalysis = !!analysisResult;
+  const hasSelectedArea = Array.isArray(selectedArea) && selectedArea.length >= 3;
 
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-5">
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <MapPin className="w-5 h-5 text-green-600 dark:text-green-400" />
             Peta Analisis Kriging
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {devices.length} device terdeteksi | MapTiler Satellite
+            {devices.length} device terdeteksi
           </p>
         </div>
         <HeaderControls
+          hasAnalysis={hasAnalysis}
+          hasSelectedArea={hasSelectedArea}
           isDrawing={isDrawing}
-          selectedArea={selectedArea}
-          isLoading={isLoading}
           isAnalyzing={isAnalyzing}
-          devicesCount={devices.length}
           onToggleDrawing={handleToggleDrawing}
           onClearPolygon={handleClearPolygon}
-          onRefresh={handleRefresh}
           onAnalysis={handleAnalysis}
         />
       </div>
@@ -198,7 +197,6 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
               className="w-full h-96 rounded-lg border-2 border-gray-200 dark:border-slate-700"
               style={{ minHeight: '400px' }}
             />
-            <MapLegend className="mt-3" />
           </CardContent>
         </Card>
 
@@ -222,12 +220,6 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
         </Card>
       </div>
 
-      {/* Device List */}
-      <DeviceListCard
-        devices={devices}
-        selectedDevice={selectedDevice}
-        onDeviceSelect={setSelectedDevice}
-      />
     </div>
   );
 }

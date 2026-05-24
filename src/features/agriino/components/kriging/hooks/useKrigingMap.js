@@ -258,12 +258,14 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
       clearDrawPolygon(map.current);
       isDrawingRef.current = true;
       setIsDrawing(true);
-      toast.info('Klik pada peta untuk menggambar area analisis. Klik "Selesai Gambar" untuk menyimpan.');
+      toast.info('Klik pada peta untuk menggambar area analisis. Klik "Selesai Memilih Area" untuk menyimpan.');
     }
   }, [isDrawing]);
 
   // Clear polygon (explicit user action to delete saved area)
   const handleClearPolygon = useCallback(() => {
+    const confirmed = window.confirm('Hapus area yang dipilih? Tindakan ini akan menghapus area dan hasil analisis.');
+    if (!confirmed) return;
     drawPointsRef.current = [];
     setSelectedArea(null); // This will trigger useEffect to clear localStorage
     setAnalysisResult(null);
@@ -277,7 +279,12 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
   // Perform Kriging analysis
   const handleAnalysis = useCallback(async () => {
     console.log('=== HANDLE ANALYSIS START ===');
-    
+
+    if (!selectedArea || selectedArea.length < 3) {
+      toast.error('Minimal area terpilih 3');
+      return;
+    }
+
     if (devices.length < 1) {
       toast.error('Minimal 1 device diperlukan untuk analisis');
       return;

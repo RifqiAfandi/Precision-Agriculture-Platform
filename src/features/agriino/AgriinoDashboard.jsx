@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Loader2, Target, Activity, Calendar } from "lucide-react";
@@ -198,16 +195,6 @@ export function AgriinoDashboard() {
         {/* Analisis Kriging */}
         <TabsContent value="kriging">
           <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
-                <Target className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
-                <span>Analisis Kriging Nitrogen</span>
-              </CardTitle>
-              <CardDescription className="text-xs md:text-sm">
-                Interpolasi spasial untuk analisis nitrogen pada area pertanian.
-                Pilih area di peta satelit untuk melakukan analisis Kriging.
-              </CardDescription>
-            </CardHeader>
             <CardContent>
               <KrigingMap />
             </CardContent>
