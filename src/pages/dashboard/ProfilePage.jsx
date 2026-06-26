@@ -16,7 +16,6 @@ import {
   Key,
   Eye,
   EyeOff,
-  CheckCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -89,10 +88,6 @@ export function ProfilePage({ user }) {
                 <span className="text-sm sm:text-base">{user.email}</span>
               </p>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-4">
-                <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Akun Terverifikasi
-                </Badge>
                 <Badge variant="outline" className="px-3 py-1">Member sejak Januari 2024</Badge>
               </div>
             </div>
@@ -129,20 +124,7 @@ export function ProfilePage({ user }) {
                 className="bg-gray-50 dark:bg-slate-700 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="userId" className="text-sm font-medium">User ID</Label>
-              <Input
-                id="userId"
-                value={user.id}
-                disabled
-                className="bg-gray-50 dark:bg-slate-700 text-sm"
-              />
-            </div>
-            <div className="pt-2 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-              <p className="text-xs text-blue-800 dark:text-blue-300">
-                Untuk mengubah informasi akun, hubungi administrator sistem.
-              </p>
-            </div>
+
           </CardContent>
         </Card>
         
