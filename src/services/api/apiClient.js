@@ -53,11 +53,41 @@ class ApiClient {
   }
 
   /**
+   * Check if a JWT token is expired
+   * @param {string} token - JWT token string
+   * @returns {boolean} True if expired or invalid
+   */
+  isTokenExpired(token) {
+    if (!token) return true;
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return true;
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (!payload.exp) return false;
+      const now = Math.floor(Date.now() / 1000);
+      return payload.exp < now;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
    * Check if user is authenticated
    * @returns {boolean} Authentication status
    */
   isAuthenticated() {
-    return !!this.getAccessToken();
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+    
+    if (!accessToken || !refreshToken) return false;
+    
+    // Pre-emptively clear tokens if the refresh token is expired
+    if (this.isTokenExpired(refreshToken)) {
+      this.clearTokens();
+      return false;
+    }
+    
+    return true;
   }
 
   /**
@@ -139,6 +169,12 @@ class ApiClient {
   async refreshAccessToken() {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) return false;
+
+    // Check if the refresh token itself is expired before calling API
+    if (this.isTokenExpired(refreshToken)) {
+      this.clearTokens();
+      return false;
+    }
 
     try {
       const response = await fetch(`${this.baseURL}/token/refresh/`, {
