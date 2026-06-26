@@ -123,7 +123,7 @@ export function useKrigingAnalysis(options = {}) {
     } finally {
       setLoading(false);
     }
-  }, [gridResolution, variogramModel, thresholds]);
+  }, [gridResolution, variogramModel, thresholds, influenceRadius]);
 
   /**
    * Perform quick Kriging analysis with simplified format

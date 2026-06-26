@@ -30,7 +30,7 @@ function AppContent() {
     } else if (!isAuthenticated && currentPage === "dashboard") {
       setCurrentPage("landing");
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, currentPage]);
 
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("agri-dark-mode");

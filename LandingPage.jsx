@@ -269,9 +269,6 @@ export function LandingPage({ onNavigate }) {
               <h4 className="font-semibold mb-4 text-base sm:text-lg">Produk</h4>
               <ul className="space-y-3 text-sm sm:text-base text-gray-400">
                 <li className="hover:text-white transition-colors cursor-pointer">Agriino</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Agriimeter</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Greenhouse Compax</li>
-                <li className="hover:text-white transition-colors cursor-pointer">SkyVera</li>
               </ul>
             </div>
 

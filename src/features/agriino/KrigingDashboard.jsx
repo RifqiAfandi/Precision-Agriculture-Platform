@@ -175,7 +175,6 @@ export function KrigingDashboard() {
   const {
     result: analysisResult,
     loading: _analysisLoading,
-    analyze,
     statistics: analysisStats,
   } = useKrigingAnalysis({
     gridResolution: 50,
@@ -191,36 +190,16 @@ export function KrigingDashboard() {
   });
 
   /**
-   * Handle Kriging analysis execution
-   * Validates device count and triggers analysis
-   * Reserved for manual analysis trigger button
-   * @returns {Promise<void>}
-   */
-  const _handleAnalyze = async () => {
-    if (devices.length < 1) {
-      toast.error('Minimal 1 device diperlukan untuk analisis');
-      return;
-    }
-
-    try {
-      await analyze(devices);
-      toast.success('Analisis Kriging berhasil!');
-    } catch (_error) {
-      toast.error(`Analisis gagal: ${_error.message}`);
-    }
-  };
-
-  /**
    * Handle selection of historical analysis result
    * @param {number} analysisId - ID of the analysis to load
    * @returns {Promise<void>}
    */
   const handleSelectAnalysis = async (analysisId) => {
     try {
-      const _result = await api.getAnalysisResult(analysisId);
+      await api.getAnalysisResult(analysisId);
       toast.info(`Memuat hasil analisis #${analysisId}`);
       // Could update state to show this result
-    } catch (_error) {
+    } catch {
       toast.error('Gagal memuat hasil analisis');
     }
   };

@@ -83,7 +83,7 @@ export function RegisterPage({ onNavigate }) {
         setError(result.error);
       }
     } catch (err) {
-      setError("");
+      setError(err?.message || "Terjadi kesalahan saat pendaftaran");
     } finally {
       setIsLoading(false);
     }

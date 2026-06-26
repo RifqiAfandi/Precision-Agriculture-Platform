@@ -51,7 +51,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   }, [classifyNitrogen]);
 
   // Fallback to dummy data
-  const useDummyData = useCallback(() => {
+  const loadDummyData = useCallback(() => {
     console.log('Using dummy data for devices');
     realTimeDataStore.start(REFRESH_INTERVALS.SLOW);
     const data = realTimeDataStore.getCurrentData();
@@ -87,7 +87,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
                 setConnected(true);
               } else {
                 // No data from Firebase, use dummy data
-                useDummyData();
+                loadDummyData();
               }
               setLoading(false);
             }
@@ -100,7 +100,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
               setDevices(processDevices(data));
               setConnected(true);
             } else {
-              useDummyData();
+              loadDummyData();
             }
             setLoading(false);
           }
@@ -110,7 +110,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
         if (isMounted) {
           setError(err.message || 'Failed to connect to Firebase');
           // Fallback to dummy data on error
-          useDummyData();
+          loadDummyData();
         }
       }
     };
@@ -126,7 +126,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
         dummyUnsubscribeRef.current();
       }
     };
-  }, [path, realtime, processDevices, useDummyData]);
+  }, [path, realtime, processDevices, loadDummyData]);
 
   // Manual refresh
   const refresh = useCallback(async () => {

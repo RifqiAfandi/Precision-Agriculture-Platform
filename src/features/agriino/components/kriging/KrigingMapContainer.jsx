@@ -20,6 +20,7 @@ import {
   Loader2,
   Square,
   Trash2,
+  X,
 } from 'lucide-react';
 
 // Import extracted components
@@ -55,6 +56,7 @@ function HeaderControls({
   isDrawing,
   isAnalyzing,
   onToggleDrawing,
+  onCancelDrawing,
   onClearPolygon,
   onAnalysis,
 }) {
@@ -86,6 +88,17 @@ function HeaderControls({
 
   return (
     <div className="flex items-center gap-2">
+      {isDrawing && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onCancelDrawing}
+          disabled={isProcessing}
+        >
+          <X className="w-4 h-4 mr-1" />
+          Batal
+        </Button>
+      )}
       <Button
         variant={variant}
         size="sm"
@@ -110,6 +123,7 @@ HeaderControls.propTypes = {
   isDrawing: PropTypes.bool,
   isAnalyzing: PropTypes.bool,
   onToggleDrawing: PropTypes.func,
+  onCancelDrawing: PropTypes.func,
   onClearPolygon: PropTypes.func,
   onAnalysis: PropTypes.func,
 };
@@ -133,11 +147,11 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
     selectedArea,
     
     // Setters
-    setSelectedDevice,
     setActiveTab,
     
     // Handlers
     handleToggleDrawing,
+    handleCancelDrawing,
     handleClearPolygon,
     handleAnalysis,
     handleToggleGrid,
@@ -164,6 +178,7 @@ export function KrigingMapContainer({ areaId, areaName, devices: propDevices, on
           isDrawing={isDrawing}
           isAnalyzing={isAnalyzing}
           onToggleDrawing={handleToggleDrawing}
+          onCancelDrawing={handleCancelDrawing}
           onClearPolygon={handleClearPolygon}
           onAnalysis={handleAnalysis}
         />

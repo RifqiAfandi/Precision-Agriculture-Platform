@@ -92,11 +92,23 @@ export function HistoryTable({ plants }) {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                  <XAxis dataKey="date" fontSize={11} />
+                  <YAxis
+                    yAxisId="left"
+                    fontSize={11}
+                    domain={[(dataMin) => Math.max(0, Math.floor(dataMin - 5)), (dataMax) => Math.ceil(dataMax + 5)]}
+                    allowDataOverflow={true}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    fontSize={11}
+                    domain={[(dataMin) => Math.max(0, parseFloat((dataMin - 0.2).toFixed(2))), (dataMax) => parseFloat((dataMax + 0.2).toFixed(2))]}
+                    allowDataOverflow={true}
+                  />
                   <Tooltip />
-                  <Bar dataKey="chlorophyll" fill="#22c55e" name="Klorofil" />
-                  <Bar dataKey="nitrogen" fill="#3b82f6" name="Nitrogen" />
+                  <Bar yAxisId="left" dataKey="chlorophyll" fill="#22c55e" name="Klorofil" radius={[4, 4, 0, 0]} />
+                  <Bar yAxisId="right" dataKey="nitrogen" fill="#3b82f6" name="Nitrogen" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

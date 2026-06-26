@@ -73,22 +73,38 @@ export function PlantDetailPanel({ plant }) {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={history}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
+                <XAxis dataKey="date" fontSize={11} />
+                <YAxis
+                  yAxisId="left"
+                  fontSize={11}
+                  domain={[(dataMin) => Math.max(0, Math.floor(dataMin - 5)), (dataMax) => Math.ceil(dataMax + 5)]}
+                  allowDataOverflow={true}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  fontSize={11}
+                  domain={[(dataMin) => Math.max(0, parseFloat((dataMin - 0.2).toFixed(2))), (dataMax) => parseFloat((dataMax + 0.2).toFixed(2))]}
+                  allowDataOverflow={true}
+                />
                 <Tooltip />
                 <Line
+                  yAxisId="left"
                   type="monotone"
                   dataKey="chlorophyll"
                   stroke="#22c55e"
                   strokeWidth={2}
                   name="Klorofil"
+                  dot={false}
                 />
                 <Line
+                  yAxisId="right"
                   type="monotone"
                   dataKey="nitrogen"
                   stroke="#3b82f6"
                   strokeWidth={2}
                   name="Nitrogen"
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>

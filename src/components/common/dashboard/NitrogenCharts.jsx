@@ -64,7 +64,12 @@ export function NitrogenLineChart({
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="dark:stroke-gray-700" />
             <XAxis dataKey={xAxisKey} fontSize={12} className="dark:fill-gray-400" />
-            <YAxis fontSize={12} className="dark:fill-gray-400" />
+            <YAxis
+              fontSize={12}
+              className="dark:fill-gray-400"
+              domain={dataKey === 'nitrogen' ? [(dataMin) => Math.max(0, parseFloat((dataMin - 0.2).toFixed(2))), (dataMax) => parseFloat((dataMax + 0.2).toFixed(2))] : [(dataMin) => Math.max(0, Math.floor(dataMin - 5)), (dataMax) => Math.ceil(dataMax + 5)]}
+              allowDataOverflow={true}
+            />
             <Tooltip
               contentStyle={DEFAULT_TOOLTIP_STYLE}
               formatter={(value) => [value, label]}
@@ -128,7 +133,12 @@ export function NitrogenBarChart({
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="dark:stroke-gray-700" />
             <XAxis dataKey={xAxisKey} fontSize={12} className="dark:fill-gray-400" />
-            <YAxis fontSize={12} className="dark:fill-gray-400" />
+            <YAxis
+              fontSize={12}
+              className="dark:fill-gray-400"
+              domain={dataKey === 'nitrogen' ? [(dataMin) => Math.max(0, parseFloat((dataMin - 0.2).toFixed(2))), (dataMax) => parseFloat((dataMax + 0.2).toFixed(2))] : [(dataMin) => Math.max(0, Math.floor(dataMin - 5)), (dataMax) => Math.ceil(dataMax + 5)]}
+              allowDataOverflow={true}
+            />
             <Tooltip
               contentStyle={DEFAULT_TOOLTIP_STYLE}
               formatter={(value) => [value, label]}

@@ -14,13 +14,9 @@ import {
   X,
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
-import { loadInstalledDevices } from "@/features/devices/utils/devicesHelpers";
 
 // Lazy load feature dashboards for better performance
 const AgriinoDashboard = lazy(() => import("@/features/agriino/AgriinoDashboard").then(m => ({ default: m.AgriinoDashboard })));
-const AgriimeterDashboard = lazy(() => import("@/features/agriimeter/AgriimeterDashboard").then(m => ({ default: m.AgriimeterDashboard })));
-const GreenhouseDashboard = lazy(() => import("@/features/greenhouse/GreenhouseDashboard").then(m => ({ default: m.GreenhouseDashboard })));
-const SkyVeraDashboard = lazy(() => import("@/features/skyvera/SkyVeraDashboard"));
 const ProfilePage = lazy(() => import("./ProfilePage").then(m => ({ default: m.ProfilePage })));
 
 // Feature loading spinner
@@ -37,12 +33,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
   const [currentPage, setCurrentPage] = useState("agriino");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [installedDevices, setInstalledDevices] = useState([]);
-
-  useEffect(() => {
-    const devices = loadInstalledDevices();
-    setInstalledDevices(devices);
-  }, []);
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -62,31 +52,8 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
       icon: Leaf,
       description: "Monitoring Klorofil & Nitrogen",
       status: "active",
-      always: true, // Agriino selalu ditampilkan
     },
-    // Alat lainnya di-disable (hide) untuk sementara
-    // {
-    //   id: "agriimeter",
-    //   label: "Agriimeter",
-    //   icon: Cloud,
-    //   description: "Pengukur DBH Pohon",
-    //   status: "active",
-    // },
-    // {
-    //   id: "greenhouse",
-    //   label: "Greenhouse Compax",
-    //   icon: Home,
-    //   description: "Monitoring Rumah Kaca",
-    //   status: "active",
-    // },
-    // {
-    //   id: "skyvera",
-    //   label: "SkyVera",
-    //   icon: Gauge,
-    //   description: "Weather Station Professional",
-    //   status: "active",
-    // },
-  ].filter((item) => item.always || installedDevices.includes(item.id));
+  ];
 
   const getCurrentDate = () => {
     return new Date().toLocaleDateString("id-ID", {
@@ -102,12 +69,6 @@ export function DashboardLayout({ user, onLogout, darkMode, toggleDarkMode }) {
       switch (currentPage) {
         case "agriino":
           return <AgriinoDashboard />;
-        case "agriimeter":
-          return <AgriimeterDashboard />;
-        case "greenhouse":
-          return <GreenhouseDashboard />;
-        case "skyvera":
-          return <SkyVeraDashboard />;
         case "profile":
           return <ProfilePage user={user} />;
         default:

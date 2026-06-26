@@ -157,7 +157,7 @@ class ApiClient {
       
       this.clearTokens();
       return false;
-    } catch (error) {
+    } catch {
       this.clearTokens();
       return false;
     }

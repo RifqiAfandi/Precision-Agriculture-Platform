@@ -246,25 +246,42 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
   const handleToggleDrawing = useCallback(() => {
     if (isDrawing) {
       // Finishing drawing mode
+      if (drawPointsRef.current.length < 3) {
+        toast.error('Area tidak terpilih, silahkan memilih area');
+        return;
+      }
+
       isDrawingRef.current = false;
       setIsDrawing(false);
-      // Save the drawn area if valid
-      if (drawPointsRef.current.length >= 3) {
-        setSelectedArea([...drawPointsRef.current]);
-      }
-    } else {
-      // Starting new drawing - clear existing for new selection
-      drawPointsRef.current = [];
-      clearDrawPolygon(map.current);
-      isDrawingRef.current = true;
-      setIsDrawing(true);
-      toast.info('Klik pada peta untuk menggambar area analisis. Klik "Selesai Memilih Area" untuk menyimpan.');
+      setSelectedArea([...drawPointsRef.current]);
+      toast.success('Area tersimpan');
+      return;
     }
+
+    // Starting new drawing - clear existing for new selection
+    drawPointsRef.current = [];
+    clearDrawPolygon(map.current);
+    isDrawingRef.current = true;
+    setIsDrawing(true);
+    toast.info('Klik pada peta untuk menggambar area analisis. Klik "Selesai Memilih Area" untuk menyimpan.');
   }, [isDrawing]);
+
+  const handleCancelDrawing = useCallback(() => {
+    if (!isDrawing) return;
+
+    drawPointsRef.current = [];
+    isDrawingRef.current = false;
+    setIsDrawing(false);
+    clearDrawPolygon(map.current);
+
+    if (selectedArea && selectedArea.length >= 3) {
+      updateDrawPolygon(map.current, selectedArea);
+    }
+  }, [isDrawing, selectedArea]);
 
   // Clear polygon (explicit user action to delete saved area)
   const handleClearPolygon = useCallback(() => {
-    const confirmed = window.confirm('Hapus area yang dipilih? Tindakan ini akan menghapus area dan hasil analisis.');
+    const confirmed = window.confirm('Hapus area yang dipilih ?');
     if (!confirmed) return;
     drawPointsRef.current = [];
     setSelectedArea(null); // This will trigger useEffect to clear localStorage
@@ -389,6 +406,7 @@ export function useKrigingMap({ areaId, areaName, propDevices, onRefresh }) {
     handleRefresh,
     handleToggleDrawing,
     handleClearPolygon,
+    handleCancelDrawing,
     handleAnalysis,
     handleToggleGrid,
   };

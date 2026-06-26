@@ -5,7 +5,6 @@
  * Extracted from KrigingMap.jsx for better maintainability.
  */
 
-import * as turf from '@turf/turf';
 import { classifyNitrogen, NITROGEN_THRESHOLDS } from '@/services/dummyDataGenerator';
 import { DEFAULT_INFLUENCE_RADIUS_KM, KRIGING_GRID_COLORS, classifyNitrogenValue } from '@/constants';
 
@@ -89,15 +88,6 @@ export const getMinDistanceToDevice = (lat, lng, devices) => {
   return minDist;
 };
 
-/**
- * Seeded pseudo-random number generator for consistent results
- * @param {number} seed - Seed value
- * @returns {number} Random value between 0 and 1
- */
-const seededRandom = (seed) => {
-  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
-  return x - Math.floor(x);
-};
 
 /**
  * Create grid polygons for Kriging visualization with small grid cells
@@ -108,12 +98,8 @@ const seededRandom = (seed) => {
  */
 export const createGridPolygons = (gridPoints, boundsData) => {
   if (!gridPoints || gridPoints.length === 0) {
-    console.log('createGridPolygons: No grid points');
     return [];
   }
-  
-  console.log('=== CREATE GRID POLYGONS (SMALL GRID) ===');
-  console.log('Grid points received:', gridPoints.length);
   
   // Get bounds and clip polygon
   let minLat, maxLat, minLng, maxLng;
@@ -155,10 +141,7 @@ export const createGridPolygons = (gridPoints, boundsData) => {
     }
   });
   
-  console.log('Valid points for rendering:', validPoints.length);
-  
   if (validPoints.length === 0) {
-    console.warn('No valid points for Kriging visualization');
     return [];
   }
 
@@ -189,10 +172,8 @@ export const createGridPolygons = (gridPoints, boundsData) => {
   const halfWidth = cellWidth / 2;
   const halfHeight = cellHeight / 2;
   
-  console.log('Cell size:', { cellWidth, cellHeight });
-  
   // Create small square for each grid point
-  validPoints.forEach((point, idx) => {
+  validPoints.forEach((point) => {
     const lng = point.longitude;
     const lat = point.latitude;
     const classification = point.classification === 'no_data' ? 'normal' : point.classification;
@@ -226,8 +207,6 @@ export const createGridPolygons = (gridPoints, boundsData) => {
     
     features.push(feature);
   });
-  
-  console.log('Final features count:', features.length);
   
   return features;
 };
@@ -317,11 +296,6 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
     // Use direct radius without multiplier for smaller, more precise circles
     const influenceRadius = DEFAULT_INFLUENCE_RADIUS_KM;
     
-    console.log('=== IDW INTERPOLATION DEBUG ===');
-    console.log('Influence radius (km):', influenceRadius);
-    console.log('Influence radius (m):', influenceRadius * 1000);
-    console.log('Devices to use:', devicesToUse.length);
-    
     for (let i = 0; i < resolution; i++) {
       for (let j = 0; j < resolution; j++) {
         const lat = minLat + ((i + 0.5) / resolution) * (maxLat - minLat);
@@ -365,11 +339,6 @@ export const generateMockAnalysisResult = (deviceList, boundsData) => {
           // Outside influence radius - default to normal (orange #FF8C00)
           value = 2.9; // Normal range value
           classification = 'normal';
-        }
-        
-        // Log first few points for debugging
-        if (gridPoints.length < 5) {
-          console.log(`Grid point ${gridPoints.length}: lat=${lat.toFixed(6)}, lng=${lng.toFixed(6)}, withinInfluence=${isWithinInfluence}, class=${classification}`);
         }
         
         gridPoints.push({

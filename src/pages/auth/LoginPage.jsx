@@ -42,7 +42,7 @@ export function LoginPage({ onNavigate, onLogin }) {
         setError(result.error);
       }
     } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga");
+      setError(err?.message || "Terjadi kesalahan yang tidak terduga");
     } finally {
       setIsLoading(false);
     }
