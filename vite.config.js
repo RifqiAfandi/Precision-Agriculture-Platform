@@ -81,7 +81,6 @@ export default defineConfig({
       'tailwind-merge',
       'sonner',
       'recharts',
-      'es-toolkit',
     ],
     // Exclude only firebase - load on demand
     exclude: ['firebase'],

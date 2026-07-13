@@ -28,11 +28,7 @@ export const analysisApi = {
    * @returns {Promise<Object>} Kriging analysis result
    */
   async performKriging(analysisData) {
-    return apiClient.request('/agriino/analyze/', {
-      method: 'POST',
-      body: JSON.stringify(analysisData),
-      skipAuth: true,
-    });
+    return apiClient.post('/agriino/analyze/', analysisData);
   },
 
   /**
@@ -46,16 +42,12 @@ export const analysisApi = {
    * @returns {Promise<Object>} Kriging analysis result
    */
   async quickKriging(points, options = {}) {
-    return apiClient.request('/agriino/quick-analyze/', {
-      method: 'POST',
-      body: JSON.stringify({
-        points,
-        resolution: options.resolution || 20,
-        model: options.model || 'spherical',
-        low_threshold: options.lowThreshold || 1.5,
-        high_threshold: options.highThreshold || 2.5,
-      }),
-      skipAuth: true,
+    return apiClient.post('/agriino/quick-analyze/', {
+      points,
+      resolution: options.resolution || 20,
+      model: options.model || 'spherical',
+      low_threshold: options.lowThreshold || 1.5,
+      high_threshold: options.highThreshold || 2.5,
     });
   },
 
@@ -80,24 +72,10 @@ export const analysisApi = {
 
 /**
  * Dashboard/Stats API methods
+ * Note: getDashboardStats and getAlerts endpoints are not yet implemented in the backend.
+ * They are kept as stubs for future implementation.
  */
 export const statsApi = {
-  /**
-   * Get Agriino dashboard statistics
-   * @returns {Promise<Object>} Dashboard statistics
-   */
-  async getDashboardStats() {
-    return apiClient.get('/agriino/stats/');
-  },
-
-  /**
-   * Get recent alerts (plants needing attention)
-   * @returns {Promise<Array>} List of alerts
-   */
-  async getAlerts() {
-    return apiClient.get('/agriino/alerts/');
-  },
-
   /**
    * Get API health status
    * @returns {Promise<Object>} Health status

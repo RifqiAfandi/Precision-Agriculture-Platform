@@ -5,7 +5,7 @@
  * and automatic token refresh.
  */
 
-import { API_CONFIG } from '@/constants/config';
+import { API_CONFIG, STORAGE_KEYS } from '@/constants/config';
 
 class ApiClient {
   constructor() {
@@ -23,7 +23,7 @@ class ApiClient {
    * @returns {string|null} Access token
    */
   getAccessToken() {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
   }
 
   /**
@@ -31,7 +31,7 @@ class ApiClient {
    * @returns {string|null} Refresh token
    */
   getRefreshToken() {
-    return localStorage.getItem('refresh_token');
+    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
   }
 
   /**
@@ -40,16 +40,16 @@ class ApiClient {
    * @param {string} refreshToken - JWT refresh token
    */
   setTokens(accessToken, refreshToken) {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, accessToken);
+    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
   }
 
   /**
    * Clear all auth tokens and user data from localStorage
    */
   clearTokens() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem('agri-user');
   }
 
@@ -96,8 +96,13 @@ class ApiClient {
    * @returns {Object|null} User object
    */
   getStoredUser() {
-    const userStr = localStorage.getItem('agri-user');
-    return userStr ? JSON.parse(userStr) : null;
+    try {
+      const userStr = localStorage.getItem('agri-user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch {
+      this.clearTokens();
+      return null;
+    }
   }
 
   /**
@@ -141,7 +146,14 @@ class ApiClient {
         headers,
       });
 
-      const data = await response.json();
+      // Safely parse response - handle non-JSON responses
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = { message: await response.text() };
+      }
 
       if (!response.ok) {
         throw {
@@ -152,11 +164,11 @@ class ApiClient {
 
       return data;
     } catch (error) {
-      // Handle 401 Unauthorized - try token refresh
-      if (error.status === 401 && !options.skipAuth) {
+      // Handle 401 Unauthorized - try token refresh (with retry guard)
+      if (error.status === 401 && !options.skipAuth && !options._isRetry) {
         const refreshed = await this.refreshAccessToken();
         if (refreshed) {
-          return this.request(endpoint, options);
+          return this.request(endpoint, { ...options, _isRetry: true });
         }
       }
       throw error;
@@ -197,9 +209,9 @@ class ApiClient {
 
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem('access_token', data.access);
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access);
           if (data.refresh) {
-            localStorage.setItem('refresh_token', data.refresh);
+            localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refresh);
           }
           this.refreshPromise = null;
           return true;

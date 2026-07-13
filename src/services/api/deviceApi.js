@@ -63,21 +63,12 @@ export const deviceApi = {
   },
 
   /**
-   * Regenerate device API key
+   * Get device data points
    * @param {string|number} deviceId - Device ID
-   * @returns {Promise<Object>} New API key data
+   * @returns {Promise<Array>} List of data points for device
    */
-  async regenerateApiKey(deviceId) {
-    return apiClient.post(`/agriino/devices/${deviceId}/regenerate_api_key/`, {});
-  },
-
-  /**
-   * Get device's plants
-   * @param {string|number} deviceId - Device ID
-   * @returns {Promise<Array>} List of plants for device
-   */
-  async getPlants(deviceId) {
-    return apiClient.get(`/agriino/devices/${deviceId}/plants/`);
+  async getData(deviceId) {
+    return apiClient.get(`/agriino/devices/${deviceId}/data/`);
   },
 
   /**
@@ -87,13 +78,9 @@ export const deviceApi = {
    * @returns {Promise<Object>} Sync result
    */
   async syncFromFirebase(devices, saveToDb = false) {
-    return apiClient.request('/agriino/sync/', {
-      method: 'POST',
-      body: JSON.stringify({
-        devices,
-        save_to_db: saveToDb,
-      }),
-      skipAuth: true,
+    return apiClient.post('/agriino/sync/', {
+      devices,
+      save_to_db: saveToDb,
     });
   },
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import firebaseService from '@/services/firebase';
 import { realTimeDataStore } from '@/services/dummyDataGenerator';
 import { REFRESH_INTERVALS } from '@/constants/config';
@@ -143,7 +143,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   }, [path, processDevices]);
 
   // Compute statistics
-  const statistics = useCallback(() => {
+  const statistics = useMemo(() => {
     if (devices.length === 0) {
       return {
         count: 0,
@@ -176,7 +176,7 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
   }, [devices]);
 
   // Compute bounds
-  const bounds = useCallback(() => {
+  const bounds = useMemo(() => {
     if (devices.length === 0) return null;
 
     const lats = devices.map(d => d.lat).filter(Boolean);
@@ -199,8 +199,8 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
     error,
     connected,
     refresh,
-    statistics: statistics(),
-    bounds: bounds(),
+    statistics,
+    bounds,
     thresholds,
   };
 }

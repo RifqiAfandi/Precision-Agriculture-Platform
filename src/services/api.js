@@ -103,18 +103,6 @@ class ApiService {
   }
 
   // ==========================================
-  // AGRIINO STATS (delegated to statsApi)
-  // ==========================================
-
-  async getAgriinoStats() {
-    return statsApi.getDashboardStats();
-  }
-
-  async getAgriinoAlerts() {
-    return statsApi.getAlerts();
-  }
-
-  // ==========================================
   // DEVICE METHODS (delegated to deviceApi)
   // ==========================================
 
@@ -138,60 +126,8 @@ class ApiService {
     return deviceApi.delete(deviceId);
   }
 
-  async regenerateDeviceApiKey(deviceId) {
-    return deviceApi.regenerateApiKey(deviceId);
-  }
-
-  async getDevicePlants(deviceId) {
-    return deviceApi.getPlants(deviceId);
-  }
-
-  // ==========================================
-  // PLANT METHODS (delegated to plantApi)
-  // ==========================================
-
-  async getPlants() {
-    return plantApi.getAll();
-  }
-
-  async getPlant(plantId) {
-    return plantApi.getById(plantId);
-  }
-
-  async createPlant(plantData) {
-    return plantApi.create(plantData);
-  }
-
-  async updatePlant(plantId, plantData) {
-    return plantApi.update(plantId, plantData);
-  }
-
-  async deletePlant(plantId) {
-    return plantApi.delete(plantId);
-  }
-
-  async getPlantHistory(plantId, days = 7, limit = 100) {
-    return plantApi.getHistory(plantId, days, limit);
-  }
-
-  async getPlantLatestReading(plantId) {
-    return plantApi.getLatestReading(plantId);
-  }
-
-  // ==========================================
-  // READINGS METHODS (delegated to readingsApi)
-  // ==========================================
-
-  async getReadings() {
-    return readingsApi.getAll();
-  }
-
-  async createReading(readingData) {
-    return readingsApi.create(readingData);
-  }
-
-  async getReading(readingId) {
-    return readingsApi.getById(readingId);
+  async getDeviceData(deviceId) {
+    return deviceApi.getData(deviceId);
   }
 
   // ==========================================
