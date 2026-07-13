@@ -11,6 +11,7 @@ class ApiClient {
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT;
+    this.refreshPromise = null;
   }
 
   // ==========================================
@@ -167,36 +168,54 @@ class ApiClient {
    * @returns {Promise<boolean>} Success status
    */
   async refreshAccessToken() {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) return false;
-
-    // Check if the refresh token itself is expired before calling API
-    if (this.isTokenExpired(refreshToken)) {
-      this.clearTokens();
-      return false;
+    if (this.refreshPromise) {
+      return this.refreshPromise;
     }
 
-    try {
-      const response = await fetch(`${this.baseURL}/token/refresh/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('access_token', data.access);
-        return true;
+    this.refreshPromise = (async () => {
+      const refreshToken = this.getRefreshToken();
+      if (!refreshToken) {
+        this.refreshPromise = null;
+        return false;
       }
-      
-      this.clearTokens();
-      return false;
-    } catch {
-      this.clearTokens();
-      return false;
-    }
+
+      // Check if the refresh token itself is expired before calling API
+      if (this.isTokenExpired(refreshToken)) {
+        this.clearTokens();
+        this.refreshPromise = null;
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${this.baseURL}/token/refresh/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('access_token', data.access);
+          if (data.refresh) {
+            localStorage.setItem('refresh_token', data.refresh);
+          }
+          this.refreshPromise = null;
+          return true;
+        }
+        
+        this.clearTokens();
+        this.refreshPromise = null;
+        return false;
+      } catch {
+        this.clearTokens();
+        this.refreshPromise = null;
+        return false;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   // ==========================================
