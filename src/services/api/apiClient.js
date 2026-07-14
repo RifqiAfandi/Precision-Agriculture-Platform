@@ -12,6 +12,26 @@ class ApiClient {
     this.baseURL = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT;
     this.refreshPromise = null;
+    this._migrateStorageKeys();
+  }
+
+  /**
+   * Migrate tokens from old localStorage keys to new ones.
+   * This ensures users who were logged in before the key rename
+   * don't lose their session.
+   */
+  _migrateStorageKeys() {
+    const oldAccess = localStorage.getItem('access_token');
+    const oldRefresh = localStorage.getItem('refresh_token');
+
+    if (oldAccess && !localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)) {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, oldAccess);
+      localStorage.removeItem('access_token');
+    }
+    if (oldRefresh && !localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)) {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, oldRefresh);
+      localStorage.removeItem('refresh_token');
+    }
   }
 
   // ==========================================
