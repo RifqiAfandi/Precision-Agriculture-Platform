@@ -16,7 +16,7 @@ export const MAP_CONFIG = {
   // API Key - uses environment variable with fallback
   MAPTILER_API_KEY: import.meta.env.VITE_MAPTILER_API_KEY || 'bedLj81C0j3GdguncpGN',
   
-  // Default map center (Jember, East Java, Indonesia)
+  // Default map center (Puslitkoka - Coffee and Cocoa Research Center, Jl. PB Sudirman, Jember)
   DEFAULT_CENTER: {
     lng: 113.7176052,
     lat: -8.1653927,

@@ -16,8 +16,8 @@ export const deviceApi = {
    * @returns {Promise<Array>} List of devices
    */
   async getAll() {
-    const data = await apiClient.get('/agriino/devices/');
-    // Handle pagination - return results array or data itself
+    const data = await apiClient.get('/agriino/devices/?no_page=true');
+    // When no_page=true, response is a plain array; otherwise handle pagination
     return Array.isArray(data) ? data : (data.results || []);
   },
 
@@ -69,6 +69,14 @@ export const deviceApi = {
    */
   async getData(deviceId) {
     return apiClient.get(`/agriino/devices/${deviceId}/data/`);
+  },
+
+  /**
+   * Get daily average measurements grouped by date
+   * @returns {Promise<Array>} List of daily averages
+   */
+  async getDailyAverages() {
+    return apiClient.get('/agriino/devices/daily_averages/');
   },
 
   /**

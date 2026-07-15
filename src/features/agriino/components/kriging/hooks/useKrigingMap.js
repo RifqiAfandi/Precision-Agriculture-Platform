@@ -59,13 +59,28 @@ function loadSelectedArea() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length >= 3) {
-        return parsed;
+        // If the coordinates are from the shifted Silo center (lng > 113.75), ignore to load original UNEJ area
+        const firstLng = parsed[0][0];
+        if (firstLng > 113.75) {
+          localStorage.removeItem(STORAGE_KEYS.KRIGING_SELECTED_AREA);
+        } else {
+          return parsed;
+        }
       }
     }
   } catch (error) {
     console.warn('Failed to load selected area from localStorage:', error);
   }
-  return null;
+  // Default polygon enclosing the original devices in UNEJ Jember campus
+  return [
+    [113.7160, -8.1640],
+    [113.7198, -8.1640],
+    [113.7200, -8.1652],
+    [113.7195, -8.1663],
+    [113.7162, -8.1663],
+    [113.7158, -8.1652],
+    [113.7160, -8.1640]
+  ];
 }
 
 /**

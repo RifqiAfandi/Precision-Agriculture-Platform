@@ -1,35 +1,10 @@
-/**
- * Nitrogen Classification Thresholds and Constants
- * 
- * This module contains all threshold values used for nitrogen level
- * classification in the Precision Agriculture Platform.
- * 
- * Classification Categories (based on nitrogen percentage):
- * - deficient: <1.80% (Red) - Needs immediate attention
- * - subnormal: 1.80-2.71% (Orange) - Below optimal
- * - normal: 2.71-3.31% (Yellow) - Optimal range
- * - high: >3.31% (Green) - Above optimal
- */
-
-// =============================================================================
-// NITROGEN CLASSIFICATION THRESHOLDS
-// =============================================================================
-
-/**
- * Default threshold values for nitrogen classification
- */
 export const DEFAULT_DEFICIENT_THRESHOLD = 1.80;
 export const DEFAULT_SUBNORMAL_THRESHOLD = 2.71;
 export const DEFAULT_NORMAL_THRESHOLD = 3.31;
 
-// Legacy thresholds for backward compatibility
 export const DEFAULT_LOW_THRESHOLD = 1.80;
 export const DEFAULT_HIGH_THRESHOLD = 3.31;
 
-/**
- * Complete nitrogen threshold configuration
- * Used throughout the application for classification
- */
 export const NITROGEN_THRESHOLDS = {
   deficient: {
     min: 0,
@@ -61,44 +36,15 @@ export const NITROGEN_THRESHOLDS = {
   },
 };
 
+export const DEFAULT_INFLUENCE_RADIUS_KM = 0.2;
 
-// =============================================================================
-// KRIGING ANALYSIS PARAMETERS
-// =============================================================================
+export const DEFAULT_GRID_RESOLUTION = 120;
 
-/**
- * Default influence radius in kilometers (0.03 km = 30 meters)
- * Controls the area of influence around each device
- */
-export const DEFAULT_INFLUENCE_RADIUS_KM = 0.03;
-
-/**
- * Default grid resolution for Kriging interpolation
- */
-export const DEFAULT_GRID_RESOLUTION = 50;
-
-/**
- * Search neighborhood parameters for local Kriging
- */
-export const DEFAULT_MAX_NEIGHBORS = 12;
+export const DEFAULT_MAX_NEIGHBORS = 8;
 export const DEFAULT_MIN_NEIGHBORS = 3;
 
-/**
- * Available variogram models for Kriging analysis
- */
 export const VARIOGRAM_MODELS = ['spherical', 'exponential', 'gaussian', 'linear'];
 
-
-// =============================================================================
-// HELPER FUNCTIONS
-// =============================================================================
-
-/**
- * Classify a nitrogen value based on thresholds
- * 
- * @param {number} value - Nitrogen percentage value
- * @returns {string} Classification: 'deficient', 'subnormal', 'normal', or 'high'
- */
 export function classifyNitrogenValue(value) {
   if (typeof value !== 'number' || isNaN(value)) {
     return 'unknown';
@@ -115,23 +61,11 @@ export function classifyNitrogenValue(value) {
   }
 }
 
-/**
- * Get the label for a classification in Indonesian
- * 
- * @param {string} classification - Classification string
- * @returns {string} Indonesian label
- */
 export function getClassificationLabelId(classification) {
   const threshold = NITROGEN_THRESHOLDS[classification];
   return threshold?.labelId || 'Unknown';
 }
 
-/**
- * Get threshold info for a classification
- * 
- * @param {string} classification - Classification string
- * @returns {object} Threshold configuration object
- */
 export function getThresholdInfo(classification) {
   return NITROGEN_THRESHOLDS[classification] || null;
 }

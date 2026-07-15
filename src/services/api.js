@@ -146,6 +146,10 @@ class ApiService {
     return deviceApi.syncFromFirebase(devices, saveToDb);
   }
 
+  async getDailyAverages() {
+    return deviceApi.getDailyAverages();
+  }
+
   async getApiHealth() {
     return statsApi.getHealth();
   }

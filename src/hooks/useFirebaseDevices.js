@@ -50,20 +50,13 @@ export function useFirebaseDevices(path = 'devices', options = {}) {
     }));
   }, [classifyNitrogen]);
 
-  // Fallback to dummy data
+  // Fallback to empty state instead of dummy data
   const loadDummyData = useCallback(() => {
-    console.log('Using dummy data for devices');
-    realTimeDataStore.start(REFRESH_INTERVALS.SLOW);
-    const data = realTimeDataStore.getCurrentData();
-    setDevices(processDevices(data));
+    console.log('No database data available, clearing devices');
+    setDevices([]);
     setConnected(false);
     setLoading(false);
-    
-    // Subscribe to dummy data updates
-    dummyUnsubscribeRef.current = realTimeDataStore.subscribe((data) => {
-      setDevices(processDevices(data));
-    });
-  }, [processDevices]);
+  }, []);
 
   // Initialize Firebase and subscribe
   useEffect(() => {
